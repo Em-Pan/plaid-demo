@@ -2111,13 +2111,36 @@
       <div style="font-size:11px;color:var(--muted);white-space:nowrap;align-self:flex-start;margin-left:8px">Yesterday</div>
     </div>
 
-    <div class="ai-row">
-      <div class="ai-icon yellow-bg">💡</div>
-      <div class="ai-body">
-        <div class="ai-desc"><strong>Detected ROAS improvement opportunity — Atlas Financial Google Search:</strong> Shifting $12K/mo from Display to Search estimated to improve ROAS by +0.4x based on historical conversion patterns.</div>
-        <div class="ai-time">Flagged 8h ago · Recommendation pending review · Atlas marked "Review" status</div>
+    <!-- ANOMALY ROOT CAUSE: Atlas CPM spike -->
+    <div class="ai-row" style="background:rgba(239,68,68,0.04);border-left:3px solid var(--red);padding-left:17px;">
+      <div class="ai-icon" style="background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.25)">⚠️</div>
+      <div class="ai-body" style="flex:1">
+        <div class="ai-desc"><strong style="color:var(--red)">Anomaly: CPM Spike +34% — Atlas Financial</strong></div>
+        <div style="margin:6px 0;padding:8px 12px;background:rgba(239,68,68,0.06);border-radius:8px;font-size:12px;line-height:1.55;color:var(--text)">
+          <strong>Why:</strong> 3 direct competitors (identified: FinServ Leads Co., TrustCapital, Apex Advisors) increased Meta auction spend by 2.8x in your target audience (homeowners 45–60, $150K+ HHI, Texas/Arizona) starting Monday. Your audience CPM typically spikes $4–6 when these competitors run weekend sale pushes.
+        </div>
+        <div style="padding:8px 12px;background:rgba(0,212,255,0.05);border-radius:8px;font-size:12px;line-height:1.55;color:var(--text)">
+          <strong style="color:var(--cyan)">Recommended action:</strong> Reduce frequency cap from 4.0 to 2.5/day until Wed. Increase bid cap 12% to maintain impression share. Shift $8K from Meta Display to Google Search this week (higher purchase intent, immune to social auction pressure). Estimated CPM normalization: 48–72h.
+        </div>
+        <div class="ai-time" style="margin-top:6px">Detected 3h ago · Auto-draft ready · Pending Jason's approval to execute</div>
       </div>
-      <div style="font-size:11px;color:var(--muted);white-space:nowrap;align-self:flex-start;margin-left:8px">4:22 AM</div>
+      <div style="font-size:11px;color:var(--red);white-space:nowrap;align-self:flex-start;margin-left:8px;font-weight:600">LIVE</div>
+    </div>
+
+    <!-- ANOMALY ROOT CAUSE: Naked MD ROAS decline -->
+    <div class="ai-row" style="background:rgba(245,158,11,0.03);border-left:3px solid var(--yellow);padding-left:17px;">
+      <div class="ai-icon yellow-bg">📉</div>
+      <div class="ai-body" style="flex:1">
+        <div class="ai-desc"><strong style="color:var(--yellow)">Pattern: Naked MD ROAS declining 3-week trend</strong></div>
+        <div style="margin:6px 0;padding:8px 12px;background:rgba(245,158,11,0.06);border-radius:8px;font-size:12px;line-height:1.55;color:var(--text)">
+          <strong>Why:</strong> 2 of top 3 creatives (Before & After — 6 Weeks, Dr. Chen Explains) are entering fatigue phase after 18–21 days and 1M+ impressions each. Frequency to cold audience has risen to 5.8x/week — above the 3.5x threshold where ROAS typically begins declining. This is a creative rotation issue, not a targeting or budget problem.
+        </div>
+        <div style="padding:8px 12px;background:rgba(0,212,255,0.05);border-radius:8px;font-size:12px;line-height:1.55;color:var(--text)">
+          <strong style="color:var(--cyan)">Recommended action:</strong> Pause "Before & After — 6 Weeks" by Friday. Introduce 2 new creatives from the brief queue ("Consultation Booking — UGC" is ready). Set frequency cap at 3.0/day for all Naked MD campaigns. Expected ROAS recovery: +0.3–0.5x within 7 days.
+        </div>
+        <div class="ai-time" style="margin-top:6px">Flagged 6h ago · 3 new creatives queued · Creative team notified</div>
+      </div>
+      <div style="font-size:11px;color:var(--yellow);white-space:nowrap;align-self:flex-start;margin-left:8px;font-weight:600">ACTION</div>
     </div>
   </div>
 </div>
