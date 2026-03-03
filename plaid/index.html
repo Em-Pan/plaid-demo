@@ -1444,7 +1444,7 @@
             </div>
             <div>
               <span class="sim-ch-spend" id="meta-spend">$420K</span>
-              <span class="sim-ch-roas" id="meta-roas"> · 3.2x</span>
+              <span class="sim-ch-roas" id="meta-roas"> · 3.0x</span>
             </div>
           </div>
           <input type="range" class="sim-slider" id="meta-slider" min="0" max="700000" step="5000" value="420000" oninput="updateSimulator()" style="accent-color:#5ba4f5">
@@ -1459,7 +1459,7 @@
             </div>
             <div>
               <span class="sim-ch-spend" id="google-spend">$168K</span>
-              <span class="sim-ch-roas" id="google-roas"> · 3.8x</span>
+              <span class="sim-ch-roas" id="google-roas"> · 3.5x</span>
             </div>
           </div>
           <input type="range" class="sim-slider" id="google-slider" min="0" max="700000" step="5000" value="168000" oninput="updateSimulator()" style="accent-color:#f87171">
@@ -1474,7 +1474,7 @@
             </div>
             <div>
               <span class="sim-ch-spend" id="tiktok-spend">$91K</span>
-              <span class="sim-ch-roas" id="tiktok-roas"> · 5.8x</span>
+              <span class="sim-ch-roas" id="tiktok-roas"> · 5.4x</span>
             </div>
           </div>
           <input type="range" class="sim-slider" id="tiktok-slider" min="0" max="700000" step="5000" value="91000" oninput="updateSimulator()" style="accent-color:#69c9d0">
@@ -1489,7 +1489,7 @@
             </div>
             <div>
               <span class="sim-ch-spend" id="pinterest-spend">$21K</span>
-              <span class="sim-ch-roas" id="pinterest-roas"> · 2.1x</span>
+              <span class="sim-ch-roas" id="pinterest-roas"> · 1.9x</span>
             </div>
           </div>
           <input type="range" class="sim-slider" id="pinterest-slider" min="0" max="700000" step="5000" value="21000" oninput="updateSimulator()" style="accent-color:#e60023">
@@ -1539,7 +1539,7 @@
 
         <div class="sim-ai-box" id="sim-ai-suggestion">
           <strong style="color:var(--cyan)">💡 AI Recommendation (current allocation):</strong><br>
-          Move <strong>$55K from Meta → TikTok</strong>. TikTok is your most efficient channel at 5.8x ROAS but currently receives only 13% of budget. This shift is projected to increase blended ROAS by +0.4x and add <strong>~$280K in monthly revenue</strong> before saturation.
+          Move <strong>$55K from Meta → TikTok</strong>. TikTok is your most efficient channel at 5.4x ROAS but receives only 13% of budget. This shift projects <strong>+0.18x blended ROAS → 3.58x</strong> and <strong>+$128K additional revenue/mo</strong> before TikTok audience saturation.
         </div>
       </div>
     </div>
@@ -1670,7 +1670,7 @@
   var SIM = {
     total: 700000,
     base: { meta: 420000, google: 168000, tiktok: 91000, pinterest: 21000 },
-    baseRoas: { meta: 3.2, google: 3.8, tiktok: 5.8, pinterest: 2.1 },
+    baseRoas: { meta: 3.0, google: 3.5, tiktok: 5.4, pinterest: 1.9 },
     // saturation: how fast ROAS drops per extra $100K above base
     sat: { meta: 0.08, google: 0.12, tiktok: 0.22, pinterest: 0.06 },
     lastMoved: null
@@ -1768,7 +1768,7 @@
     });
     var suggestEl = document.getElementById('sim-ai-suggestion');
     if (Math.abs(blendedRoas - 3.4) < 0.05) {
-      suggestEl.innerHTML = '<strong style="color:var(--cyan)">💡 AI Recommendation:</strong><br>Move <strong>$55K from Meta → TikTok</strong>. TikTok is your most efficient channel at 5.8x ROAS but receives only 13% of budget. Projected impact: <strong>+0.4x blended ROAS, +$280K revenue / mo</strong>.';
+      suggestEl.innerHTML = '<strong style="color:var(--cyan)">💡 AI Recommendation:</strong><br>Move <strong>$55K from Meta → TikTok</strong>. TikTok is your most efficient channel at 5.4x ROAS but receives only 13% of budget. Projected impact: <strong>+0.18x blended ROAS → 3.58x, +$128K revenue / mo</strong>.';
     } else if (blendedRoas > 3.7) {
       suggestEl.innerHTML = '<strong style="color:var(--green)">✓ Strong allocation.</strong> This mix projects <strong>' + blendedRoas.toFixed(1) + 'x blended ROAS</strong>. Consider testing this split for 2 weeks before locking in. TikTok saturation risk increases above $180K/mo.';
     } else if (blendedRoas < 3.1) {
