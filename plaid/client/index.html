@@ -374,6 +374,36 @@
     [data-theme="light"] .sec-badge { background: rgba(0,0,0,0.04); border-color: #e2e8f0; color: #64748b; }
     [data-theme="light"] .dl-btn { background: rgba(0,184,217,0.1); border-color: rgba(0,184,217,0.22); color: #00b8d9; }
 
+    /* ─── CROSS-NAV LINK ─── */
+    .cross-link {
+      font-size: 12px; font-weight: 600; color: var(--cyan);
+      text-decoration: none; padding: 6px 12px;
+      border: 1px solid rgba(0,212,255,0.25); border-radius: 7px;
+      background: rgba(0,212,255,0.06); transition: all 0.15s;
+    }
+    .cross-link:hover { background: rgba(0,212,255,0.12); }
+    [data-theme="light"] .cross-link { color: #00b8d9; border-color: rgba(0,184,217,0.3); background: rgba(0,184,217,0.07); }
+
+    /* ─── DEMO BANNER ─── */
+    .demo-banner {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 36px; font-size: 12.5px;
+      background: rgba(0,212,255,0.06); border-bottom: 1px solid rgba(0,212,255,0.14);
+      color: rgba(255,255,255,0.65);
+    }
+    [data-theme="light"] .demo-banner { background: rgba(0,184,217,0.07); border-color: rgba(0,184,217,0.18); color: #475569; }
+
+    /* ─── THEME TOGGLE (labeled pill) ─── */
+    .theme-toggle {
+      display: flex !important; align-items: center; gap: 6px;
+      padding: 6px 14px !important; border-radius: 99px !important; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    [data-theme="dark"] .theme-toggle { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.7); }
+    [data-theme="dark"] .theme-toggle:hover { background: rgba(255,255,255,0.13); }
+    [data-theme="light"] .theme-toggle { background: rgba(15,23,42,0.08); border: 1px solid rgba(15,23,42,0.15) !important; color: #374151; }
+    [data-theme="light"] .theme-toggle:hover { background: rgba(15,23,42,0.12); }
+
     /* ─── CONNECTED SOURCES BAR ─── */
     .sources-bar {
       display: flex; align-items: center; gap: 0;
@@ -494,13 +524,22 @@
   </div>
 
   <div class="header-right">
+    <a href="/plaid" class="cross-link">← Agency View</a>
     <div class="powered">Powered by <span class="powered-logo">Plaid Testing</span></div>
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
       <span id="theme-icon">☀️</span>
+      <span id="theme-label">Light</span>
     </button>
     <div class="dl-btn">↓ Export PDF</div>
   </div>
 </header>
+
+<!-- ─── DEMO BANNER ─── -->
+<div class="demo-banner" id="demo-banner">
+  <span style="opacity:0.7">🔬</span>
+  <span><strong>Demo Environment</strong> — All data is illustrative. Connect Meta, Google, TikTok, Pinterest, Shopify, GA4, LinkedIn & Snowflake to activate real-time sync.</span>
+  <button onclick="document.getElementById('demo-banner').style.display='none'" style="margin-left:auto;background:none;border:none;color:inherit;opacity:0.5;cursor:pointer;font-size:16px;padding:0 4px">×</button>
+</div>
 
 <div class="page">
 
@@ -1100,10 +1139,6 @@
     var t = localStorage.getItem('plaid-theme');
     if (t === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
-      document.addEventListener('DOMContentLoaded', function() {
-        var el = document.getElementById('theme-icon');
-        if (el) el.textContent = '🌙';
-      });
     }
   })();
 
@@ -1112,9 +1147,25 @@
     var next = isLight ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', next);
     var icon = document.getElementById('theme-icon');
+    var label = document.getElementById('theme-label');
     if (icon) icon.textContent = next === 'light' ? '🌙' : '☀️';
+    if (label) label.textContent = next === 'light' ? 'Dark' : 'Light';
     localStorage.setItem('plaid-theme', next);
   }
+
+  // Set initial label state
+  (function() {
+    var stored = localStorage.getItem('plaid-theme');
+    var label = document.getElementById('theme-label');
+    var icon = document.getElementById('theme-icon');
+    if (stored === 'light') {
+      if (label) label.textContent = 'Dark';
+      if (icon) icon.textContent = '🌙';
+    } else {
+      if (label) label.textContent = 'Light';
+      if (icon) icon.textContent = '☀️';
+    }
+  })();
 </script>
 </body>
 </html>

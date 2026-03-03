@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plaid Testing — Agency Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #050508;
+      --surface:  #12121a;
+      --surface2: #1a1a26;
+      --border:   rgba(255,255,255,0.06);
+      --cyan:     #00d4ff;
+      --purple:   #7c3aed;
+      --text:     #f0f0f5;
+      --muted:    #a0a0b0;
+      --green:    #22c55e;
+      --red:      #ef4444;
+      --yellow:   #f59e0b;
+    }
+
+    html { font-size: 14px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ─── HEADER ─── */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(5,5,8,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo { display: flex; flex-direction: column; gap: 1px; }
+    .logo-name {
+      font-size: 17px; font-weight: 700; color: #fff;
+      letter-spacing: -0.025em;
+    }
+    .logo-name span {
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .logo-sub {
+      font-size: 10.5px; color: rgba(0,212,255,0.55);
+      letter-spacing: 0.09em; text-transform: uppercase;
+    }
+
+    .nav { display: flex; gap: 2px; }
+    .nav-item {
+      padding: 6px 14px; border-radius: 8px;
+      font-size: 13px; color: var(--muted); cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-item.active { color: var(--cyan); background: rgba(0,212,255,0.08); }
+
+    .header-right { display: flex; align-items: center; gap: 20px; }
+
+    .live-badge {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--muted);
+    }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse-green 2s ease-in-out infinite;
+    }
+
+    .user-chip {
+      display: flex; align-items: center; gap: 9px;
+      padding: 6px 14px 6px 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 99px; cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .user-chip:hover { border-color: rgba(255,255,255,0.12); }
+    .user-av {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff;
+    }
+    .user-name { font-size: 13px; color: var(--text); }
+
+    /* ─── STATS BAR ─── */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 14px; padding: 20px 32px 0;
+    }
+
+    .stat-card {
+      position: relative; overflow: hidden;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 22px;
+    }
+    .stat-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--cyan) 0%, transparent 80%);
+    }
+    .stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--cyan) 0%, var(--purple) 100%); }
+    .stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--yellow) 0%, transparent 70%); }
+    .stat-card:nth-child(4)::before { background: linear-gradient(90deg, var(--green) 0%, transparent 70%); }
+
+    .stat-label {
+      font-size: 11px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      margin-bottom: 10px;
+    }
+    .stat-value {
+      font-size: 30px; font-weight: 800; color: #fff;
+      letter-spacing: -0.03em; line-height: 1;
+    }
+    .stat-sub {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 8px; font-size: 12px;
+    }
+    .chg { font-weight: 600; }
+    .chg.up { color: var(--green); }
+    .chg.dn { color: var(--red); }
+    .chg-label { color: var(--muted); }
+
+    /* ─── MAIN LAYOUT ─── */
+    .main {
+      display: grid; grid-template-columns: 1fr 336px;
+      gap: 20px; padding: 20px 32px;
+    }
+
+    .section-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .section-title { font-size: 15px; font-weight: 600; color: #fff; }
+
+    /* ─── CLIENT CARDS ─── */
+    .clients-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .cc {
+      position: relative; overflow: hidden;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .cc:hover {
+      border-color: rgba(0,212,255,0.18);
+      box-shadow: 0 4px 32px rgba(0,212,255,0.04);
+    }
+    .cc.alert-active { border-color: rgba(239,68,68,0.18); }
+
+    .cc-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; margin-bottom: 16px;
+    }
+    .cc-name { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 7px; }
+    .cc-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .badge {
+      padding: 3px 9px; border-radius: 99px;
+      font-size: 10.5px; font-weight: 600; letter-spacing: 0.02em;
+    }
+
+    .status-pill {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 11px; border-radius: 99px;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .sdot { width: 6px; height: 6px; border-radius: 50%; }
+    .status-active { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.22); }
+    .status-active .sdot { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse-green 2s ease-in-out infinite; }
+    .status-review { background: rgba(245,158,11,0.12); color: var(--yellow); border: 1px solid rgba(245,158,11,0.22); }
+    .status-review .sdot { background: var(--yellow); }
+
+    @keyframes pulse-green {
+      0%,100% { box-shadow: 0 0 4px rgba(34,197,94,0.6); }
+      50%      { box-shadow: 0 0 10px rgba(34,197,94,0.9); }
+    }
+
+    /* Metrics row */
+    .metrics-row {
+      display: grid; grid-template-columns: repeat(5,1fr);
+      gap: 7px; margin-bottom: 14px;
+    }
+    .met {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 9px; padding: 8px 6px;
+    }
+    .met-lbl {
+      font-size: 9.5px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 3px;
+    }
+    .met-val { font-size: 13.5px; font-weight: 700; color: #fff; }
+    .met-val.roas { color: var(--cyan); }
+    .met-val.warn { color: var(--yellow); }
+
+    /* Sparkline */
+    .spark-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    }
+    .spark-lbl { font-size: 11px; color: var(--muted); width: 56px; flex-shrink: 0; }
+    .spark-chg { font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+
+    /* Card footer */
+    .cc-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 13px; border-top: 1px solid var(--border);
+    }
+    .platforms { display: flex; gap: 5px; }
+    .plat {
+      width: 26px; height: 26px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 800; letter-spacing: -0.03em;
+    }
+    .ret { text-align: right; }
+    .ret-val { font-size: 14px; font-weight: 700; color: #fff; }
+    .ret-lbl { font-size: 10px; color: var(--muted); }
+
+    .alert-badge-card {
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(239,68,68,0.13);
+      border: 1px solid rgba(239,68,68,0.28);
+      color: var(--red); padding: 3px 9px;
+      border-radius: 99px; font-size: 10px; font-weight: 700;
+      animation: blink 2.2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.55; } }
+
+    /* ─── ALERT SIDEBAR ─── */
+    .alert-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid; border-radius: 11px;
+      padding: 14px 15px; margin-bottom: 10px;
+    }
+    .alert-item.crit  { border-left-color: var(--red); }
+    .alert-item.warn  { border-left-color: var(--yellow); }
+    .alert-item.info  { border-left-color: var(--cyan); }
+
+    .alert-hd { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .alert-client { font-size: 12.5px; font-weight: 700; color: #fff; }
+    .alert-time   { font-size: 11px; color: var(--muted); }
+    .alert-msg    { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .alert-met    { font-size: 12px; font-weight: 600; margin-top: 6px; }
+    .alert-met.crit { color: var(--red); }
+    .alert-met.warn { color: var(--yellow); }
+    .alert-met.info { color: var(--cyan); }
+
+    /* System status card */
+    .sys-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 11px; padding: 14px 16px; margin-top: 20px;
+    }
+    .sys-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0; border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .sys-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .sys-row:first-child { padding-top: 0; }
+    .sys-name { color: var(--muted); }
+    .sys-status { display: flex; align-items: center; gap: 6px; }
+    .sdot-sm { width: 6px; height: 6px; border-radius: 50%; }
+
+    /* ─── AI ACTIVITY ─── */
+    /* ─── CREATIVE BRIEFS ─── */
+    .briefs-section { padding: 0 32px 40px; }
+
+    .briefs-summary-bar {
+      display: flex; align-items: center; gap: 20px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 13px 20px; margin-bottom: 18px;
+    }
+    .bsb-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--muted);
+    }
+    .bsb-item strong { color: var(--text); font-weight: 600; }
+    .bsb-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); }
+
+    .briefs-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .brief-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
+      display: flex; flex-direction: column; gap: 0;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .brief-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+    }
+    .brief-card:nth-child(1)::before { background: linear-gradient(90deg, var(--cyan), var(--purple)); }
+    .brief-card:nth-child(2)::before { background: linear-gradient(90deg, var(--yellow), #f97316); }
+    .brief-card:nth-child(3)::before { background: linear-gradient(90deg, var(--green), #16a34a); }
+    .brief-card:hover {
+      border-color: rgba(255,255,255,0.12);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.3);
+    }
+
+    .brief-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+    .brief-client-label {
+      font-size: 10.5px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 5px;
+    }
+    .brief-title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.3; }
+
+    .brief-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+
+    .brief-hook {
+      font-size: 17px; font-weight: 700; color: #fff;
+      line-height: 1.4; font-style: italic;
+      border-left: 3px solid rgba(255,255,255,0.12);
+      padding-left: 14px; margin-bottom: 18px;
+    }
+
+    .brief-meta { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .brief-meta-row { display: flex; align-items: flex-start; gap: 10px; }
+    .brief-meta-icon {
+      width: 22px; height: 22px; flex-shrink: 0; border-radius: 6px;
+      background: rgba(255,255,255,0.05); display: flex;
+      align-items: center; justify-content: center; font-size: 12px;
+    }
+    .brief-meta-lbl { font-size: 11px; color: var(--muted); margin-bottom: 1px; }
+    .brief-meta-val { font-size: 12.5px; color: var(--text); line-height: 1.4; }
+
+    .brief-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 14px; border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+    .brief-platforms { display: flex; gap: 5px; }
+
+    .brief-status-ready {
+      background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.22);
+      color: var(--green); padding: 4px 11px; border-radius: 99px;
+      font-size: 11px; font-weight: 600;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .brief-status-ready::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); box-shadow: 0 0 6px var(--green);
+      animation: pulse-green 2s ease-in-out infinite;
+    }
+    .brief-status-prod {
+      background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.22);
+      color: #60a5fa; padding: 4px 11px; border-radius: 99px;
+      font-size: 11px; font-weight: 600;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .brief-status-prod::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: #60a5fa;
+    }
+
+    .ai-section { padding: 0 32px 36px; }
+
+    .ai-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+    .ai-row {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 15px 20px; border-bottom: 1px solid var(--border);
+    }
+    .ai-row:last-child { border-bottom: none; }
+    .ai-icon {
+      width: 34px; height: 34px; flex-shrink: 0; border-radius: 9px;
+      background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.14);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .ai-icon.purple-bg { background: rgba(124,58,237,0.1); border-color: rgba(124,58,237,0.18); }
+    .ai-icon.green-bg  { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.16); }
+    .ai-icon.yellow-bg { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.16); }
+    .ai-body { flex: 1; }
+    .ai-desc { font-size: 13px; color: var(--text); line-height: 1.5; }
+    .ai-desc strong { color: #fff; font-weight: 600; }
+    .ai-time { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* pill button */
+    .pill-btn {
+      padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid; transition: background 0.15s;
+    }
+
+    /* total retainer badge */
+    .total-badge {
+      background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.18);
+      color: var(--cyan); border-radius: 8px; padding: 4px 12px;
+      font-size: 12px; font-weight: 600;
+    }
+
+    /* ─── THEME TOGGLE ─── */
+    .theme-toggle {
+      width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+      background: var(--surface); border: 1px solid var(--border);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+    }
+    .theme-toggle:hover { border-color: rgba(0,212,255,0.35); }
+
+    /* ─── TRANSITIONS ─── */
+    body, .header, .stat-card, .cc, .met, .alert-item, .ai-card, .ai-row,
+    .brief-card, .briefs-summary-bar, .sys-card, .user-chip, .theme-toggle,
+    .nav-item, .total-badge, .pill-btn, .status-pill {
+      transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+    }
+
+    /* ─── LIGHT MODE ─── */
+    [data-theme="light"] {
+      --bg:       #f8fafc;
+      --surface:  #ffffff;
+      --surface2: #f1f5f9;
+      --border:   #e2e8f0;
+      --text:     #0f172a;
+      --muted:    #64748b;
+      --cyan:     #00b8d9;
+    }
+    [data-theme="light"] body { background: var(--bg); color: var(--text); }
+    [data-theme="light"] .header {
+      background: rgba(248,250,252,0.92); border-bottom-color: #e2e8f0;
+    }
+    [data-theme="light"] .logo-name { color: #0f172a; }
+    [data-theme="light"] .logo-name span {
+      background: linear-gradient(90deg, #00b8d9, #7c3aed);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    [data-theme="light"] .logo-sub { color: rgba(0,184,217,0.75); }
+    [data-theme="light"] .user-chip { background: #fff; border-color: #e2e8f0; }
+    [data-theme="light"] .user-name { color: #0f172a; }
+    [data-theme="light"] .live-badge { color: #64748b; }
+
+    [data-theme="light"] .stat-label { color: #64748b; }
+    [data-theme="light"] .stat-value { color: #0f172a; }
+    [data-theme="light"] .chg-label { color: #64748b; }
+
+    [data-theme="light"] .section-title { color: #0f172a; }
+    [data-theme="light"] .cc-name { color: #0f172a; }
+    [data-theme="light"] .met { background: rgba(0,0,0,0.03); border-color: #e9eef4; }
+    [data-theme="light"] .met-lbl { color: #64748b; }
+    [data-theme="light"] .met-val { color: #0f172a; }
+    [data-theme="light"] .met-val.roas { color: #00b8d9; }
+    [data-theme="light"] .met-val.warn { color: var(--yellow); }
+    [data-theme="light"] .spark-lbl { color: #64748b; }
+    [data-theme="light"] .cc-foot { border-top-color: #e2e8f0; }
+    [data-theme="light"] .ret-val { color: #0f172a; }
+    [data-theme="light"] .ret-lbl { color: #64748b; }
+
+    [data-theme="light"] .alert-client { color: #0f172a; }
+    [data-theme="light"] .alert-msg { color: #475569; }
+    [data-theme="light"] .alert-time { color: #94a3b8; }
+    [data-theme="light"] .sys-name { color: #64748b; }
+    [data-theme="light"] .sys-row { border-bottom-color: #e2e8f0; }
+
+    [data-theme="light"] .ai-desc { color: #374151; }
+    [data-theme="light"] .ai-desc strong { color: #0f172a; }
+    [data-theme="light"] .ai-time { color: #64748b; }
+    [data-theme="light"] .ai-icon { background: rgba(0,184,217,0.08); border-color: rgba(0,184,217,0.18); }
+    [data-theme="light"] .ai-icon.purple-bg { background: rgba(124,58,237,0.08); border-color: rgba(124,58,237,0.16); }
+    [data-theme="light"] .ai-icon.green-bg  { background: rgba(34,197,94,0.07); border-color: rgba(34,197,94,0.14); }
+    [data-theme="light"] .ai-icon.yellow-bg { background: rgba(245,158,11,0.07); border-color: rgba(245,158,11,0.14); }
+    [data-theme="light"] .ai-row { border-bottom-color: #e2e8f0; }
+
+    [data-theme="light"] .brief-client-label { color: #64748b; }
+    [data-theme="light"] .brief-title { color: #0f172a; }
+    [data-theme="light"] .brief-hook { color: #1e293b; border-left-color: #cbd5e1; }
+    [data-theme="light"] .brief-meta-icon { background: rgba(0,0,0,0.04); }
+    [data-theme="light"] .brief-meta-lbl { color: #64748b; }
+    [data-theme="light"] .brief-meta-val { color: #374151; }
+    [data-theme="light"] .brief-footer { border-top-color: #e2e8f0; }
+    [data-theme="light"] .bsb-item { color: #475569; }
+    [data-theme="light"] .bsb-item strong { color: #0f172a; }
+    [data-theme="light"] .bsb-dot { background: #cbd5e1; }
+    [data-theme="light"] .total-badge { background: rgba(0,184,217,0.08); border-color: rgba(0,184,217,0.2); color: #00b8d9; }
+
+    /* ─── CONNECTED SOURCES BAR ─── */
+    .sources-bar {
+      display: flex; align-items: center; gap: 0;
+      padding: 0 32px; margin: 12px 0 0;
+      overflow-x: auto;
+    }
+    .sources-bar::-webkit-scrollbar { display: none; }
+    .src-inner {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 18px; width: 100%;
+      flex-wrap: wrap;
+    }
+    .src-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-right: 6px; flex-shrink: 0; }
+    .src-item {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 99px;
+      background: rgba(34,197,94,0.07); border: 1px solid rgba(34,197,94,0.16);
+      font-size: 11.5px; color: var(--text); white-space: nowrap; font-weight: 500;
+    }
+    .src-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 5px var(--green); }
+    [data-theme="light"] .src-item { background: rgba(34,197,94,0.07); border-color: rgba(34,197,94,0.2); color: #374151; }
+
+    /* ─── CREATIVE FATIGUE TRACKER ─── */
+    .fatigue-section { padding: 0 32px 28px; }
+    .fatigue-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .ft-table { width: 100%; border-collapse: collapse; }
+    .ft-table th {
+      padding: 11px 16px; text-align: left;
+      font-size: 11px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border); font-weight: 500;
+    }
+    .ft-table td {
+      padding: 13px 16px; font-size: 13px; color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+    .ft-table tr:last-child td { border-bottom: none; }
+    .ft-table tr:hover td { background: rgba(255,255,255,0.02); }
+    [data-theme="light"] .ft-table tr:hover td { background: rgba(0,0,0,0.02); }
+    .ft-ad-name { font-weight: 600; color: var(--text); }
+    .ft-client { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .ft-trend-up { color: var(--green); font-weight: 700; font-size: 15px; }
+    .ft-trend-dn { color: var(--red); font-weight: 700; font-size: 15px; }
+    .ft-trend-nt { color: var(--muted); font-weight: 700; font-size: 15px; }
+    .fatigue-pill {
+      padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .fatigue-fresh  { background: rgba(34,197,94,0.1);  color: var(--green);  border: 1px solid rgba(34,197,94,0.22); }
+    .fatigue-watch  { background: rgba(245,158,11,0.1); color: var(--yellow); border: 1px solid rgba(245,158,11,0.22); }
+    .fatigue-replace{ background: rgba(239,68,68,0.1);  color: var(--red);    border: 1px solid rgba(239,68,68,0.22); animation: blink 2s ease-in-out infinite; }
+
+    /* ─── AUTOMATED REPORTS ─── */
+    .reports-section { padding: 0 32px 36px; }
+    .reports-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .rpt-table { width: 100%; border-collapse: collapse; }
+    .rpt-table th {
+      padding: 11px 18px; text-align: left;
+      font-size: 11px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border); font-weight: 500;
+    }
+    .rpt-table td { padding: 13px 18px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); }
+    .rpt-table tr:last-child td { border-bottom: none; }
+    .rpt-status-sched { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); color: var(--cyan); padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+    .rpt-status-gen   { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.22); color: var(--yellow); padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; animation: blink 1.5s ease-in-out infinite; }
+    .rpt-status-sent  { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--green); padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+    .rpt-view-btn {
+      padding: 4px 12px; border-radius: 7px; font-size: 11.5px; font-weight: 600;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      color: var(--text); cursor: pointer; text-decoration: none;
+    }
+    [data-theme="light"] .rpt-view-btn { background: rgba(0,0,0,0.04); color: #374151; }
+
+    /* ─── CROSS-NAV LINK ─── */
+    .cross-link {
+      font-size: 12px; font-weight: 600; color: var(--cyan);
+      text-decoration: none; padding: 6px 12px;
+      border: 1px solid rgba(0,212,255,0.25); border-radius: 7px;
+      background: rgba(0,212,255,0.06); transition: all 0.15s;
+    }
+    .cross-link:hover { background: rgba(0,212,255,0.12); }
+    [data-theme="light"] .cross-link { color: #00b8d9; border-color: rgba(0,184,217,0.3); background: rgba(0,184,217,0.07); }
+
+    /* ─── DEMO BANNER ─── */
+    .demo-banner {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 32px; font-size: 12.5px;
+      background: rgba(0,212,255,0.06); border-bottom: 1px solid rgba(0,212,255,0.14);
+      color: rgba(255,255,255,0.65);
+    }
+    [data-theme="light"] .demo-banner { background: rgba(0,184,217,0.07); border-color: rgba(0,184,217,0.18); color: #475569; }
+
+    /* ─── THEME TOGGLE (labeled pill) ─── */
+    .theme-toggle {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    [data-theme="dark"] .theme-toggle { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+    [data-theme="dark"] .theme-toggle:hover { background: rgba(255,255,255,0.13); }
+    [data-theme="light"] .theme-toggle { background: rgba(15,23,42,0.08); border: 1px solid rgba(15,23,42,0.15); color: #374151; }
+    [data-theme="light"] .theme-toggle:hover { background: rgba(15,23,42,0.12); }
+
+    /* ─── TOAST ─── */
+    .demo-toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: #1a1a2e; border: 1px solid rgba(0,212,255,0.25);
+      color: rgba(255,255,255,0.85); padding: 12px 20px;
+      border-radius: 10px; font-size: 13px; z-index: 9999;
+      opacity: 0; transition: all 0.25s; max-width: 460px; text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .demo-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    [data-theme="light"] .demo-toast { background: #f8fafc; border-color: rgba(0,184,217,0.3); color: #0f172a; }
+
+    /* ─── BUDGET SIMULATOR ─── */
+    .simulator-section { padding: 0 32px 36px; }
+    .simulator-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px; overflow: hidden; position: relative;
+    }
+    .simulator-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--cyan), #7c3aed);
+    }
+    .sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 24px; }
+    .sim-channel { display: flex; flex-direction: column; gap: 14px; }
+    .sim-ch-row { display: flex; flex-direction: column; gap: 6px; }
+    .sim-ch-hd { display: flex; align-items: center; justify-content: space-between; }
+    .sim-ch-name { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .sim-ch-icon { width: 20px; height: 20px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+    .sim-ch-spend { font-size: 14px; font-weight: 700; color: var(--text); }
+    .sim-ch-roas { font-size: 11px; color: var(--muted); }
+    .sim-slider {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 4px; border-radius: 2px;
+      outline: none; cursor: pointer; transition: height 0.15s;
+      background: var(--border);
+    }
+    .sim-slider:hover { height: 6px; }
+    .sim-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px;
+      border-radius: 50%; cursor: pointer;
+      background: var(--cyan); box-shadow: 0 0 8px rgba(0,212,255,0.5);
+      transition: transform 0.15s;
+    }
+    .sim-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    .sim-slider::-moz-range-thumb {
+      width: 16px; height: 16px; border-radius: 50%; cursor: pointer;
+      background: var(--cyan); border: none; box-shadow: 0 0 8px rgba(0,212,255,0.5);
+    }
+    .sim-results { display: flex; flex-direction: column; gap: 16px; }
+    .sim-compare {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .sim-compare-card {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px;
+    }
+    [data-theme="light"] .sim-compare-card { background: rgba(0,0,0,0.02); }
+    .sim-compare-card.active { border-color: rgba(0,212,255,0.3); background: rgba(0,212,255,0.04); }
+    .sim-cmp-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+    .sim-cmp-roas { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; }
+    .sim-cmp-roas-cur { color: rgba(255,255,255,0.5); }
+    [data-theme="light"] .sim-cmp-roas-cur { color: rgba(15,23,42,0.4); }
+    .sim-cmp-roas-proj { color: var(--cyan); }
+    .sim-cmp-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .sim-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .sim-met { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+    [data-theme="light"] .sim-met { background: rgba(0,0,0,0.02); }
+    .sim-met-lbl { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+    .sim-met-cur { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.45); text-decoration: line-through; }
+    [data-theme="light"] .sim-met-cur { color: rgba(15,23,42,0.35); }
+    .sim-met-proj { font-size: 15px; font-weight: 700; color: var(--text); }
+    .sim-met-delta { font-size: 11px; margin-top: 2px; }
+    .sim-ai-box {
+      background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.18);
+      border-radius: 10px; padding: 14px 16px; font-size: 13px; line-height: 1.55;
+    }
+    .sim-total-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-top: 1px solid var(--border); margin-top: 4px;
+      font-size: 12px; color: var(--muted);
+    }
+    .sim-total-val { font-weight: 700; color: var(--text); font-size: 13px; }
+    .sim-reset-btn {
+      padding: 7px 18px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      color: var(--text); cursor: pointer;
+    }
+    [data-theme="light"] .sim-reset-btn { background: rgba(0,0,0,0.04); }
+    .sim-reset-btn:hover { background: rgba(255,255,255,0.1); }
+    [data-theme="light"] .sim-reset-btn:hover { background: rgba(0,0,0,0.07); }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-name">Plaid<span> Testing</span></div>
+    <div class="logo-sub">AI Marketing Intelligence</div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">Dashboard</div>
+    <div class="nav-item" data-page="clients" onclick="showPage('clients')">Clients</div>
+    <div class="nav-item" data-page="alerts" onclick="showPage('alerts')">Alerts</div>
+    <div class="nav-item" data-page="reports" onclick="showPage('reports')">Reports</div>
+    <div class="nav-item" data-page="insights" onclick="showPage('insights')">AI Insights</div>
+    <div class="nav-item" data-page="briefs" onclick="showPage('briefs')" style="position:relative">Creative Briefs
+      <span style="position:absolute;top:2px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan)"></span>
+    </div>
+    <div class="nav-item" data-page="simulator" onclick="showPage('simulator')">Budget Simulator</div>
+    <div class="nav-item" data-page="settings" onclick="showPage('settings')">Settings</div>
+  </nav>
+
+  <div class="header-right">
+    <a href="/plaid/client" class="cross-link">Client View →</a>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      Live · Updated 2 min ago
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+      <span id="theme-icon">☀️</span>
+      <span id="theme-label">Light</span>
+    </button>
+    <div class="user-chip">
+      <div class="user-av">JG</div>
+      <span class="user-name">Jason Garcia</span>
+    </div>
+  </div>
+</header>
+
+<!-- ─── DEMO BANNER ─── -->
+<div class="demo-banner" id="demo-banner">
+  <span style="opacity:0.7">🔬</span>
+  <span><strong>Demo Environment</strong> — All data is illustrative. Connect Meta, Google, TikTok, Pinterest, Shopify, GA4, LinkedIn & Snowflake to activate real-time sync.</span>
+  <button onclick="document.getElementById('demo-banner').style.display='none'" style="margin-left:auto;background:none;border:none;color:inherit;opacity:0.5;cursor:pointer;font-size:16px;padding:0 4px">×</button>
+</div>
+
+<!-- ─── STATS BAR ─── -->
+<div class="stats-bar" data-pages="all">
+  <div class="stat-card">
+    <div class="stat-label">Total Spend / Month</div>
+    <div class="stat-value">$950K</div>
+    <div class="stat-sub">
+      <span class="chg up">↑ 12.4%</span>
+      <span class="chg-label">vs last month</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Portfolio Avg ROAS</div>
+    <div class="stat-value" style="color:var(--cyan)">4.0x</div>
+    <div class="stat-sub">
+      <span class="chg up">↑ 0.3x</span>
+      <span class="chg-label">vs last month</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Alerts Today</div>
+    <div class="stat-value" style="color:var(--yellow)">4</div>
+    <div class="stat-sub">
+      <span style="color:var(--red);font-weight:600">1 critical</span>
+      <span class="chg-label">·</span>
+      <span style="color:var(--yellow);font-weight:600">1 warning</span>
+      <span class="chg-label">·</span>
+      <span style="color:var(--cyan);font-weight:600">2 info</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Time Saved / Month</div>
+    <div class="stat-value" style="color:var(--green)">47h</div>
+    <div class="stat-sub">
+      <span class="chg-label">vs manual reporting baseline</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CONNECTED SOURCES ─── -->
+<div class="sources-bar" data-pages="all">
+  <div class="src-inner">
+    <span class="src-label">Connected</span>
+    <div class="src-item"><div class="src-dot"></div>Meta Ads</div>
+    <div class="src-item"><div class="src-dot"></div>Google Ads</div>
+    <div class="src-item"><div class="src-dot"></div>TikTok Ads</div>
+    <div class="src-item"><div class="src-dot"></div>Pinterest</div>
+    <div class="src-item"><div class="src-dot"></div>Shopify</div>
+    <div class="src-item"><div class="src-dot"></div>GA4</div>
+    <div class="src-item"><div class="src-dot"></div>LinkedIn Ads</div>
+    <div class="src-item"><div class="src-dot"></div>Snowflake</div>
+    <div style="margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0">8 / 8 sources live · last sync 4 min ago</div>
+  </div>
+</div>
+
+<!-- ─── MAIN LAYOUT ─── -->
+<div class="main" data-pages="dashboard clients">
+
+  <!-- LEFT: Client Cards -->
+  <div>
+    <div class="section-hd">
+      <div class="section-title">Client Overview
+        <span style="margin-left:10px;font-size:12px;color:var(--muted);font-weight:400">4 accounts · $12,400/mo retainer</span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <span class="total-badge">$950K managed</span>
+        <button class="pill-btn" style="background:rgba(0,212,255,0.08);border-color:rgba(0,212,255,0.22);color:var(--cyan)">+ Add Client</button>
+      </div>
+    </div>
+
+    <div class="clients-grid">
+
+      <!-- ── Naked MD ── -->
+      <div class="cc">
+        <div class="cc-top">
+          <div>
+            <div class="cc-name">Naked MD</div>
+            <div class="cc-badges">
+              <span class="badge" style="background:rgba(124,58,237,0.14);color:#a78bfa;border:1px solid rgba(124,58,237,0.24)">Med Spa</span>
+              <span class="badge" style="background:rgba(0,212,255,0.08);color:var(--cyan);border:1px solid rgba(0,212,255,0.18)">Healthcare</span>
+            </div>
+          </div>
+          <div class="status-pill status-active">
+            <div class="sdot"></div>Active
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="met"><div class="met-lbl">ROAS</div><div class="met-val roas">3.2x</div></div>
+          <div class="met"><div class="met-lbl">Spend</div><div class="met-val">$700K</div></div>
+          <div class="met"><div class="met-lbl">CPC</div><div class="met-val">$4.20</div></div>
+          <div class="met"><div class="met-lbl">Conv %</div><div class="met-val">3.2%</div></div>
+          <div class="met"><div class="met-lbl">CTR</div><div class="met-val">1.8%</div></div>
+        </div>
+
+        <div class="spark-row">
+          <div class="spark-lbl">7-day ROAS</div>
+          <svg viewBox="0 0 210 36" width="210" height="36" style="overflow:visible;flex:1">
+            <defs>
+              <linearGradient id="gn-md" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.28"/>
+                <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="0,32 35,21 70,14 105,28 140,5 175,14 210,9 210,36 0,36" fill="url(#gn-md)"/>
+            <polyline points="0,32 35,21 70,14 105,28 140,5 175,14 210,9" fill="none" stroke="#00d4ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="210" cy="9" r="3" fill="#00d4ff"/>
+          </svg>
+          <span class="spark-chg" style="color:var(--green)">↑ +0.4x</span>
+        </div>
+
+        <div class="cc-foot">
+          <div class="platforms">
+            <div class="plat" style="background:rgba(24,119,242,0.18);color:#5ba4f5" title="Meta">M</div>
+            <div class="plat" style="background:rgba(234,67,53,0.14);color:#ff6f6f" title="Google">G</div>
+            <div class="plat" style="background:rgba(255,255,255,0.08);color:#ccc" title="TikTok">TK</div>
+          </div>
+          <div class="ret">
+            <div class="ret-val">$4,200/mo</div>
+            <div class="ret-lbl">Monthly Retainer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Velocity Boards ── -->
+      <div class="cc">
+        <div class="cc-top">
+          <div>
+            <div class="cc-name">Velocity Boards</div>
+            <div class="cc-badges">
+              <span class="badge" style="background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.2)">eCommerce</span>
+              <span class="badge" style="background:rgba(245,158,11,0.1);color:var(--yellow);border:1px solid rgba(245,158,11,0.2)">Sports</span>
+            </div>
+          </div>
+          <div class="status-pill status-active">
+            <div class="sdot"></div>Active
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="met"><div class="met-lbl">ROAS</div><div class="met-val roas">5.8x</div></div>
+          <div class="met"><div class="met-lbl">Spend</div><div class="met-val">$45K</div></div>
+          <div class="met"><div class="met-lbl">CPC</div><div class="met-val">$1.85</div></div>
+          <div class="met"><div class="met-lbl">Conv %</div><div class="met-val">4.7%</div></div>
+          <div class="met"><div class="met-lbl">CTR</div><div class="met-val">3.1%</div></div>
+        </div>
+
+        <div class="spark-row">
+          <div class="spark-lbl">7-day ROAS</div>
+          <svg viewBox="0 0 210 36" width="210" height="36" style="overflow:visible;flex:1">
+            <defs>
+              <linearGradient id="gn-vb" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#22c55e" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="0,32 35,23 70,13 105,20 140,7 175,10 210,4 210,36 0,36" fill="url(#gn-vb)"/>
+            <polyline points="0,32 35,23 70,13 105,20 140,7 175,10 210,4" fill="none" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="210" cy="4" r="3" fill="#22c55e"/>
+          </svg>
+          <span class="spark-chg" style="color:var(--green)">↑ +0.9x</span>
+        </div>
+
+        <div class="cc-foot">
+          <div class="platforms">
+            <div class="plat" style="background:rgba(24,119,242,0.18);color:#5ba4f5" title="Meta">M</div>
+            <div class="plat" style="background:rgba(234,67,53,0.14);color:#ff6f6f" title="Google">G</div>
+            <div class="plat" style="background:rgba(255,255,255,0.08);color:#ccc" title="TikTok">TK</div>
+            <div class="plat" style="background:rgba(230,0,35,0.12);color:#f06;opacity:.85" title="Pinterest">P</div>
+          </div>
+          <div class="ret">
+            <div class="ret-val">$2,400/mo</div>
+            <div class="ret-lbl">Monthly Retainer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Luminary Skin ── -->
+      <div class="cc">
+        <div class="cc-top">
+          <div>
+            <div class="cc-name">Luminary Skin</div>
+            <div class="cc-badges">
+              <span class="badge" style="background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.2)">Beauty</span>
+              <span class="badge" style="background:rgba(244,114,182,0.1);color:#f472b6;border:1px solid rgba(244,114,182,0.2)">DTC</span>
+            </div>
+          </div>
+          <div class="status-pill status-active">
+            <div class="sdot"></div>Active
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="met"><div class="met-lbl">ROAS</div><div class="met-val roas">4.1x</div></div>
+          <div class="met"><div class="met-lbl">Spend</div><div class="met-val">$120K</div></div>
+          <div class="met"><div class="met-lbl">CPC</div><div class="met-val">$2.75</div></div>
+          <div class="met"><div class="met-lbl">Conv %</div><div class="met-val">3.8%</div></div>
+          <div class="met"><div class="met-lbl">CTR</div><div class="met-val">2.4%</div></div>
+        </div>
+
+        <div class="spark-row">
+          <div class="spark-lbl">7-day ROAS</div>
+          <svg viewBox="0 0 210 36" width="210" height="36" style="overflow:visible;flex:1">
+            <defs>
+              <linearGradient id="gn-ls" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.22"/>
+                <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="0,31 35,21 70,26 105,10 140,21 175,5 210,15 210,36 0,36" fill="url(#gn-ls)"/>
+            <polyline points="0,31 35,21 70,26 105,10 140,21 175,5 210,15" fill="none" stroke="#00d4ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="210" cy="15" r="3" fill="#00d4ff"/>
+          </svg>
+          <span class="spark-chg" style="color:var(--green)">↑ +0.3x</span>
+        </div>
+
+        <div class="cc-foot">
+          <div class="platforms">
+            <div class="plat" style="background:rgba(24,119,242,0.18);color:#5ba4f5" title="Meta">M</div>
+            <div class="plat" style="background:rgba(255,255,255,0.08);color:#ccc" title="TikTok">TK</div>
+            <div class="plat" style="background:rgba(230,0,35,0.12);color:#f06;opacity:.85" title="Pinterest">P</div>
+          </div>
+          <div class="ret">
+            <div class="ret-val">$3,000/mo</div>
+            <div class="ret-lbl">Monthly Retainer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Atlas Financial ── -->
+      <div class="cc alert-active">
+        <div class="alert-badge-card">⚠ 1 Alert</div>
+        <div class="cc-top">
+          <div>
+            <div class="cc-name">Atlas Financial</div>
+            <div class="cc-badges">
+              <span class="badge" style="background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.22)">Finance</span>
+              <span class="badge" style="background:rgba(124,58,237,0.1);color:#a78bfa;border:1px solid rgba(124,58,237,0.2)">Lead Gen</span>
+            </div>
+          </div>
+          <div class="status-pill status-review">
+            <div class="sdot"></div>Review
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="met"><div class="met-lbl">ROAS</div><div class="met-val warn">2.9x</div></div>
+          <div class="met"><div class="met-lbl">Spend</div><div class="met-val">$85K</div></div>
+          <div class="met"><div class="met-lbl">CPC</div><div class="met-val">$7.40</div></div>
+          <div class="met"><div class="met-lbl">Conv %</div><div class="met-val">2.1%</div></div>
+          <div class="met"><div class="met-lbl">CTR</div><div class="met-val">0.9%</div></div>
+        </div>
+
+        <div class="spark-row">
+          <div class="spark-lbl">7-day ROAS</div>
+          <svg viewBox="0 0 210 36" width="210" height="36" style="overflow:visible;flex:1">
+            <defs>
+              <linearGradient id="gn-af" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ef4444" stop-opacity="0.2"/>
+                <stop offset="100%" stop-color="#ef4444" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="0,5 35,25 70,11 105,31 140,18 175,25 210,18 210,36 0,36" fill="url(#gn-af)"/>
+            <polyline points="0,5 35,25 70,11 105,31 140,18 175,25 210,18" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="210" cy="18" r="3" fill="#ef4444"/>
+          </svg>
+          <span class="spark-chg" style="color:var(--red)">↓ −0.2x</span>
+        </div>
+
+        <div class="cc-foot">
+          <div class="platforms">
+            <div class="plat" style="background:rgba(24,119,242,0.18);color:#5ba4f5" title="Meta">M</div>
+            <div class="plat" style="background:rgba(234,67,53,0.14);color:#ff6f6f" title="Google">G</div>
+          </div>
+          <div class="ret">
+            <div class="ret-val">$2,800/mo</div>
+            <div class="ret-lbl">Monthly Retainer</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .clients-grid -->
+  </div><!-- LEFT -->
+
+  <!-- RIGHT: Alert Sidebar -->
+  <div>
+    <div class="section-hd">
+      <div class="section-title">Alert Feed</div>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:blink 1.5s ease-in-out infinite;"></div>
+        <span style="font-size:12px;color:var(--muted)">4 active</span>
+      </div>
+    </div>
+
+    <div class="alert-item crit">
+      <div class="alert-hd">
+        <span class="alert-client">Atlas Financial</span>
+        <span class="alert-time">6h ago</span>
+      </div>
+      <div class="alert-msg">CPM spiked significantly across Google Display. Possible audience overlap with remarketing campaign — review and segment immediately.</div>
+      <div class="alert-met crit">📈 CPM +47% in last 6h — Action needed</div>
+    </div>
+
+    <div class="alert-item warn">
+      <div class="alert-hd">
+        <span class="alert-client">Naked MD</span>
+        <span class="alert-time">11h ago</span>
+      </div>
+      <div class="alert-msg">TikTok conversion rate has dropped below 7-day rolling average. Likely creative fatigue — 3 ads running >14 days.</div>
+      <div class="alert-met warn">📉 Conv rate −18% vs 7-day avg</div>
+    </div>
+
+    <div class="alert-item info">
+      <div class="alert-hd">
+        <span class="alert-client">Velocity Boards</span>
+        <span class="alert-time">14h ago</span>
+      </div>
+      <div class="alert-msg">AI detected 3 new high-performing creatives via early engagement signals. Ready for budget scaling — estimated +22% ROAS uplift.</div>
+      <div class="alert-met info">✨ 3 winning creatives detected</div>
+    </div>
+
+    <div class="alert-item info">
+      <div class="alert-hd">
+        <span class="alert-client">Luminary Skin</span>
+        <span class="alert-time">Yesterday</span>
+      </div>
+      <div class="alert-msg">Weekly performance report auto-generated and delivered to client contact. No manual effort required.</div>
+      <div class="alert-met info">📧 Weekly report auto-sent to client</div>
+    </div>
+
+    <!-- System Status -->
+    <div style="margin-top:22px;">
+      <div class="section-hd" style="margin-bottom:10px;">
+        <div class="section-title" style="font-size:13px;">System Status</div>
+        <div style="font-size:11px;color:var(--green)">All systems operational</div>
+      </div>
+      <div class="sys-card">
+        <div class="sys-row">
+          <span class="sys-name">Ad Intelligence Scrapers</span>
+          <div class="sys-status"><div class="sdot-sm" style="background:var(--green)"></div><span style="color:var(--green);font-size:12px;font-weight:600">Running</span></div>
+        </div>
+        <div class="sys-row">
+          <span class="sys-name">Report Generator</span>
+          <div class="sys-status"><div class="sdot-sm" style="background:var(--green)"></div><span style="color:var(--green);font-size:12px;font-weight:600">Online</span></div>
+        </div>
+        <div class="sys-row">
+          <span class="sys-name">Alert Engine</span>
+          <div class="sys-status"><div class="sdot-sm" style="background:var(--green)"></div><span style="color:var(--green);font-size:12px;font-weight:600">Active</span></div>
+        </div>
+        <div class="sys-row">
+          <span class="sys-name">Platform API Connections</span>
+          <div class="sys-status"><div class="sdot-sm" style="background:var(--cyan)"></div><span style="color:var(--cyan);font-size:12px;font-weight:600">4 / 4 Live</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- RIGHT -->
+</div><!-- .main -->
+
+<!-- ─── CREATIVE BRIEFS ─── -->
+<div class="briefs-section" data-pages="dashboard briefs">
+  <div class="section-hd">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="section-title">Creative Briefs</div>
+      <span style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.18);border-radius:99px;padding:3px 12px;font-size:11px;color:var(--cyan);font-weight:600">AI Generated</span>
+    </div>
+    <span style="font-size:12px;color:var(--muted)">3 ready for review</span>
+  </div>
+
+  <!-- Summary bar -->
+  <div class="briefs-summary-bar">
+    <div class="bsb-item">
+      <span style="font-size:16px">✍️</span>
+      <span><strong>3 briefs</strong> ready for review</span>
+    </div>
+    <div class="bsb-dot"></div>
+    <div class="bsb-item">
+      <span style="font-size:16px">🕷️</span>
+      <span><strong>847</strong> competitor ads analyzed</span>
+    </div>
+    <div class="bsb-dot"></div>
+    <div class="bsb-item">
+      <span style="font-size:16px">🕑</span>
+      <span>Last updated <strong>2:14 AM</strong></span>
+    </div>
+    <div style="margin-left:auto">
+      <button class="pill-btn" style="background:rgba(0,212,255,0.08);border-color:rgba(0,212,255,0.22);color:var(--cyan)">Download All ↓</button>
+    </div>
+  </div>
+
+  <div class="briefs-grid">
+
+    <!-- ── Brief 1: Naked MD ── -->
+    <div class="brief-card">
+      <div class="brief-hd">
+        <div style="flex:1">
+          <div class="brief-client-label">Naked MD · Med Spa</div>
+          <div class="brief-title">Hook Brief #47 —<br>Med Spa Reactivation</div>
+        </div>
+      </div>
+
+      <div class="brief-badges">
+        <span class="badge" style="background:rgba(0,212,255,0.1);color:var(--cyan);border:1px solid rgba(0,212,255,0.22)">✦ AI Generated</span>
+        <span class="badge" style="background:rgba(124,58,237,0.14);color:#a78bfa;border:1px solid rgba(124,58,237,0.24)">Competitor-sourced</span>
+      </div>
+
+      <div class="brief-hook">
+        "You've been thinking about it. Here's why this week is the right time."
+      </div>
+
+      <div class="brief-meta">
+        <div class="brief-meta-row">
+          <div class="brief-meta-icon">📊</div>
+          <div>
+            <div class="brief-meta-lbl">Source Intelligence</div>
+            <div class="brief-meta-val">3 competitor ads from Meta Ad Library · 14–22 day run time · high impression signals</div>
+          </div>
+        </div>
+        <div class="brief-meta-row">
+          <div class="brief-meta-icon">🎬</div>
+          <div>
+            <div class="brief-meta-lbl">Recommended Format</div>
+            <div class="brief-meta-val">UGC testimonial · :15s</div>
+          </div>
+        </div>
+        <div class="brief-meta-row">
+          <div class="brief-meta-icon">📱</div>
+          <div>
+            <div class="brief-meta-lbl">Recommended Platforms</div>
+            <div class="brief-meta-val">Meta Stories · TikTok</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="brief-footer">
+        <div class="brief-platforms">
+          <div class="plat" style="background:rgba(24,119,242,0.18);color:#5ba4f5" title="Meta">M</div>
+          <div class="plat" style="background:rgba(255,255,255,0.08);color:#ccc" title="TikTok">TK</div>
+        </div>
+        <div class="brief-status-ready">Ready for review</div>
+      </div>
+    </div>
+
+    <!-- ── Brief 2: Velocity Boards ── -->
+    <div class="brief-card">
+      <div class="brief-hd">
+        <div style="flex:1">
+          <div class="brief-client-label">Velocity Boards · Sports eComm</div>
+          <div class="brief-title">Hook Brief #12 —<br>Product Demo Series</div>
+        </div>
+      </div>
+
+      <div class="brief-badges">
+        <span class="badge" style="background:rgba(245,158,11,0.12);color:var(--yellow);border:1px solid rgba(245,158,11,0.25)">🔥 Trending format</span>
+      </div>
+
+      <div class="brief-hook" style="border-left-color:rgba(245,158,11,0.3)">
+        "Everyone said this trick was impossible. We filmed it anyway."
+      </div>
+
+      <div class="brief-meta">
+        <div class="brief-meta-row">
+          <div class="brief-meta-icon">📊</div>
+          <div>
+            <div class="brief-meta-lbl">Source Intelligence</div>
+            <div class="brief-meta-val">TikTok Creative Center · top 3 performing sports ecomm ads this week</div>
+          </div>
+        </div>
+        <div class="brief-meta-row">
+          <div class="brief-meta-icon">🎬</div>
+          <div>
+            <div class="brief-meta-lbl">Recommended Format</div>
+            <div class="brief-meta-val">POV action shot · :30s</div>
+          </div>
+        </div>
+        <div class="brief-meta-row">
+          <div class="brief-meta-icon">📱</div>
+          <div>
+            <div class="brief-meta-lbl">Recommended Platforms</div>
+            <div class="brief-meta-val">TikTok · Instagram Reels</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="brief-footer">
+        <div class="brief-platforms">
+          <div class="plat" style="background:rgba(255,255,255,0.08);color:#ccc" title="TikTok">TK</div>
+          <div class="plat" style="background:rgba(225,48,108,0.15);color:#e1306c" title="Instagram">IG</div>
+        </div>
+        <div class="brief-status-prod">In production</div>
+      </div>
+    </div>
+
+    <!-- ── Brief 3: Luminary Skin ── -->
+    <div class="brief-card">
+      <div class="brief-hd">
+        <div style="flex:1">
+          <div class="brief-client-label">Luminary Skin · Beauty DTC</div>
+          <div class="brief-title">Hook Brief #28 —<br>Before/After Authority</div>
+        </div>
+      </div>
+
+      <div class="brief-badges">
+        <span class="badge" style="background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.22)">↑ High engagement signal</span>
+      </div>
+
+      <div class="brief-hook" style="border-left-color:rgba(34,197,94,0.3)">
+        "30 days. No filter. This is what happened."
+      </div>
+
+      <div class="brief-meta">
+        <div class="brief-meta-row">
+          <div class="brief-meta-icon">📊</div>
+          <div>
+            <div class="brief-meta-lbl">Source Intelligence</div>
+            <div class="brief-meta-val">Meta Ad Library · beauty DTC top performers · 18+ day run time</div>
+          </div>
+        </div>
+        <div class="brief-meta-row">
+          <div class="brief-meta-icon">🎬</div>
+          <div>
+            <div class="brief-meta-lbl">Recommended Format</div>
+            <div class="brief-meta-val">Split screen transformation · :20s</div>
+          </div>
+        </div>
+        <div class="brief-meta-row">
+          <div class="brief-meta-icon">📱</div>
+          <div>
+            <div class="brief-meta-lbl">Recommended Platforms</div>
+            <div class="brief-meta-val">Meta Feed · Instagram</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="brief-footer">
+        <div class="brief-platforms">
+          <div class="plat" style="background:rgba(24,119,242,0.18);color:#5ba4f5" title="Meta">M</div>
+          <div class="plat" style="background:rgba(225,48,108,0.15);color:#e1306c" title="Instagram">IG</div>
+        </div>
+        <div class="brief-status-ready">Ready for review</div>
+      </div>
+    </div>
+
+  </div><!-- .briefs-grid -->
+</div><!-- .briefs-section -->
+
+<!-- ─── CREATIVE FATIGUE TRACKER ─── -->
+<div class="fatigue-section" data-pages="dashboard briefs">
+  <div class="section-hd">
+    <div class="section-title">Creative Health — Active Ads</div>
+    <span class="sec-badge">5 ads monitored · 2 need attention</span>
+  </div>
+  <div class="fatigue-card">
+    <table class="ft-table">
+      <thead>
+        <tr>
+          <th>Ad Name</th>
+          <th>Client</th>
+          <th>Days Running</th>
+          <th>Impressions</th>
+          <th>ROAS Trend</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="ft-ad-name">Glow Up — Before/After Series</div>
+            <div class="ft-client">Naked MD</div>
+          </td>
+          <td>Naked MD</td>
+          <td>18 days</td>
+          <td>842K</td>
+          <td><span class="ft-trend-dn">↓</span> −0.4x vs 7d avg</td>
+          <td><span class="fatigue-pill fatigue-watch">Watch</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="ft-ad-name">Trick Shot Challenge — POV</div>
+            <div class="ft-client">Velocity Boards</div>
+          </td>
+          <td>Velocity Boards</td>
+          <td>24 days</td>
+          <td>1.2M</td>
+          <td><span class="ft-trend-dn">↓</span> −0.8x vs 7d avg</td>
+          <td><span class="fatigue-pill fatigue-replace">Replace</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="ft-ad-name">Consultation Booking — UGC</div>
+            <div class="ft-client">Naked MD</div>
+          </td>
+          <td>Naked MD</td>
+          <td>6 days</td>
+          <td>124K</td>
+          <td><span class="ft-trend-up">↑</span> +0.3x vs 7d avg</td>
+          <td><span class="fatigue-pill fatigue-fresh">Fresh</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="ft-ad-name">Pro Model Demo — Product Focus</div>
+            <div class="ft-client">Velocity Boards</div>
+          </td>
+          <td>Velocity Boards</td>
+          <td>9 days</td>
+          <td>312K</td>
+          <td><span class="ft-trend-nt">→</span> Flat vs 7d avg</td>
+          <td><span class="fatigue-pill fatigue-fresh">Fresh</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="ft-ad-name">30-Day Transformation — No Filter</div>
+            <div class="ft-client">Naked MD</div>
+          </td>
+          <td>Naked MD</td>
+          <td>21 days</td>
+          <td>698K</td>
+          <td><span class="ft-trend-dn">↓</span> −0.2x vs 7d avg</td>
+          <td><span class="fatigue-pill fatigue-watch">Watch</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── AUTOMATED REPORTS ─── -->
+<div class="reports-section" data-pages="dashboard reports">
+  <div class="section-hd">
+    <div class="section-title">Automated Client Reports</div>
+    <span class="sec-badge">4 reports queued · next in 12h</span>
+  </div>
+  <div class="reports-card">
+    <table class="rpt-table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Report Type</th>
+          <th>Scheduled</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Naked MD</strong></td>
+          <td>Monthly Performance</td>
+          <td>Mar 1, 9:00 AM</td>
+          <td><span class="rpt-status-sent">Sent 5 days ago</span></td>
+          <td><a href="#" class="rpt-view-btn">View →</a></td>
+        </tr>
+        <tr>
+          <td><strong>Velocity Boards</strong></td>
+          <td>Weekly Summary</td>
+          <td>Mon, 8:00 AM</td>
+          <td><span class="rpt-status-sched">Scheduled</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>Luminary Skin</strong></td>
+          <td>Weekly Summary</td>
+          <td>Mon, 8:30 AM</td>
+          <td><span class="rpt-status-gen">Generating...</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>Atlas Financial</strong></td>
+          <td>Performance Alert</td>
+          <td>Triggered</td>
+          <td><span class="rpt-status-sent">Sent 6h ago</span></td>
+          <td><a href="#" class="rpt-view-btn">View →</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── BUDGET SIMULATOR ─── -->
+<div class="simulator-section" data-pages="simulator">
+  <div class="section-hd">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="section-title">Budget Reallocation Simulator</div>
+      <span class="sec-badge" style="background:rgba(0,212,255,0.08);border-color:rgba(0,212,255,0.2);color:var(--cyan)">AI-Powered · Naked MD · Feb 2026</span>
+    </div>
+    <button class="sim-reset-btn" onclick="resetSimulator()">↺ Reset to Current</button>
+  </div>
+  <div class="simulator-card">
+    <div class="sim-grid">
+      <!-- LEFT: Sliders -->
+      <div class="sim-channel">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Drag sliders to reallocate budget. Total locked at <strong style="color:var(--text)">$700K</strong></div>
+
+        <!-- Meta -->
+        <div class="sim-ch-row">
+          <div class="sim-ch-hd">
+            <div class="sim-ch-name">
+              <div class="sim-ch-icon" style="background:rgba(24,119,242,0.2);color:#5ba4f5">M</div>
+              Meta Ads
+            </div>
+            <div>
+              <span class="sim-ch-spend" id="meta-spend">$420K</span>
+              <span class="sim-ch-roas" id="meta-roas"> · 3.2x</span>
+            </div>
+          </div>
+          <input type="range" class="sim-slider" id="meta-slider" min="0" max="700000" step="5000" value="420000" oninput="updateSimulator()" style="accent-color:#5ba4f5">
+        </div>
+
+        <!-- Google -->
+        <div class="sim-ch-row">
+          <div class="sim-ch-hd">
+            <div class="sim-ch-name">
+              <div class="sim-ch-icon" style="background:rgba(234,67,53,0.2);color:#f87171">G</div>
+              Google Ads
+            </div>
+            <div>
+              <span class="sim-ch-spend" id="google-spend">$168K</span>
+              <span class="sim-ch-roas" id="google-roas"> · 3.8x</span>
+            </div>
+          </div>
+          <input type="range" class="sim-slider" id="google-slider" min="0" max="700000" step="5000" value="168000" oninput="updateSimulator()" style="accent-color:#f87171">
+        </div>
+
+        <!-- TikTok -->
+        <div class="sim-ch-row">
+          <div class="sim-ch-hd">
+            <div class="sim-ch-name">
+              <div class="sim-ch-icon" style="background:rgba(105,201,208,0.2);color:#69c9d0">T</div>
+              TikTok Ads
+            </div>
+            <div>
+              <span class="sim-ch-spend" id="tiktok-spend">$91K</span>
+              <span class="sim-ch-roas" id="tiktok-roas"> · 5.8x</span>
+            </div>
+          </div>
+          <input type="range" class="sim-slider" id="tiktok-slider" min="0" max="700000" step="5000" value="91000" oninput="updateSimulator()" style="accent-color:#69c9d0">
+        </div>
+
+        <!-- Pinterest -->
+        <div class="sim-ch-row">
+          <div class="sim-ch-hd">
+            <div class="sim-ch-name">
+              <div class="sim-ch-icon" style="background:rgba(230,0,35,0.2);color:#f87171">P</div>
+              Pinterest
+            </div>
+            <div>
+              <span class="sim-ch-spend" id="pinterest-spend">$21K</span>
+              <span class="sim-ch-roas" id="pinterest-roas"> · 2.1x</span>
+            </div>
+          </div>
+          <input type="range" class="sim-slider" id="pinterest-slider" min="0" max="700000" step="5000" value="21000" oninput="updateSimulator()" style="accent-color:#e60023">
+        </div>
+
+        <div class="sim-total-row">
+          <span>Total allocated</span>
+          <span class="sim-total-val" id="total-allocated">$700K / $700K</span>
+        </div>
+      </div>
+
+      <!-- RIGHT: Projected Results -->
+      <div class="sim-results">
+        <div class="sim-compare">
+          <div class="sim-compare-card">
+            <div class="sim-cmp-label">Current ROAS</div>
+            <div class="sim-cmp-roas sim-cmp-roas-cur">3.4x</div>
+            <div class="sim-cmp-sub">$2.38M revenue / mo</div>
+          </div>
+          <div class="sim-compare-card active">
+            <div class="sim-cmp-label">Projected ROAS</div>
+            <div class="sim-cmp-roas sim-cmp-roas-proj" id="proj-roas">3.4x</div>
+            <div class="sim-cmp-sub" id="proj-revenue">$2.38M revenue / mo</div>
+          </div>
+        </div>
+
+        <div class="sim-metrics">
+          <div class="sim-met">
+            <div class="sim-met-lbl">Conversions / mo</div>
+            <div class="sim-met-cur">4,847</div>
+            <div class="sim-met-proj" id="proj-conv">4,847</div>
+            <div class="sim-met-delta" id="proj-conv-delta" style="color:var(--muted)">—</div>
+          </div>
+          <div class="sim-met">
+            <div class="sim-met-lbl">Avg CPL</div>
+            <div class="sim-met-cur">$144</div>
+            <div class="sim-met-proj" id="proj-cpl">$144</div>
+            <div class="sim-met-delta" id="proj-cpl-delta" style="color:var(--muted)">—</div>
+          </div>
+          <div class="sim-met">
+            <div class="sim-met-lbl">Revenue Impact</div>
+            <div class="sim-met-cur">—</div>
+            <div class="sim-met-proj" id="proj-impact">—</div>
+            <div class="sim-met-delta" id="proj-impact-delta" style="color:var(--muted)">—</div>
+          </div>
+        </div>
+
+        <div class="sim-ai-box" id="sim-ai-suggestion">
+          <strong style="color:var(--cyan)">💡 AI Recommendation (current allocation):</strong><br>
+          Move <strong>$55K from Meta → TikTok</strong>. TikTok is your most efficient channel at 5.8x ROAS but currently receives only 13% of budget. This shift is projected to increase blended ROAS by +0.4x and add <strong>~$280K in monthly revenue</strong> before saturation.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── AI ACTIVITY ─── -->
+<div class="ai-section" data-pages="dashboard alerts insights">
+  <div class="section-hd">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="section-title">AI Activity</div>
+      <span style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.18);border-radius:99px;padding:3px 12px;font-size:11px;color:var(--cyan);font-weight:600">Last 24h</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted)">847 autonomous actions completed · 0 human-hours required</div>
+  </div>
+
+  <div class="ai-card">
+    <div class="ai-row">
+      <div class="ai-icon">🕷️</div>
+      <div class="ai-body">
+        <div class="ai-desc"><strong>Scraped 847 competitor ads</strong> across 4 client niches — Med Spa, Sports eCommerce, Skincare DTC, Financial Services Lead Gen</div>
+        <div class="ai-time">Completed 2h ago · 0 errors · 847 creatives indexed</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);white-space:nowrap;align-self:flex-start;margin-left:8px">2:14 AM</div>
+    </div>
+
+    <div class="ai-row">
+      <div class="ai-icon purple-bg">✍️</div>
+      <div class="ai-body">
+        <div class="ai-desc"><strong>Generated 3 creative briefs</strong> based on top-performing competitor ads identified in the Med Spa and DTC niches. Ready for creative team review in the Briefs queue.</div>
+        <div class="ai-time">Completed 4h ago · Awaiting creative team review</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);white-space:nowrap;align-self:flex-start;margin-left:8px">12:08 AM</div>
+    </div>
+
+    <div class="ai-row">
+      <div class="ai-icon green-bg">📤</div>
+      <div class="ai-body">
+        <div class="ai-desc"><strong>Auto-sent weekly performance reports</strong> to 3 clients — Velocity Boards, Luminary Skin, and Naked MD. Each report included executive summary, ROAS breakdown by channel, and next-week recommendations.</div>
+        <div class="ai-time">Yesterday at 9:00 AM · 0 manual hours · 3 / 4 clients on auto-reporting</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);white-space:nowrap;align-self:flex-start;margin-left:8px">Yesterday</div>
+    </div>
+
+    <div class="ai-row">
+      <div class="ai-icon yellow-bg">💡</div>
+      <div class="ai-body">
+        <div class="ai-desc"><strong>Detected ROAS improvement opportunity — Atlas Financial Google Search:</strong> Shifting $12K/mo from Display to Search estimated to improve ROAS by +0.4x based on historical conversion patterns.</div>
+        <div class="ai-time">Flagged 8h ago · Recommendation pending review · Atlas marked "Review" status</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);white-space:nowrap;align-self:flex-start;margin-left:8px">4:22 AM</div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // Restore saved theme before paint
+  (function() {
+    var t = localStorage.getItem('plaid-theme');
+    if (t === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.addEventListener('DOMContentLoaded', function() {
+        var el = document.getElementById('theme-icon');
+        if (el) el.textContent = '🌙';
+      });
+    }
+  })();
+
+  function toggleTheme() {
+    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    var next = isLight ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    var icon = document.getElementById('theme-icon');
+    var label = document.getElementById('theme-label');
+    if (icon) icon.textContent = next === 'light' ? '🌙' : '☀️';
+    if (label) label.textContent = next === 'light' ? 'Dark' : 'Light';
+    localStorage.setItem('plaid-theme', next);
+  }
+
+  // Also fix initial label on load
+  (function() {
+    var stored = localStorage.getItem('plaid-theme');
+    var label = document.getElementById('theme-label');
+    var icon = document.getElementById('theme-icon');
+    if (stored === 'light') {
+      if (label) label.textContent = 'Dark';
+      if (icon) icon.textContent = '🌙';
+    } else {
+      if (label) label.textContent = 'Light';
+      if (icon) icon.textContent = '☀️';
+    }
+  })();
+
+  /* ── PAGE / TAB SWITCHER ── */
+  function showPage(name) {
+    if (name === 'settings') {
+      showToast('⚙️  Settings are available in the fully integrated version. Connect your data sources to configure alerts, report schedules, and access controls.');
+      return;
+    }
+    document.querySelectorAll('.nav-item').forEach(function(el) {
+      el.classList.toggle('active', el.dataset.page === name);
+    });
+    document.querySelectorAll('[data-pages]').forEach(function(el) {
+      var pages = el.dataset.pages.split(' ');
+      if (pages.includes('all')) { el.style.display = ''; return; }
+      el.style.display = pages.includes(name) ? '' : 'none';
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── TOAST ── */
+  function showToast(msg) {
+    var existing = document.querySelector('.demo-toast');
+    if (existing) existing.remove();
+    var t = document.createElement('div');
+    t.className = 'demo-toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function() { t.classList.add('show'); }, 30);
+    setTimeout(function() {
+      t.classList.remove('show');
+      setTimeout(function() { t.remove(); }, 300);
+    }, 4000);
+  }
+
+  /* ── BUDGET SIMULATOR ── */
+  var SIM = {
+    total: 700000,
+    base: { meta: 420000, google: 168000, tiktok: 91000, pinterest: 21000 },
+    baseRoas: { meta: 3.2, google: 3.8, tiktok: 5.8, pinterest: 2.1 },
+    // saturation: how fast ROAS drops per extra $100K above base
+    sat: { meta: 0.08, google: 0.12, tiktok: 0.22, pinterest: 0.06 },
+    lastMoved: null
+  };
+
+  function chRoas(ch, spend) {
+    var base = SIM.base[ch];
+    var delta = (spend - base) / 100000;  // units of $100K
+    var roas = SIM.baseRoas[ch] - SIM.sat[ch] * delta;
+    return Math.max(0.8, Math.min(roas, SIM.baseRoas[ch] + SIM.sat[ch] * 0.5));
+  }
+
+  function fmtK(n) {
+    if (n >= 1000000) return '$' + (n/1000000).toFixed(2) + 'M';
+    return '$' + Math.round(n/1000) + 'K';
+  }
+
+  function updateSimulator() {
+    var channels = ['meta','google','tiktok','pinterest'];
+    var sliders = {};
+    var vals = {};
+    channels.forEach(function(ch) {
+      sliders[ch] = document.getElementById(ch + '-slider');
+      vals[ch] = parseInt(sliders[ch].value);
+    });
+
+    var total = vals.meta + vals.google + vals.tiktok + vals.pinterest;
+    var over = total - SIM.total;
+
+    // Proportionally clamp if over budget
+    if (over > 0) {
+      // find the last moved slider and reduce others
+      var movingId = event && event.target ? event.target.id.replace('-slider','') : null;
+      var others = channels.filter(function(c) { return c !== movingId; });
+      var othersTotal = others.reduce(function(s,c) { return s + vals[c]; }, 0);
+      if (othersTotal > 0) {
+        others.forEach(function(c) {
+          vals[c] = Math.max(0, Math.round(vals[c] - over * (vals[c] / othersTotal)));
+          sliders[c].value = vals[c];
+        });
+      }
+      total = SIM.total;
+    }
+
+    // Recalculate ROAS per channel and blended
+    var blendedRev = 0;
+    channels.forEach(function(ch) {
+      var roas = chRoas(ch, vals[ch]);
+      blendedRev += roas * vals[ch];
+      document.getElementById(ch + '-spend').textContent = fmtK(vals[ch]);
+      document.getElementById(ch + '-roas').textContent = ' · ' + roas.toFixed(1) + 'x';
+    });
+    var blendedRoas = blendedRev / SIM.total;
+    var baseRev = 2380000;
+    var projConv = Math.round(4847 * (blendedRoas / 3.4));
+    var projCpl = Math.round(SIM.total / projConv);
+    var revDelta = blendedRev - baseRev;
+
+    document.getElementById('proj-roas').textContent = blendedRoas.toFixed(1) + 'x';
+    document.getElementById('proj-revenue').textContent = fmtK(Math.round(blendedRev)) + ' revenue / mo';
+    document.getElementById('proj-conv').textContent = projConv.toLocaleString();
+    document.getElementById('proj-cpl').textContent = '$' + projCpl;
+    document.getElementById('total-allocated').textContent = fmtK(vals.meta+vals.google+vals.tiktok+vals.pinterest) + ' / $700K';
+
+    var convDelta = projConv - 4847;
+    var cplDelta = projCpl - 144;
+    var el;
+
+    el = document.getElementById('proj-conv-delta');
+    el.textContent = (convDelta >= 0 ? '+' : '') + convDelta.toLocaleString() + ' vs current';
+    el.style.color = convDelta >= 0 ? 'var(--green)' : 'var(--red)';
+
+    el = document.getElementById('proj-cpl-delta');
+    el.textContent = (cplDelta >= 0 ? '+' : '') + '$' + cplDelta + ' vs current';
+    el.style.color = cplDelta <= 0 ? 'var(--green)' : 'var(--red)';
+
+    el = document.getElementById('proj-impact');
+    el.textContent = (revDelta >= 0 ? '+' : '') + fmtK(Math.round(Math.abs(revDelta)));
+    el.style.color = revDelta >= 0 ? 'var(--green)' : 'var(--red)';
+
+    el = document.getElementById('proj-impact-delta');
+    el.textContent = revDelta >= 0 ? 'additional revenue' : 'revenue reduction';
+    el.style.color = revDelta >= 0 ? 'var(--green)' : 'var(--red)';
+
+    // Dynamic ROAS card color
+    var projRoasEl = document.getElementById('proj-roas');
+    projRoasEl.style.color = blendedRoas > 3.4 ? 'var(--green)' : blendedRoas < 3.2 ? 'var(--red)' : 'var(--cyan)';
+
+    // Update AI suggestion
+    var best = channels.reduce(function(a,b) {
+      return (vals[a]/SIM.base[a] < vals[b]/SIM.base[b]) && SIM.baseRoas[b] > SIM.baseRoas[a] ? b : a;
+    });
+    var worst = channels.reduce(function(a,b) {
+      return (SIM.baseRoas[a] < SIM.baseRoas[b]) && vals[a] > SIM.base[a]*0.3 ? a : b;
+    });
+    var suggestEl = document.getElementById('sim-ai-suggestion');
+    if (Math.abs(blendedRoas - 3.4) < 0.05) {
+      suggestEl.innerHTML = '<strong style="color:var(--cyan)">💡 AI Recommendation:</strong><br>Move <strong>$55K from Meta → TikTok</strong>. TikTok is your most efficient channel at 5.8x ROAS but receives only 13% of budget. Projected impact: <strong>+0.4x blended ROAS, +$280K revenue / mo</strong>.';
+    } else if (blendedRoas > 3.7) {
+      suggestEl.innerHTML = '<strong style="color:var(--green)">✓ Strong allocation.</strong> This mix projects <strong>' + blendedRoas.toFixed(1) + 'x blended ROAS</strong>. Consider testing this split for 2 weeks before locking in. TikTok saturation risk increases above $180K/mo.';
+    } else if (blendedRoas < 3.1) {
+      suggestEl.innerHTML = '<strong style="color:var(--red)">⚠️ Suboptimal allocation.</strong> Shifting spend toward lower-ROAS channels. Recommend reverting Meta + Google balance. <strong>TikTok efficiency drops sharply above $200K/mo</strong> due to audience saturation.';
+    } else {
+      suggestEl.innerHTML = '<strong style="color:var(--cyan)">💡 AI Note:</strong> Moderate improvement vs baseline. For maximum efficiency, reduce Pinterest allocation (2.1x ROAS) and route freed budget to Google (3.8x) or TikTok (5.8x, pre-saturation).';
+    }
+  }
+
+  function resetSimulator() {
+    var channels = ['meta','google','tiktok','pinterest'];
+    var defaults = { meta: 420000, google: 168000, tiktok: 91000, pinterest: 21000 };
+    channels.forEach(function(ch) {
+      document.getElementById(ch + '-slider').value = defaults[ch];
+    });
+    updateSimulator();
+  }
+</script>
+</body>
+</html>
