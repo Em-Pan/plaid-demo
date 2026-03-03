@@ -492,6 +492,86 @@
     [data-theme="light"] .bsb-item strong { color: #0f172a; }
     [data-theme="light"] .bsb-dot { background: #cbd5e1; }
     [data-theme="light"] .total-badge { background: rgba(0,184,217,0.08); border-color: rgba(0,184,217,0.2); color: #00b8d9; }
+
+    /* ─── CONNECTED SOURCES BAR ─── */
+    .sources-bar {
+      display: flex; align-items: center; gap: 0;
+      padding: 0 32px; margin: 12px 0 0;
+      overflow-x: auto;
+    }
+    .sources-bar::-webkit-scrollbar { display: none; }
+    .src-inner {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 18px; width: 100%;
+      flex-wrap: wrap;
+    }
+    .src-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-right: 6px; flex-shrink: 0; }
+    .src-item {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 99px;
+      background: rgba(34,197,94,0.07); border: 1px solid rgba(34,197,94,0.16);
+      font-size: 11.5px; color: var(--text); white-space: nowrap; font-weight: 500;
+    }
+    .src-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 5px var(--green); }
+    [data-theme="light"] .src-item { background: rgba(34,197,94,0.07); border-color: rgba(34,197,94,0.2); color: #374151; }
+
+    /* ─── CREATIVE FATIGUE TRACKER ─── */
+    .fatigue-section { padding: 0 32px 28px; }
+    .fatigue-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .ft-table { width: 100%; border-collapse: collapse; }
+    .ft-table th {
+      padding: 11px 16px; text-align: left;
+      font-size: 11px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border); font-weight: 500;
+    }
+    .ft-table td {
+      padding: 13px 16px; font-size: 13px; color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+    .ft-table tr:last-child td { border-bottom: none; }
+    .ft-table tr:hover td { background: rgba(255,255,255,0.02); }
+    [data-theme="light"] .ft-table tr:hover td { background: rgba(0,0,0,0.02); }
+    .ft-ad-name { font-weight: 600; color: var(--text); }
+    .ft-client { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .ft-trend-up { color: var(--green); font-weight: 700; font-size: 15px; }
+    .ft-trend-dn { color: var(--red); font-weight: 700; font-size: 15px; }
+    .ft-trend-nt { color: var(--muted); font-weight: 700; font-size: 15px; }
+    .fatigue-pill {
+      padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .fatigue-fresh  { background: rgba(34,197,94,0.1);  color: var(--green);  border: 1px solid rgba(34,197,94,0.22); }
+    .fatigue-watch  { background: rgba(245,158,11,0.1); color: var(--yellow); border: 1px solid rgba(245,158,11,0.22); }
+    .fatigue-replace{ background: rgba(239,68,68,0.1);  color: var(--red);    border: 1px solid rgba(239,68,68,0.22); animation: blink 2s ease-in-out infinite; }
+
+    /* ─── AUTOMATED REPORTS ─── */
+    .reports-section { padding: 0 32px 36px; }
+    .reports-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .rpt-table { width: 100%; border-collapse: collapse; }
+    .rpt-table th {
+      padding: 11px 18px; text-align: left;
+      font-size: 11px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border); font-weight: 500;
+    }
+    .rpt-table td { padding: 13px 18px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); }
+    .rpt-table tr:last-child td { border-bottom: none; }
+    .rpt-status-sched { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); color: var(--cyan); padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+    .rpt-status-gen   { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.22); color: var(--yellow); padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; animation: blink 1.5s ease-in-out infinite; }
+    .rpt-status-sent  { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--green); padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+    .rpt-view-btn {
+      padding: 4px 12px; border-radius: 7px; font-size: 11.5px; font-weight: 600;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      color: var(--text); cursor: pointer; text-decoration: none;
+    }
+    [data-theme="light"] .rpt-view-btn { background: rgba(0,0,0,0.04); color: #374151; }
   </style>
 </head>
 <body>
@@ -514,7 +594,6 @@
     </div>
     <div class="nav-item">Settings</div>
   </nav>
-  <a href="/client" style="padding:6px 14px;border-radius:8px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.22);color:var(--cyan);font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap">Client View →</a>
 
   <div class="header-right">
     <div class="live-badge">
@@ -569,6 +648,22 @@
     <div class="stat-sub">
       <span class="chg-label">vs manual reporting baseline</span>
     </div>
+  </div>
+</div>
+
+<!-- ─── CONNECTED SOURCES ─── -->
+<div class="sources-bar">
+  <div class="src-inner">
+    <span class="src-label">Connected</span>
+    <div class="src-item"><div class="src-dot"></div>Meta Ads</div>
+    <div class="src-item"><div class="src-dot"></div>Google Ads</div>
+    <div class="src-item"><div class="src-dot"></div>TikTok Ads</div>
+    <div class="src-item"><div class="src-dot"></div>Pinterest</div>
+    <div class="src-item"><div class="src-dot"></div>Shopify</div>
+    <div class="src-item"><div class="src-dot"></div>GA4</div>
+    <div class="src-item"><div class="src-dot"></div>LinkedIn Ads</div>
+    <div class="src-item"><div class="src-dot"></div>Snowflake</div>
+    <div style="margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0">8 / 8 sources live · last sync 4 min ago</div>
   </div>
 </div>
 
@@ -1062,6 +1157,136 @@
 
   </div><!-- .briefs-grid -->
 </div><!-- .briefs-section -->
+
+<!-- ─── CREATIVE FATIGUE TRACKER ─── -->
+<div class="fatigue-section">
+  <div class="section-hd">
+    <div class="section-title">Creative Health — Active Ads</div>
+    <span class="sec-badge">5 ads monitored · 2 need attention</span>
+  </div>
+  <div class="fatigue-card">
+    <table class="ft-table">
+      <thead>
+        <tr>
+          <th>Ad Name</th>
+          <th>Client</th>
+          <th>Days Running</th>
+          <th>Impressions</th>
+          <th>ROAS Trend</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="ft-ad-name">Glow Up — Before/After Series</div>
+            <div class="ft-client">Naked MD</div>
+          </td>
+          <td>Naked MD</td>
+          <td>18 days</td>
+          <td>842K</td>
+          <td><span class="ft-trend-dn">↓</span> −0.4x vs 7d avg</td>
+          <td><span class="fatigue-pill fatigue-watch">Watch</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="ft-ad-name">Trick Shot Challenge — POV</div>
+            <div class="ft-client">Velocity Boards</div>
+          </td>
+          <td>Velocity Boards</td>
+          <td>24 days</td>
+          <td>1.2M</td>
+          <td><span class="ft-trend-dn">↓</span> −0.8x vs 7d avg</td>
+          <td><span class="fatigue-pill fatigue-replace">Replace</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="ft-ad-name">Consultation Booking — UGC</div>
+            <div class="ft-client">Naked MD</div>
+          </td>
+          <td>Naked MD</td>
+          <td>6 days</td>
+          <td>124K</td>
+          <td><span class="ft-trend-up">↑</span> +0.3x vs 7d avg</td>
+          <td><span class="fatigue-pill fatigue-fresh">Fresh</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="ft-ad-name">Pro Model Demo — Product Focus</div>
+            <div class="ft-client">Velocity Boards</div>
+          </td>
+          <td>Velocity Boards</td>
+          <td>9 days</td>
+          <td>312K</td>
+          <td><span class="ft-trend-nt">→</span> Flat vs 7d avg</td>
+          <td><span class="fatigue-pill fatigue-fresh">Fresh</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="ft-ad-name">30-Day Transformation — No Filter</div>
+            <div class="ft-client">Naked MD</div>
+          </td>
+          <td>Naked MD</td>
+          <td>21 days</td>
+          <td>698K</td>
+          <td><span class="ft-trend-dn">↓</span> −0.2x vs 7d avg</td>
+          <td><span class="fatigue-pill fatigue-watch">Watch</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── AUTOMATED REPORTS ─── -->
+<div class="reports-section">
+  <div class="section-hd">
+    <div class="section-title">Automated Client Reports</div>
+    <span class="sec-badge">4 reports queued · next in 12h</span>
+  </div>
+  <div class="reports-card">
+    <table class="rpt-table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Report Type</th>
+          <th>Scheduled</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Naked MD</strong></td>
+          <td>Monthly Performance</td>
+          <td>Mar 1, 9:00 AM</td>
+          <td><span class="rpt-status-sent">Sent 5 days ago</span></td>
+          <td><a href="#" class="rpt-view-btn">View →</a></td>
+        </tr>
+        <tr>
+          <td><strong>Velocity Boards</strong></td>
+          <td>Weekly Summary</td>
+          <td>Mon, 8:00 AM</td>
+          <td><span class="rpt-status-sched">Scheduled</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>Luminary Skin</strong></td>
+          <td>Weekly Summary</td>
+          <td>Mon, 8:30 AM</td>
+          <td><span class="rpt-status-gen">Generating...</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>Atlas Financial</strong></td>
+          <td>Performance Alert</td>
+          <td>Triggered</td>
+          <td><span class="rpt-status-sent">Sent 6h ago</span></td>
+          <td><a href="#" class="rpt-view-btn">View →</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
 <!-- ─── AI ACTIVITY ─── -->
 <div class="ai-section">

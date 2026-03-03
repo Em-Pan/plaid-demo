@@ -373,6 +373,102 @@
 
     [data-theme="light"] .sec-badge { background: rgba(0,0,0,0.04); border-color: #e2e8f0; color: #64748b; }
     [data-theme="light"] .dl-btn { background: rgba(0,184,217,0.1); border-color: rgba(0,184,217,0.22); color: #00b8d9; }
+
+    /* ─── CONNECTED SOURCES BAR ─── */
+    .sources-bar {
+      display: flex; align-items: center; gap: 0;
+      padding: 0 36px; margin: 16px 0 8px;
+    }
+    .src-inner {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 18px; width: 100%;
+      flex-wrap: wrap;
+    }
+    .src-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-right: 6px; flex-shrink: 0; }
+    .src-item {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 99px;
+      background: rgba(34,197,94,0.07); border: 1px solid rgba(34,197,94,0.16);
+      font-size: 11.5px; color: var(--text); white-space: nowrap; font-weight: 500;
+    }
+    .src-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 5px var(--green); }
+    [data-theme="light"] .src-item { background: rgba(34,197,94,0.07); border-color: rgba(34,197,94,0.2); color: #374151; }
+
+    /* ─── DAY-PARTING HEATMAP ─── */
+    .heatmap-section { padding: 0 36px 28px; }
+    .heatmap-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
+    }
+    .heatmap-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+    .heatmap-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .heatmap-note { font-size: 12px; color: var(--cyan); font-weight: 600; }
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: 50px repeat(24, 1fr);
+      gap: 3px;
+    }
+    .hm-day-label {
+      font-size: 11px; color: var(--muted);
+      display: flex; align-items: center; justify-content: flex-end;
+      padding-right: 10px;
+    }
+    .hm-hour-label {
+      font-size: 9px; color: rgba(255,255,255,0.25);
+      text-align: center;
+      padding: 4px 0;
+    }
+    [data-theme="light"] .hm-hour-label { color: rgba(15,23,42,0.35); }
+    .hm-cell {
+      aspect-ratio: 1;
+      border-radius: 2px;
+      min-height: 18px;
+    }
+    .hm-legend {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 14px; font-size: 11px; color: var(--muted);
+    }
+    .hm-legend-bar {
+      width: 80px; height: 6px; border-radius: 3px;
+      background: linear-gradient(90deg, rgba(0,212,255,0.15), rgba(0,212,255,0.9));
+    }
+
+    /* ─── ATTRIBUTION WINDOW COMPARISON ─── */
+    .attribution-section { padding: 0 36px 28px; }
+    .attribution-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .attr-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
+    }
+    .attr-card:nth-child(2) { border-color: rgba(0,212,255,0.25); }
+    .attr-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px; padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .attr-title { font-size: 15px; font-weight: 700; color: #fff; }
+    [data-theme="light"] .attr-title { color: #0f172a; }
+    .attr-badge {
+      padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 600;
+    }
+    .attr-badge-rec {
+      background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.22); color: var(--cyan);
+    }
+    .attr-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .attr-met {}
+    .attr-met-lbl { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .attr-met-val { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+    [data-theme="light"] .attr-met-val { color: #0f172a; }
+    .attr-note {
+      margin-top: 16px; padding: 12px 14px;
+      background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.14);
+      border-radius: 10px; font-size: 12.5px; color: var(--text); line-height: 1.5;
+    }
+    [data-theme="light"] .attr-note { color: #374151; background: rgba(0,184,217,0.06); }
   </style>
 </head>
 <body>
@@ -398,7 +494,6 @@
   </div>
 
   <div class="header-right">
-    <a href="/" style="padding:6px 14px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;transition:color 200ms,border-color 200ms">← Agency View</a>
     <div class="powered">Powered by <span class="powered-logo">Plaid Testing</span></div>
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
       <span id="theme-icon">☀️</span>
@@ -435,6 +530,22 @@
       <div class="kpi-label">Blended ROAS</div>
       <div class="kpi-value" style="color:var(--cyan)">3.4x</div>
       <div class="kpi-sub"><span class="kpi-chg up">↑ 0.2x</span> vs last month</div>
+    </div>
+  </div>
+
+  <!-- ─── CONNECTED SOURCES ─── -->
+  <div class="sources-bar">
+    <div class="src-inner">
+      <span class="src-label">Connected Sources</span>
+      <div class="src-item"><div class="src-dot"></div>Meta Ads</div>
+      <div class="src-item"><div class="src-dot"></div>Google Ads</div>
+      <div class="src-item"><div class="src-dot"></div>TikTok Ads</div>
+      <div class="src-item"><div class="src-dot"></div>Pinterest</div>
+      <div class="src-item"><div class="src-dot"></div>Shopify</div>
+      <div class="src-item"><div class="src-dot"></div>GA4</div>
+      <div class="src-item"><div class="src-dot"></div>LinkedIn Ads</div>
+      <div class="src-item"><div class="src-dot"></div>Snowflake</div>
+      <div style="margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0">8 sources synced · last update 2 min ago</div>
     </div>
   </div>
 
@@ -558,6 +669,97 @@
     </div>
 
   </div><!-- .ch-grid -->
+
+  <!-- ─── DAY-PARTING HEATMAP ─── -->
+  <div class="heatmap-section">
+    <div class="heatmap-card">
+      <div class="heatmap-hd">
+        <div>
+          <div class="sec-title">Performance by Day & Hour — Last 30 Days</div>
+          <div class="heatmap-sub">Color intensity = blended ROAS across all channels</div>
+        </div>
+        <div class="heatmap-note">Highest ROAS: Tue–Thu 7–9pm · Lowest: Mon 2–5am</div>
+      </div>
+      <div class="heatmap-grid">
+        <!-- Hour labels -->
+        <div></div>
+        <div class="hm-hour-label">12a</div><div class="hm-hour-label">2a</div><div class="hm-hour-label">4a</div><div class="hm-hour-label">6a</div>
+        <div class="hm-hour-label">8a</div><div class="hm-hour-label">10a</div><div class="hm-hour-label">12p</div><div class="hm-hour-label">2p</div>
+        <div class="hm-hour-label">4p</div><div class="hm-hour-label">6p</div><div class="hm-hour-label">8p</div><div class="hm-hour-label">10p</div>
+        <div class="hm-hour-label"></div><div class="hm-hour-label"></div><div class="hm-hour-label"></div><div class="hm-hour-label"></div>
+        <div class="hm-hour-label"></div><div class="hm-hour-label"></div><div class="hm-hour-label"></div><div class="hm-hour-label"></div>
+        <div class="hm-hour-label"></div><div class="hm-hour-label"></div><div class="hm-hour-label"></div><div class="hm-hour-label"></div>
+
+        <!-- Mon -->
+        <div class="hm-day-label">Mon</div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.15)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.12)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.08)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.10)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.18)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.28)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.35)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.42)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.48)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.55)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.62)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.58)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.52)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.48)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.45)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.50)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.58)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.68)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.75)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.70)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.55)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.42)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.32)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.22)"></div>
+
+        <!-- Tue -->
+        <div class="hm-day-label">Tue</div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.18)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.14)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.10)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.12)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.22)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.32)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.42)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.50)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.58)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.65)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.72)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.68)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.62)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.58)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.55)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.62)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.72)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.85)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.92)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.88)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.72)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.55)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.42)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.28)"></div>
+
+        <!-- Wed -->
+        <div class="hm-day-label">Wed</div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.16)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.12)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.10)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.14)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.25)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.35)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.45)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.52)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.60)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.68)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.75)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.70)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.65)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.60)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.58)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.65)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.75)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.88)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.95)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.90)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.75)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.58)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.45)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.32)"></div>
+
+        <!-- Thu -->
+        <div class="hm-day-label">Thu</div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.15)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.12)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.10)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.15)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.28)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.38)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.48)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.55)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.62)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.70)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.78)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.72)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.68)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.62)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.58)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.65)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.75)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.88)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.92)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.85)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.68)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.52)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.38)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.25)"></div>
+
+        <!-- Fri -->
+        <div class="hm-day-label">Fri</div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.18)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.14)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.12)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.18)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.30)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.40)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.50)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.55)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.62)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.68)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.72)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.65)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.58)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.52)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.48)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.55)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.65)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.78)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.82)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.75)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.58)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.42)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.32)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.22)"></div>
+
+        <!-- Sat -->
+        <div class="hm-day-label">Sat</div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.22)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.18)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.15)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.20)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.32)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.42)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.52)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.58)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.65)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.72)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.75)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.68)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.62)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.55)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.52)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.58)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.68)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.82)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.88)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.78)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.62)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.48)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.35)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.28)"></div>
+
+        <!-- Sun -->
+        <div class="hm-day-label">Sun</div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.20)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.16)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.14)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.18)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.28)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.38)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.48)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.52)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.58)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.65)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.68)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.62)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.55)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.48)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.45)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.52)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.62)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.75)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.82)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.72)"></div>
+        <div class="hm-cell" style="background:rgba(0,212,255,0.55)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.42)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.30)"></div><div class="hm-cell" style="background:rgba(0,212,255,0.20)"></div>
+      </div>
+      <div class="hm-legend">
+        <span>Low ROAS</span>
+        <div class="hm-legend-bar"></div>
+        <span>High ROAS</span>
+      </div>
+    </div>
+  </div>
 
   <!-- ─── CHARTS ─── -->
   <div class="charts-row">
@@ -782,6 +984,69 @@
     </div>
 
   </div><!-- .lq-grid -->
+
+  <!-- ─── ATTRIBUTION WINDOW COMPARISON ─── -->
+  <div class="attribution-section">
+    <div class="section-hd">
+      <div class="sec-title">Attribution Window Comparison</div>
+      <span class="sec-badge">Data from last 30 days</span>
+    </div>
+    <div class="attribution-grid">
+      <!-- 1-Day Click -->
+      <div class="attr-card">
+        <div class="attr-hd">
+          <div class="attr-title">1-Day Click</div>
+          <span class="attr-badge" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted)">Standard</span>
+        </div>
+        <div class="attr-metrics">
+          <div class="attr-met">
+            <div class="attr-met-lbl">Conversions</div>
+            <div class="attr-met-val">3,847</div>
+          </div>
+          <div class="attr-met">
+            <div class="attr-met-lbl">Revenue</div>
+            <div class="attr-met-val">$2.4M</div>
+          </div>
+          <div class="attr-met">
+            <div class="attr-met-lbl">ROAS</div>
+            <div class="attr-met-val" style="color:var(--cyan)">2.9x</div>
+          </div>
+          <div class="attr-met">
+            <div class="attr-met-lbl">CPL</div>
+            <div class="attr-met-val">$184</div>
+          </div>
+        </div>
+      </div>
+      <!-- 7-Day Click -->
+      <div class="attr-card">
+        <div class="attr-hd">
+          <div class="attr-title">7-Day Click</div>
+          <span class="attr-badge attr-badge-rec">✓ Recommended</span>
+        </div>
+        <div class="attr-metrics">
+          <div class="attr-met">
+            <div class="attr-met-lbl">Conversions</div>
+            <div class="attr-met-val">5,032</div>
+          </div>
+          <div class="attr-met">
+            <div class="attr-met-lbl">Revenue</div>
+            <div class="attr-met-val">$3.1M</div>
+          </div>
+          <div class="attr-met">
+            <div class="attr-met-lbl">ROAS</div>
+            <div class="attr-met-val" style="color:var(--green)">3.7x</div>
+          </div>
+          <div class="attr-met">
+            <div class="attr-met-lbl">CPL</div>
+            <div class="attr-met-val">$141</div>
+          </div>
+        </div>
+        <div class="attr-note">
+          <strong style="color:var(--cyan)">+31% more attributed revenue</strong> vs 1-day window. Recommendation: align reporting window with client's purchase cycle. Most med spa consultations happen 3–7 days after first click.
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ─── RECENT ALERTS ─── -->
   <div class="sec-hd">
