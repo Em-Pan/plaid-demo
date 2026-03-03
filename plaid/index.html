@@ -2358,10 +2358,15 @@
   };
 
   function get14DayLabels() {
-    var names = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    var today = new Date().getDay();
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var now = new Date();
     var out = [];
-    for (var i = 13; i >= 0; i--) out.push(i === 0 ? 'Today' : names[(today - i + 7) % 7]);
+    for (var i = 13; i >= 0; i--) {
+      if (i === 0) { out.push('Today'); continue; }
+      var d = new Date(now);
+      d.setDate(now.getDate() - i);
+      out.push(months[d.getMonth()] + ' ' + d.getDate());
+    }
     return out;
   }
 
@@ -2421,11 +2426,14 @@
     /* day labels — show every 3rd + Today */
     var daysSVG = '';
     pts.forEach(function(p, i) {
-      var today = i === n - 1;
-      if (!today && i % 3 !== 0) return;
-      daysSVG += '<text class="day-lbl" x="' + p[0].toFixed(1) + '" y="' + (H - 5)
-        + '" text-anchor="middle" font-size="9" fill="' + (today ? d.color : 'rgba(155,155,175,0.6)')
-        + '" font-weight="' + (today ? 'bold' : 'normal') + '" font-family="system-ui,sans-serif">'
+      var isToday = i === n - 1;
+      if (!isToday && i % 3 !== 0) return;
+      /* Today: anchor end + nudge left so it never clips the card edge */
+      var anchor = isToday ? 'end' : 'middle';
+      var lx = isToday ? (p[0] - 3).toFixed(1) : p[0].toFixed(1);
+      daysSVG += '<text class="day-lbl" x="' + lx + '" y="' + (H - 5)
+        + '" text-anchor="' + anchor + '" font-size="9" fill="' + (isToday ? d.color : 'rgba(155,155,175,0.6)')
+        + '" font-weight="' + (isToday ? 'bold' : 'normal') + '" font-family="system-ui,sans-serif">'
         + dayLabels[i] + '</text>';
     });
 
