@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Naked MD — Performance Dashboard</title>
+  <script>if(localStorage.getItem('plaid-theme')==='light')document.documentElement.setAttribute('data-theme','light');</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -486,6 +487,30 @@
       background: linear-gradient(90deg, rgba(0,212,255,0.15), rgba(0,212,255,0.9));
     }
 
+    /* ─── COMPETITOR AD PRESSURE ─── */
+    .pressure-section { padding: 0 36px 28px; }
+    .pressure-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
+    }
+    [data-theme="light"] .pressure-card { background: #FFFCF8; border-color: #DDD0C0; }
+    .pressure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px; }
+    .pressure-insight {
+      background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18);
+      border-radius: 10px; padding: 13px 15px; font-size: 12.5px; line-height: 1.55;
+    }
+    .competitor-list { display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
+    .comp-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 12px; padding: 7px 10px;
+      background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.12);
+      border-radius: 8px;
+    }
+    .comp-name { font-weight: 600; color: var(--text); }
+    .comp-ads { color: var(--red); font-size: 11px; }
+    .comp-spend { color: var(--muted); font-size: 11px; }
+    [data-theme="light"] .comp-name { color: #1B1A18; }
+
     /* ─── ATTRIBUTION WINDOW COMPARISON ─── */
     .attribution-section { padding: 0 36px 28px; }
     .attribution-grid {
@@ -825,16 +850,19 @@
   <!-- ─── CHARTS ─── -->
   <div class="charts-row">
 
-    <!-- ROAS Line Chart -->
+    <!-- ROAS Line Chart + 30-Day Forecast -->
     <div class="chart-card">
       <div class="chart-hd">
         <div>
-          <div class="chart-title">Blended ROAS — 30 Days</div>
-          <div class="chart-sub">Daily blended return on ad spend across all channels</div>
+          <div class="chart-title">Blended ROAS + 30-Day Forecast</div>
+          <div class="chart-sub">Historical Feb · Predictive March · Based on trajectory + Q1 seasonality</div>
         </div>
         <div class="roas-current">
-          <div class="roas-num">3.2x</div>
-          <div class="roas-chg">↑ +0.4x vs Jan</div>
+          <div class="roas-num">3.4x</div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <div class="roas-chg">↑ +0.4x vs Jan</div>
+            <div style="font-size:10px;color:var(--muted)">Forecast: <span style="color:var(--cyan);font-weight:600">3.1x–3.6x</span></div>
+          </div>
         </div>
       </div>
 
@@ -845,32 +873,67 @@
           <span class="y-lbl">3.0x</span>
           <span class="y-lbl">2.5x</span>
         </div>
-        <svg viewBox="0 0 600 155" width="100%" height="155" style="display:block">
+        <svg viewBox="0 0 800 155" width="100%" height="155" style="display:block">
           <defs>
             <linearGradient id="roas-grad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.22"/>
               <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
             </linearGradient>
-            <!-- Grid lines -->
+            <linearGradient id="forecast-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.12"/>
+              <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.03"/>
+            </linearGradient>
           </defs>
-          <!-- Horizontal grid lines -->
-          <line x1="0" y1="10"  x2="600" y2="10"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <line x1="0" y1="47"  x2="600" y2="47"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <line x1="0" y1="83"  x2="600" y2="83"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <line x1="0" y1="120" x2="600" y2="120" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <!-- Area fill -->
+          <!-- Grid lines -->
+          <line x1="0" y1="10"  x2="800" y2="10"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <line x1="0" y1="47"  x2="800" y2="47"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <line x1="0" y1="83"  x2="800" y2="83"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <line x1="0" y1="120" x2="800" y2="120" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+          <!-- TODAY divider -->
+          <line x1="600" y1="5" x2="600" y2="135" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="606" y="16" font-size="9" fill="rgba(255,255,255,0.4)" font-family="sans-serif">TODAY</text>
+          <text x="650" y="16" font-size="9" fill="rgba(0,212,255,0.6)" font-family="sans-serif">MARCH FORECAST →</text>
+
+          <!-- Forecast confidence band (polygon) -->
+          <polygon
+            points="600,92 633,80 667,74 700,70 733,65 767,60 800,58 800,108 767,113 733,120 700,125 667,118 633,110 600,92"
+            fill="url(#forecast-grad)" stroke="none"
+          />
+          <!-- Forecast upper bound -->
+          <polyline
+            points="600,92 633,80 667,74 700,70 733,65 767,60 800,58"
+            fill="none" stroke="rgba(0,212,255,0.25)" stroke-width="1" stroke-dasharray="3,3"
+          />
+          <!-- Forecast lower bound -->
+          <polyline
+            points="600,92 633,110 667,118 700,125 733,120 767,113 800,108"
+            fill="none" stroke="rgba(0,212,255,0.25)" stroke-width="1" stroke-dasharray="3,3"
+          />
+          <!-- Forecast center line (dashed) -->
+          <polyline
+            points="600,92 633,95 667,99 700,97 733,93 767,86 800,83"
+            fill="none" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="5,4" stroke-linecap="round"
+          />
+
+          <!-- Historical area fill -->
           <polygon
             points="0,121 21,136 41,107 62,150 83,92 103,121 124,78 145,107 165,136 186,92 207,63 228,92 248,121 269,78 290,107 310,63 331,92 352,49 372,78 393,107 414,63 434,34 455,63 476,92 497,49 517,20 538,63 559,34 579,78 600,92 600,150 0,150"
             fill="url(#roas-grad)"
           />
-          <!-- ROAS line -->
+          <!-- Historical ROAS line -->
           <polyline
             points="0,121 21,136 41,107 62,150 83,92 103,121 124,78 145,107 165,136 186,92 207,63 228,92 248,121 269,78 290,107 310,63 331,92 352,49 372,78 393,107 414,63 434,34 455,63 476,92 497,49 517,20 538,63 559,34 579,78 600,92"
             fill="none" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
           />
+
           <!-- Current point -->
           <circle cx="600" cy="92" r="4" fill="#00d4ff"/>
-          <circle cx="600" cy="92" r="8" fill="rgba(0,212,255,0.2)"/>
+          <circle cx="600" cy="92" r="9" fill="rgba(0,212,255,0.18)"/>
+
+          <!-- Forecast range label -->
+          <rect x="656" y="56" width="84" height="18" rx="4" fill="rgba(0,212,255,0.1)" stroke="rgba(0,212,255,0.25)" stroke-width="1"/>
+          <text x="698" y="68" font-size="9" fill="#00d4ff" font-family="sans-serif" text-anchor="middle" font-weight="600">3.1x – 3.6x</text>
         </svg>
         <div class="x-labels" style="padding-left:0">
           <span class="x-lbl">Feb 1</span>
@@ -878,6 +941,9 @@
           <span class="x-lbl">Feb 15</span>
           <span class="x-lbl">Feb 22</span>
           <span class="x-lbl">Feb 28</span>
+          <span class="x-lbl" style="color:rgba(0,212,255,0.6)">Mar 7</span>
+          <span class="x-lbl" style="color:rgba(0,212,255,0.5)">Mar 14</span>
+          <span class="x-lbl" style="color:rgba(0,212,255,0.4)">Mar 28</span>
         </div>
       </div>
     </div>
@@ -950,6 +1016,96 @@
     </div>
 
   </div><!-- .charts-row -->
+
+  <!-- ─── COMPETITOR AD PRESSURE ─── -->
+  <div class="pressure-section">
+    <div class="sec-hd">
+      <div class="sec-title">Competitor Ad Pressure Index</div>
+      <span class="sec-badge" style="background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.2);color:var(--red)">⚠️ Active spike detected · Feb 17–28</span>
+    </div>
+    <div class="pressure-card">
+      <!-- Chart: bars = competitor ad density, line = your CPM -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:12px;color:var(--muted);display:flex;gap:20px">
+          <span><span style="display:inline-block;width:12px;height:12px;background:rgba(239,68,68,0.5);border-radius:2px;margin-right:5px;vertical-align:middle"></span>Competitor Ad Count</span>
+          <span><span style="display:inline-block;width:24px;height:2px;background:#F59E0B;margin-right:5px;vertical-align:middle;border-radius:1px"></span>Your CPM ($)</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted)">Target audience: homeowners 45–60, $150K+ HHI, TX/AZ</div>
+      </div>
+      <svg viewBox="0 0 600 130" width="100%" height="130" style="display:block;margin-bottom:4px">
+        <!-- Grid lines -->
+        <line x1="0" y1="15"  x2="600" y2="15"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="47"  x2="600" y2="47"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="79"  x2="600" y2="79"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="110" x2="600" y2="110" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+
+        <!-- Bar: Jan 27 (45 ads — normal) -->
+        <rect x="35" y="75" width="50" height="35" rx="4" fill="rgba(100,116,139,0.35)"/>
+        <!-- Bar: Feb 3 (52 ads — normal) -->
+        <rect x="155" y="70" width="50" height="40" rx="4" fill="rgba(100,116,139,0.35)"/>
+        <!-- Bar: Feb 10 (48 ads — normal) -->
+        <rect x="275" y="73" width="50" height="37" rx="4" fill="rgba(100,116,139,0.35)"/>
+        <!-- Bar: Feb 17 (88 ads — SPIKE) -->
+        <rect x="395" y="42" width="50" height="68" rx="4" fill="rgba(239,68,68,0.45)"/>
+        <rect x="395" y="42" width="50" height="68" rx="4" fill="none" stroke="rgba(239,68,68,0.6)" stroke-width="1"/>
+        <!-- Bar: Feb 24 (124 ads — BIG SPIKE) -->
+        <rect x="515" y="15" width="50" height="95" rx="4" fill="rgba(239,68,68,0.6)"/>
+        <rect x="515" y="15" width="50" height="95" rx="4" fill="none" stroke="rgba(239,68,68,0.75)" stroke-width="1.5"/>
+
+        <!-- CPM line (yellow) -->
+        <polyline
+          points="60,67 180,62 300,65 420,33 540,14"
+          fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+        />
+        <!-- CPM dots -->
+        <circle cx="60" cy="67" r="4" fill="#F59E0B"/>
+        <circle cx="180" cy="62" r="4" fill="#F59E0B"/>
+        <circle cx="300" cy="65" r="4" fill="#F59E0B"/>
+        <circle cx="420" cy="33" r="4" fill="#F59E0B"/>
+        <circle cx="540" cy="14" r="5" fill="#F59E0B"/>
+        <circle cx="540" cy="14" r="10" fill="rgba(245,158,11,0.2)"/>
+
+        <!-- CPM value labels -->
+        <text x="60" y="59" font-size="9" fill="rgba(245,158,11,0.7)" text-anchor="middle" font-family="sans-serif">$22</text>
+        <text x="180" y="54" font-size="9" fill="rgba(245,158,11,0.7)" text-anchor="middle" font-family="sans-serif">$25</text>
+        <text x="300" y="57" font-size="9" fill="rgba(245,158,11,0.7)" text-anchor="middle" font-family="sans-serif">$23</text>
+        <text x="420" y="25" font-size="9" fill="rgba(245,158,11,0.9)" text-anchor="middle" font-family="sans-serif">$38</text>
+        <text x="540" y="6" font-size="10" fill="#F59E0B" text-anchor="middle" font-family="sans-serif" font-weight="bold">$47 ⚠️</text>
+
+        <!-- Week labels -->
+        <text x="60"  y="125" font-size="9" fill="rgba(255,255,255,0.35)" text-anchor="middle" font-family="sans-serif">Jan 27</text>
+        <text x="180" y="125" font-size="9" fill="rgba(255,255,255,0.35)" text-anchor="middle" font-family="sans-serif">Feb 3</text>
+        <text x="300" y="125" font-size="9" fill="rgba(255,255,255,0.35)" text-anchor="middle" font-family="sans-serif">Feb 10</text>
+        <text x="420" y="125" font-size="9" fill="rgba(239,68,68,0.8)" text-anchor="middle" font-family="sans-serif" font-weight="bold">Feb 17 ↑</text>
+        <text x="540" y="125" font-size="9" fill="rgba(239,68,68,0.9)" text-anchor="middle" font-family="sans-serif" font-weight="bold">Feb 24 ↑↑</text>
+      </svg>
+
+      <div class="pressure-grid">
+        <div class="pressure-insight">
+          <strong style="color:var(--red)">Why your CPM spiked $25 in 2 weeks:</strong><br>
+          3 direct competitors increased auction pressure in your target audience starting Feb 17. Their combined spend inflated CPM from $23 → $47 — a 104% increase. This is not a performance issue; it's a competitive market event.
+        </div>
+        <div class="competitor-list">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">Competitors detected in your auction</div>
+          <div class="comp-row">
+            <span class="comp-name">FinServ Leads Co.</span>
+            <span class="comp-ads">+42 new ads</span>
+            <span class="comp-spend">~$180K est.</span>
+          </div>
+          <div class="comp-row">
+            <span class="comp-name">TrustCapital</span>
+            <span class="comp-ads">+28 new ads</span>
+            <span class="comp-spend">~$90K est.</span>
+          </div>
+          <div class="comp-row">
+            <span class="comp-name">Apex Advisors</span>
+            <span class="comp-ads">+22 new ads</span>
+            <span class="comp-spend">~$75K est.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ─── LEAD QUALITY ─── -->
   <div class="sec-hd">

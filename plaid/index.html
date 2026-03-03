@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plaid Testing — Agency Dashboard</title>
+  <!-- FOUC prevention: set theme BEFORE CSS renders so ::after labels are correct from frame 1 -->
+  <script>if(localStorage.getItem('plaid-theme')==='light')document.documentElement.setAttribute('data-theme','light');</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -662,7 +664,7 @@
     [data-theme="light"] .ci-tab:not(.active-top):not(.active-bot):hover { background: rgba(0,0,0,0.04); color: #1B1A18; }
     .ads-list { padding: 6px 0; }
     .ad-row {
-      display: grid; grid-template-columns: 1fr 60px 70px 60px 64px;
+      display: grid; grid-template-columns: 36px 1fr 60px 70px 60px 64px;
       align-items: center; gap: 10px;
       padding: 10px 20px; border-bottom: 1px solid var(--border);
       transition: background 0.15s;
@@ -682,8 +684,17 @@
     .ad-trend.up { color: var(--green); }
     .ad-trend.dn { color: var(--red); }
     .ad-trend.nt { color: var(--muted); }
+    /* Ad thumbnail preview */
+    .ad-thumb {
+      width: 32px; height: 40px; border-radius: 5px; flex-shrink: 0;
+      position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+    }
+    .ad-thumb-play {
+      position: absolute; font-size: 10px; color: rgba(255,255,255,0.9);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
     .ads-col-hd {
-      display: grid; grid-template-columns: 1fr 60px 70px 60px 64px;
+      display: grid; grid-template-columns: 36px 1fr 60px 70px 60px 64px;
       gap: 10px; padding: 6px 20px;
       font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
       border-bottom: 1px solid var(--border);
@@ -1599,29 +1610,34 @@
       </div>
       <!-- Top 5 ads -->
       <div id="ads-top">
-        <div class="ads-col-hd"><span>Ad Creative</span><span>Spend</span><span>Impressions</span><span>ROAS</span><span>Trend</span></div>
+        <div class="ads-col-hd"><span></span><span>Ad Creative</span><span>Spend</span><span>Impressions</span><span>ROAS</span><span>Trend</span></div>
         <div class="ads-list">
           <div class="ad-row">
+            <div class="ad-thumb" style="background:linear-gradient(160deg,#69C9D0,#010101)"><div class="ad-thumb-play">▶</div></div>
             <div><div class="ad-name">Board Drop — Spring Edit</div><div class="ad-client">Velocity Boards · TikTok</div></div>
             <div class="ad-spend">$18K</div><div class="ad-imp">945K</div>
             <div class="ad-roas hi">6.1x</div><div class="ad-trend up">↑</div>
           </div>
           <div class="ad-row">
+            <div class="ad-thumb" style="background:linear-gradient(160deg,#1877F2,#C13584)"><div class="ad-thumb-play">▶</div></div>
             <div><div class="ad-name">Before & After — 6 Weeks</div><div class="ad-client">Naked MD · Meta</div></div>
             <div class="ad-spend">$52K</div><div class="ad-imp">1.8M</div>
             <div class="ad-roas hi">5.2x</div><div class="ad-trend up">↑</div>
           </div>
           <div class="ad-row">
+            <div class="ad-thumb" style="background:linear-gradient(160deg,#1877F2,#0a2d6e)"><div class="ad-thumb-play">▶</div></div>
             <div><div class="ad-name">Dr. Chen Explains — UGC</div><div class="ad-client">Naked MD · Meta</div></div>
             <div class="ad-spend">$38K</div><div class="ad-imp">1.2M</div>
             <div class="ad-roas hi">4.8x</div><div class="ad-trend up">↑</div>
           </div>
           <div class="ad-row">
+            <div class="ad-thumb" style="background:linear-gradient(160deg,#C13584,#F56040)"><div class="ad-thumb-play">▶</div></div>
             <div><div class="ad-name">Real Results, No Filter</div><div class="ad-client">Luminary Skin · Instagram</div></div>
             <div class="ad-spend">$24K</div><div class="ad-imp">780K</div>
             <div class="ad-roas hi">4.5x</div><div class="ad-trend nt">→</div>
           </div>
           <div class="ad-row">
+            <div class="ad-thumb" style="background:linear-gradient(160deg,#69C9D0,#1a2040)"><div class="ad-thumb-play">▶</div></div>
             <div><div class="ad-name">Why We Left Our Old Agency</div><div class="ad-client">Naked MD · TikTok</div></div>
             <div class="ad-spend">$31K</div><div class="ad-imp">1.1M</div>
             <div class="ad-roas hi">4.2x</div><div class="ad-trend up">↑</div>
@@ -1630,29 +1646,34 @@
       </div>
       <!-- Worst 5 ads (hidden by default) -->
       <div id="ads-bot" style="display:none">
-        <div class="ads-col-hd"><span>Ad Creative</span><span>Spend</span><span>Impressions</span><span>ROAS</span><span>Trend</span></div>
+        <div class="ads-col-hd"><span></span><span>Ad Creative</span><span>Spend</span><span>Impressions</span><span>ROAS</span><span>Trend</span></div>
         <div class="ads-list">
           <div class="ad-row">
+            <div class="ad-thumb" style="background:linear-gradient(160deg,#3a4a6a,#1a1a2e)"><div class="ad-thumb-play" style="font-size:8px">■</div></div>
             <div><div class="ad-name">Trusted Since 2002 — Brand</div><div class="ad-client">Atlas Financial · Meta</div></div>
             <div class="ad-spend">$31K</div><div class="ad-imp">415K</div>
             <div class="ad-roas lo">1.4x</div><div class="ad-trend dn">↓</div>
           </div>
           <div class="ad-row">
+            <div class="ad-thumb" style="background:linear-gradient(160deg,#4a5568,#2d3748)"><div class="ad-thumb-play" style="font-size:8px">■</div></div>
             <div><div class="ad-name">Q1 Promotion — 30% Off</div><div class="ad-client">Velocity Boards · Meta</div></div>
             <div class="ad-spend">$22K</div><div class="ad-imp">285K</div>
             <div class="ad-roas lo">1.8x</div><div class="ad-trend dn">↓</div>
           </div>
           <div class="ad-row">
+            <div class="ad-thumb" style="background:linear-gradient(160deg,#6b46a0,#2d1b4e)"><div class="ad-thumb-play" style="font-size:8px">■</div></div>
             <div><div class="ad-name">Holiday Collection 2025</div><div class="ad-client">Luminary Skin · Meta</div></div>
             <div class="ad-spend">$19K</div><div class="ad-imp">225K</div>
             <div class="ad-roas mid">1.9x</div><div class="ad-trend dn">↓</div>
           </div>
           <div class="ad-row">
+            <div class="ad-thumb" style="background:linear-gradient(160deg,#34a853,#1a3a2a)"><div class="ad-thumb-play" style="font-size:8px">■</div></div>
             <div><div class="ad-name">Medical Grade Skincare</div><div class="ad-client">Naked MD · Google</div></div>
             <div class="ad-spend">$15K</div><div class="ad-imp">198K</div>
             <div class="ad-roas mid">2.1x</div><div class="ad-trend nt">→</div>
           </div>
           <div class="ad-row">
+            <div class="ad-thumb" style="background:linear-gradient(160deg,#0A66C2,#061428)"><div class="ad-thumb-play" style="font-size:8px">■</div></div>
             <div><div class="ad-name">Atlas — Secure Your Future</div><div class="ad-client">Atlas Financial · LinkedIn</div></div>
             <div class="ad-spend">$28K</div><div class="ad-imp">340K</div>
             <div class="ad-roas mid">2.2x</div><div class="ad-trend dn">↓</div>
