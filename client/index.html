@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Naked MD — Performance Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #050508;
+      --surface: #12121a;
+      --border:  rgba(255,255,255,0.06);
+      --cyan:    #00d4ff;
+      --purple:  #7c3aed;
+      --text:    #f0f0f5;
+      --muted:   #a0a0b0;
+      --green:   #22c55e;
+      --red:     #ef4444;
+      --yellow:  #f59e0b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ─── HEADER ─── */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 36px;
+      background: rgba(5,5,8,0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand { display: flex; flex-direction: column; gap: 1px; }
+    .brand-name {
+      font-size: 20px; font-weight: 800; color: #fff;
+      letter-spacing: -0.03em;
+    }
+    .brand-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+
+    .header-mid { display: flex; align-items: center; gap: 8px; }
+    .date-chip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; font-size: 13px; color: var(--text); cursor: pointer;
+    }
+    .date-chip svg { opacity: 0.4; }
+    .date-opts {
+      display: flex; gap: 4px; padding: 4px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .date-opt {
+      padding: 5px 12px; border-radius: 7px;
+      font-size: 12px; color: var(--muted); cursor: pointer;
+    }
+    .date-opt.sel { background: rgba(0,212,255,0.1); color: var(--cyan); font-weight: 600; }
+
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .powered {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 11.5px; color: var(--muted);
+    }
+    .powered-logo {
+      font-size: 11px; font-weight: 700; color: var(--cyan);
+      background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.18);
+      border-radius: 6px; padding: 2px 7px;
+    }
+    .dl-btn {
+      padding: 7px 16px; border-radius: 9px;
+      background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.22);
+      color: var(--cyan); font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+
+    /* ─── MAIN ─── */
+    .page { padding: 28px 36px 40px; max-width: 1400px; }
+
+    .sec-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .sec-title { font-size: 15px; font-weight: 600; color: #fff; }
+
+    /* ─── KPI BAR ─── */
+    .kpi-bar {
+      display: grid; grid-template-columns: repeat(5,1fr);
+      gap: 12px; margin-bottom: 28px;
+    }
+    .kpi {
+      position: relative; overflow: hidden;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 22px;
+    }
+    .kpi::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--cyan), transparent);
+    }
+    .kpi:nth-child(2)::before { background: linear-gradient(90deg, #a78bfa, transparent); }
+    .kpi:nth-child(3)::before { background: linear-gradient(90deg, #34d399, transparent); }
+    .kpi:nth-child(4)::before { background: linear-gradient(90deg, var(--yellow), transparent); }
+    .kpi:nth-child(5)::before { background: linear-gradient(90deg, var(--cyan), var(--purple)); }
+
+    .kpi-label {
+      font-size: 11px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-size: 28px; font-weight: 800; color: #fff;
+      letter-spacing: -0.03em; line-height: 1;
+    }
+    .kpi-sub { font-size: 12px; color: var(--muted); margin-top: 7px; }
+    .kpi-chg { font-weight: 600; }
+    .kpi-chg.up { color: var(--green); }
+    .kpi-chg.dn { color: var(--red); }
+
+    /* ─── CHANNEL PERFORMANCE ─── */
+    .ch-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 14px; margin-bottom: 28px;
+    }
+    .ch-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px; overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .ch-card:hover { border-color: rgba(255,255,255,0.12); }
+
+    .ch-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .ch-name-row { display: flex; align-items: center; gap: 10px; }
+    .ch-icon {
+      width: 32px; height: 32px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800;
+    }
+    .ch-name { font-size: 15px; font-weight: 700; color: #fff; }
+
+    .trend-pill {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 11px; border-radius: 99px;
+      font-size: 12px; font-weight: 600;
+    }
+    .trend-up { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+    .trend-dn { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+
+    .ch-metrics {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    .ch-met {
+      background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+      border-radius: 9px; padding: 10px 12px;
+    }
+    .ch-met-lbl {
+      font-size: 10px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;
+    }
+    .ch-met-val { font-size: 18px; font-weight: 700; color: #fff; }
+    .ch-met-val.hi { color: var(--cyan); }
+    .ch-met-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .ch-spend-bar { margin-top: 16px; }
+    .ch-bar-lbl { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+    .ch-bar-track {
+      height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden;
+    }
+    .ch-bar-fill { height: 100%; border-radius: 2px; }
+
+    /* ─── CHARTS ROW ─── */
+    .charts-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; margin-bottom: 28px;
+    }
+    .chart-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
+    }
+    .chart-hd {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; margin-bottom: 18px;
+    }
+    .chart-title { font-size: 14px; font-weight: 600; color: #fff; }
+    .chart-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ROAS legend */
+    .roas-current {
+      text-align: right;
+    }
+    .roas-num { font-size: 28px; font-weight: 800; color: var(--cyan); letter-spacing: -0.02em; }
+    .roas-chg { font-size: 12px; color: var(--green); font-weight: 600; }
+
+    /* Y-axis labels */
+    .chart-wrap {
+      position: relative;
+      padding-left: 32px;
+    }
+    .y-labels {
+      position: absolute; left: 0; top: 0; bottom: 20px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .y-lbl { font-size: 10px; color: rgba(255,255,255,0.25); }
+    .x-labels {
+      display: flex; justify-content: space-between;
+      padding: 6px 0 0; padding-left: 0;
+    }
+    .x-lbl { font-size: 10px; color: rgba(255,255,255,0.2); }
+
+    /* Donut chart */
+    .donut-wrap {
+      display: flex; align-items: center; gap: 24px; padding: 4px 0;
+    }
+    .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .legend-row { display: flex; align-items: center; gap: 10px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .legend-name { font-size: 13px; color: var(--text); flex: 1; }
+    .legend-pct { font-size: 13px; font-weight: 700; color: #fff; }
+    .legend-val { font-size: 11px; color: var(--muted); }
+
+    /* ─── LEAD QUALITY ─── */
+    .lq-section { margin-bottom: 28px; }
+    .lq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .lq-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
+    }
+    .lq-channels { display: flex; flex-direction: column; gap: 18px; }
+    .lq-row {}
+    .lq-row-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .lq-ch-name { font-size: 13px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .lq-score { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+    .lq-bar-track { height: 6px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; }
+    .lq-bar-fill { height: 100%; border-radius: 99px; }
+    .lq-desc { font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+    /* Insight callout */
+    .insight-card {
+      background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.14);
+      border-radius: 14px; padding: 20px 22px;
+      display: flex; gap: 16px; align-items: flex-start;
+    }
+    .insight-icon {
+      width: 36px; height: 36px; flex-shrink: 0; border-radius: 10px;
+      background: rgba(0,212,255,0.12); border: 1px solid rgba(0,212,255,0.22);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .insight-title { font-size: 14px; font-weight: 700; color: var(--cyan); margin-bottom: 6px; }
+    .insight-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .insight-body strong { color: var(--text); font-weight: 600; }
+    .insight-cta {
+      margin-top: 12px; display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 16px; border-radius: 8px;
+      background: rgba(0,212,255,0.12); border: 1px solid rgba(0,212,255,0.25);
+      color: var(--cyan); font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+
+    /* ─── ALERTS ─── */
+    .alerts-list { display: flex; flex-direction: column; gap: 10px; }
+    .al {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .al-icon {
+      width: 32px; height: 32px; flex-shrink: 0; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .al-body { flex: 1; }
+    .al-title { font-size: 13px; font-weight: 600; color: #fff; }
+    .al-desc  { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+    .al-time  { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+    /* divider */
+    .divider { height: 1px; background: var(--border); margin: 0; }
+
+    /* section badge */
+    .sec-badge {
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      border-radius: 99px; padding: 3px 12px; font-size: 11.5px;
+      color: var(--muted); font-weight: 500;
+    }
+
+    /* ─── THEME TOGGLE ─── */
+    .theme-toggle {
+      width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+      background: var(--surface); border: 1px solid var(--border);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+    }
+    .theme-toggle:hover { border-color: rgba(0,212,255,0.35); }
+
+    /* ─── TRANSITIONS ─── */
+    body, .header, .kpi, .ch-card, .chart-card, .lq-card, .insight-card,
+    .al, .date-chip, .date-opts, .date-opt, .theme-toggle,
+    .brand-name, .kpi-label, .kpi-value, .ch-name, .ch-met, .ch-met-val,
+    .chart-title, .roas-num, .legend-pct, .al-title, .al-icon {
+      transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+    }
+
+    /* ─── LIGHT MODE ─── */
+    [data-theme="light"] {
+      --bg:       #f8fafc;
+      --surface:  #ffffff;
+      --surface2: #f1f5f9;
+      --border:   #e2e8f0;
+      --text:     #0f172a;
+      --muted:    #64748b;
+      --cyan:     #00b8d9;
+    }
+    [data-theme="light"] body { background: var(--bg); color: var(--text); }
+    [data-theme="light"] .header {
+      background: rgba(248,250,252,0.92); border-bottom-color: #e2e8f0;
+    }
+    [data-theme="light"] .brand-name { color: #0f172a; }
+    [data-theme="light"] .brand-sub { color: #64748b; }
+    [data-theme="light"] .powered { color: #64748b; }
+    [data-theme="light"] .date-chip { background: #fff; border-color: #e2e8f0; color: #0f172a; }
+    [data-theme="light"] .date-opt { color: #64748b; }
+    [data-theme="light"] .date-opt.sel { background: rgba(0,184,217,0.1); color: #00b8d9; }
+
+    [data-theme="light"] .kpi-label { color: #64748b; }
+    [data-theme="light"] .kpi-value { color: #0f172a; }
+    [data-theme="light"] .kpi-sub { color: #64748b; }
+
+    [data-theme="light"] .ch-name { color: #0f172a; }
+    [data-theme="light"] .ch-met { background: rgba(0,0,0,0.03); border-color: #e9eef4; }
+    [data-theme="light"] .ch-met-lbl { color: #64748b; }
+    [data-theme="light"] .ch-met-val { color: #0f172a; }
+    [data-theme="light"] .ch-met-val.hi { color: #00b8d9; }
+    [data-theme="light"] .ch-met-sub { color: #64748b; }
+    [data-theme="light"] .ch-bar-lbl { color: #64748b; }
+    [data-theme="light"] .ch-bar-track { background: rgba(0,0,0,0.07); }
+
+    [data-theme="light"] .chart-title { color: #0f172a; }
+    [data-theme="light"] .chart-sub { color: #64748b; }
+    [data-theme="light"] .roas-num { color: #00b8d9; }
+    [data-theme="light"] .roas-chg { color: var(--green); }
+    [data-theme="light"] .y-lbl { color: rgba(15,23,42,0.3); }
+    [data-theme="light"] .x-lbl { color: rgba(15,23,42,0.28); }
+    [data-theme="light"] .legend-name { color: #374151; }
+    [data-theme="light"] .legend-pct { color: #0f172a; }
+    [data-theme="light"] .legend-val { color: #64748b; }
+
+    [data-theme="light"] .lq-ch-name { color: #0f172a; }
+    [data-theme="light"] .lq-bar-track { background: rgba(0,0,0,0.08); }
+    [data-theme="light"] .lq-desc { color: #64748b; }
+    [data-theme="light"] .chart-wrap { background: transparent; }
+
+    [data-theme="light"] .insight-title { color: #00b8d9; }
+    [data-theme="light"] .insight-body { color: #475569; }
+    [data-theme="light"] .insight-body strong { color: #0f172a; }
+    [data-theme="light"] .insight-cta { background: rgba(0,184,217,0.1); border-color: rgba(0,184,217,0.22); color: #00b8d9; }
+
+    [data-theme="light"] .al-title { color: #0f172a; }
+    [data-theme="light"] .al-desc  { color: #475569; }
+    [data-theme="light"] .al-time  { color: #94a3b8; }
+    [data-theme="light"] .al-icon  { background: rgba(0,0,0,0.04); border-color: #e2e8f0; }
+
+    [data-theme="light"] .sec-badge { background: rgba(0,0,0,0.04); border-color: #e2e8f0; color: #64748b; }
+    [data-theme="light"] .dl-btn { background: rgba(0,184,217,0.1); border-color: rgba(0,184,217,0.22); color: #00b8d9; }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+  <div class="brand">
+    <div class="brand-name">Naked MD</div>
+    <div class="brand-sub">Performance Dashboard</div>
+  </div>
+
+  <div class="header-mid">
+    <div class="date-opts">
+      <div class="date-opt">7D</div>
+      <div class="date-opt sel">30D</div>
+      <div class="date-opt">90D</div>
+      <div class="date-opt">YTD</div>
+    </div>
+    <div class="date-chip">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Feb 1 – Feb 28, 2026
+    </div>
+  </div>
+
+  <div class="header-right">
+    <a href="/" style="padding:6px 14px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;transition:color 200ms,border-color 200ms">← Agency View</a>
+    <div class="powered">Powered by <span class="powered-logo">Plaid Testing</span></div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+      <span id="theme-icon">☀️</span>
+    </button>
+    <div class="dl-btn">↓ Export PDF</div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- ─── KPI BAR ─── -->
+  <div class="kpi-bar">
+    <div class="kpi">
+      <div class="kpi-label">Total Ad Spend</div>
+      <div class="kpi-value">$830K</div>
+      <div class="kpi-sub"><span class="kpi-chg up">↑ 8.2%</span> vs last month</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Leads Generated</div>
+      <div class="kpi-value" style="color:#a78bfa">5,936</div>
+      <div class="kpi-sub"><span class="kpi-chg up">↑ 14.3%</span> vs last month</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Cost Per Lead</div>
+      <div class="kpi-value" style="color:#34d399">$139</div>
+      <div class="kpi-sub"><span class="kpi-chg up">↓ $18</span> vs last month</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Conversion Rate</div>
+      <div class="kpi-value" style="color:var(--yellow)">3.1%</div>
+      <div class="kpi-sub"><span class="kpi-chg dn">↓ 0.3%</span> vs last month</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Blended ROAS</div>
+      <div class="kpi-value" style="color:var(--cyan)">3.4x</div>
+      <div class="kpi-sub"><span class="kpi-chg up">↑ 0.2x</span> vs last month</div>
+    </div>
+  </div>
+
+  <!-- ─── CHANNEL PERFORMANCE ─── -->
+  <div class="sec-hd">
+    <div class="sec-title">Channel Performance</div>
+    <span class="sec-badge">Feb 1 – Feb 28 · 3 active channels</span>
+  </div>
+
+  <div class="ch-grid">
+
+    <!-- Meta -->
+    <div class="ch-card">
+      <div class="ch-top">
+        <div class="ch-name-row">
+          <div class="ch-icon" style="background:rgba(24,119,242,0.18);color:#5ba4f5">M</div>
+          <span class="ch-name">Meta Ads</span>
+        </div>
+        <div class="trend-pill trend-up">↑ +8% ROAS</div>
+      </div>
+      <div class="ch-metrics">
+        <div class="ch-met">
+          <div class="ch-met-lbl">Spend</div>
+          <div class="ch-met-val">$700K</div>
+          <div class="ch-met-sub">84.3% of total</div>
+        </div>
+        <div class="ch-met">
+          <div class="ch-met-lbl">Leads</div>
+          <div class="ch-met-val">4,847</div>
+          <div class="ch-met-sub">81.7% of total</div>
+        </div>
+        <div class="ch-met">
+          <div class="ch-met-lbl">Cost Per Lead</div>
+          <div class="ch-met-val hi">$144</div>
+          <div class="ch-met-sub">↓ vs $162 prev</div>
+        </div>
+        <div class="ch-met">
+          <div class="ch-met-lbl">ROAS</div>
+          <div class="ch-met-val hi">3.2x</div>
+          <div class="ch-met-sub">Conv: 3.2%</div>
+        </div>
+      </div>
+      <div class="ch-spend-bar">
+        <div class="ch-bar-lbl"><span>Spend allocation</span><span>84.3%</span></div>
+        <div class="ch-bar-track"><div class="ch-bar-fill" style="width:84.3%;background:linear-gradient(90deg,#5ba4f5,#4a9eff)"></div></div>
+      </div>
+    </div>
+
+    <!-- Google -->
+    <div class="ch-card">
+      <div class="ch-top">
+        <div class="ch-name-row">
+          <div class="ch-icon" style="background:rgba(234,67,53,0.14);color:#ff6f6f">G</div>
+          <span class="ch-name">Google Ads</span>
+        </div>
+        <div class="trend-pill trend-up">↑ +12% ROAS</div>
+      </div>
+      <div class="ch-metrics">
+        <div class="ch-met">
+          <div class="ch-met-lbl">Spend</div>
+          <div class="ch-met-val">$100K</div>
+          <div class="ch-met-sub">12.0% of total</div>
+        </div>
+        <div class="ch-met">
+          <div class="ch-met-lbl">Leads</div>
+          <div class="ch-met-val">891</div>
+          <div class="ch-met-sub">15.0% of total</div>
+        </div>
+        <div class="ch-met">
+          <div class="ch-met-lbl">Cost Per Lead</div>
+          <div class="ch-met-val hi">$112</div>
+          <div class="ch-met-sub">↓ vs $128 prev</div>
+        </div>
+        <div class="ch-met">
+          <div class="ch-met-lbl">ROAS</div>
+          <div class="ch-met-val hi">4.8x</div>
+          <div class="ch-met-sub">Conv: 5.1%</div>
+        </div>
+      </div>
+      <div class="ch-spend-bar">
+        <div class="ch-bar-lbl"><span>Spend allocation</span><span>12.0%</span></div>
+        <div class="ch-bar-track"><div class="ch-bar-fill" style="width:12%;background:linear-gradient(90deg,#ff6f6f,#ef4444)"></div></div>
+      </div>
+    </div>
+
+    <!-- TikTok -->
+    <div class="ch-card" style="border-color:rgba(245,158,11,0.14)">
+      <div class="ch-top">
+        <div class="ch-name-row">
+          <div class="ch-icon" style="background:rgba(255,255,255,0.07);color:#e0e0e0">TK</div>
+          <span class="ch-name">TikTok Ads</span>
+        </div>
+        <div class="trend-pill trend-dn">↓ −6% ROAS</div>
+      </div>
+      <div class="ch-metrics">
+        <div class="ch-met">
+          <div class="ch-met-lbl">Spend</div>
+          <div class="ch-met-val">$30K</div>
+          <div class="ch-met-sub">3.6% of total</div>
+        </div>
+        <div class="ch-met">
+          <div class="ch-met-lbl">Leads</div>
+          <div class="ch-met-val">198</div>
+          <div class="ch-met-sub">3.3% of total</div>
+        </div>
+        <div class="ch-met">
+          <div class="ch-met-lbl">Cost Per Lead</div>
+          <div class="ch-met-val" style="color:var(--yellow)">$151</div>
+          <div class="ch-met-sub">↑ vs $140 prev</div>
+        </div>
+        <div class="ch-met">
+          <div class="ch-met-lbl">ROAS</div>
+          <div class="ch-met-val" style="color:var(--yellow)">2.7x</div>
+          <div class="ch-met-sub">Conv: 2.4%</div>
+        </div>
+      </div>
+      <div class="ch-spend-bar">
+        <div class="ch-bar-lbl"><span>Spend allocation</span><span style="color:var(--yellow)">3.6% — under review</span></div>
+        <div class="ch-bar-track"><div class="ch-bar-fill" style="width:3.6%;background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div>
+      </div>
+    </div>
+
+  </div><!-- .ch-grid -->
+
+  <!-- ─── CHARTS ─── -->
+  <div class="charts-row">
+
+    <!-- ROAS Line Chart -->
+    <div class="chart-card">
+      <div class="chart-hd">
+        <div>
+          <div class="chart-title">Blended ROAS — 30 Days</div>
+          <div class="chart-sub">Daily blended return on ad spend across all channels</div>
+        </div>
+        <div class="roas-current">
+          <div class="roas-num">3.2x</div>
+          <div class="roas-chg">↑ +0.4x vs Jan</div>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="y-labels" style="top:0;bottom:22px;">
+          <span class="y-lbl">4.0x</span>
+          <span class="y-lbl">3.5x</span>
+          <span class="y-lbl">3.0x</span>
+          <span class="y-lbl">2.5x</span>
+        </div>
+        <svg viewBox="0 0 600 155" width="100%" height="155" style="display:block">
+          <defs>
+            <linearGradient id="roas-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+            </linearGradient>
+            <!-- Grid lines -->
+          </defs>
+          <!-- Horizontal grid lines -->
+          <line x1="0" y1="10"  x2="600" y2="10"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <line x1="0" y1="47"  x2="600" y2="47"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <line x1="0" y1="83"  x2="600" y2="83"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <line x1="0" y1="120" x2="600" y2="120" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <!-- Area fill -->
+          <polygon
+            points="0,121 21,136 41,107 62,150 83,92 103,121 124,78 145,107 165,136 186,92 207,63 228,92 248,121 269,78 290,107 310,63 331,92 352,49 372,78 393,107 414,63 434,34 455,63 476,92 497,49 517,20 538,63 559,34 579,78 600,92 600,150 0,150"
+            fill="url(#roas-grad)"
+          />
+          <!-- ROAS line -->
+          <polyline
+            points="0,121 21,136 41,107 62,150 83,92 103,121 124,78 145,107 165,136 186,92 207,63 228,92 248,121 269,78 290,107 310,63 331,92 352,49 372,78 393,107 414,63 434,34 455,63 476,92 497,49 517,20 538,63 559,34 579,78 600,92"
+            fill="none" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          />
+          <!-- Current point -->
+          <circle cx="600" cy="92" r="4" fill="#00d4ff"/>
+          <circle cx="600" cy="92" r="8" fill="rgba(0,212,255,0.2)"/>
+        </svg>
+        <div class="x-labels" style="padding-left:0">
+          <span class="x-lbl">Feb 1</span>
+          <span class="x-lbl">Feb 8</span>
+          <span class="x-lbl">Feb 15</span>
+          <span class="x-lbl">Feb 22</span>
+          <span class="x-lbl">Feb 28</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spend Donut Chart -->
+    <div class="chart-card">
+      <div class="chart-hd">
+        <div>
+          <div class="chart-title">Spend by Channel</div>
+          <div class="chart-sub">February 2026 · Total $830,000</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);text-align:right;">
+          <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.02em">$830K</div>
+          <div>total budget</div>
+        </div>
+      </div>
+
+      <div class="donut-wrap">
+        <!-- SVG Donut -->
+        <svg width="160" height="160" viewBox="0 0 200 200" style="flex-shrink:0">
+          <!-- Background track -->
+          <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="24"/>
+          <!-- Meta (84.3%) -->
+          <circle cx="100" cy="100" r="70" fill="none" stroke="#4a9eff" stroke-width="24"
+            stroke-dasharray="370.9 439.8" stroke-dashoffset="0"
+            transform="rotate(-90 100 100)" stroke-linecap="butt"/>
+          <!-- Google (12.0%) -->
+          <circle cx="100" cy="100" r="70" fill="none" stroke="#ff6f6f" stroke-width="24"
+            stroke-dasharray="52.8 439.8" stroke-dashoffset="-370.9"
+            transform="rotate(-90 100 100)" stroke-linecap="butt"/>
+          <!-- TikTok (3.6%) -->
+          <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="24"
+            stroke-dasharray="15.8 439.8" stroke-dashoffset="-423.7"
+            transform="rotate(-90 100 100)" stroke-linecap="butt"/>
+          <!-- Center label -->
+          <text x="100" y="94" text-anchor="middle" font-size="20" font-weight="800" fill="white" font-family="system-ui">$830K</text>
+          <text x="100" y="114" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.4)" font-family="system-ui">total spend</text>
+        </svg>
+
+        <div class="donut-legend">
+          <div class="legend-row">
+            <div class="legend-dot" style="background:#4a9eff"></div>
+            <span class="legend-name">Meta Ads</span>
+            <div>
+              <div class="legend-pct">84.3%</div>
+              <div class="legend-val">$700,000</div>
+            </div>
+          </div>
+          <div class="legend-row">
+            <div class="legend-dot" style="background:#ff6f6f"></div>
+            <span class="legend-name">Google Ads</span>
+            <div>
+              <div class="legend-pct">12.0%</div>
+              <div class="legend-val">$100,000</div>
+            </div>
+          </div>
+          <div class="legend-row">
+            <div class="legend-dot" style="background:rgba(255,255,255,0.35)"></div>
+            <span class="legend-name">TikTok Ads</span>
+            <div>
+              <div class="legend-pct">3.6%</div>
+              <div class="legend-val">$30,000</div>
+            </div>
+          </div>
+          <div style="margin-top:8px;padding:10px 12px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.12);border-radius:9px;font-size:12px;color:var(--muted);line-height:1.5">
+            💡 Google is <strong style="color:var(--cyan)">underallocated</strong>.<br>Recommendation below ↓
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- .charts-row -->
+
+  <!-- ─── LEAD QUALITY ─── -->
+  <div class="sec-hd">
+    <div class="sec-title">Lead Quality Analysis</div>
+    <span class="sec-badge">AI-scored · Updated daily</span>
+  </div>
+  <div class="lq-grid lq-section">
+
+    <div class="lq-card">
+      <div class="sec-hd" style="margin-bottom:18px">
+        <div class="chart-title">Quality Score by Channel</div>
+        <div style="font-size:11px;color:var(--muted)">Avg 70 / 100</div>
+      </div>
+      <div class="lq-channels">
+
+        <div class="lq-row">
+          <div class="lq-row-hd">
+            <div class="lq-ch-name">
+              <div class="ch-icon" style="width:24px;height:24px;border-radius:6px;font-size:9px;background:rgba(234,67,53,0.14);color:#ff6f6f">G</div>
+              Google Ads
+            </div>
+            <div class="lq-score" style="color:var(--green)">87<span style="font-size:13px;font-weight:400;color:var(--muted)">/100</span></div>
+          </div>
+          <div class="lq-bar-track">
+            <div class="lq-bar-fill" style="width:87%;background:linear-gradient(90deg,#22c55e,#16a34a)"></div>
+          </div>
+          <div class="lq-desc">High intent, strong close rate. Search-based traffic converts at 5.1%.</div>
+        </div>
+
+        <div class="lq-row">
+          <div class="lq-row-hd">
+            <div class="lq-ch-name">
+              <div class="ch-icon" style="width:24px;height:24px;border-radius:6px;font-size:9px;background:rgba(24,119,242,0.18);color:#5ba4f5">M</div>
+              Meta Ads
+            </div>
+            <div class="lq-score" style="color:var(--cyan)">64<span style="font-size:13px;font-weight:400;color:var(--muted)">/100</span></div>
+          </div>
+          <div class="lq-bar-track">
+            <div class="lq-bar-fill" style="width:64%;background:linear-gradient(90deg,#00d4ff,#0ea5e9)"></div>
+          </div>
+          <div class="lq-desc">Mid-funnel quality. Lookalike audiences performing best. Retargeting +18% quality.</div>
+        </div>
+
+        <div class="lq-row">
+          <div class="lq-row-hd">
+            <div class="lq-ch-name">
+              <div class="ch-icon" style="width:24px;height:24px;border-radius:6px;font-size:9px;background:rgba(255,255,255,0.07);color:#ccc">TK</div>
+              TikTok Ads
+            </div>
+            <div class="lq-score" style="color:var(--yellow)">58<span style="font-size:13px;font-weight:400;color:var(--muted)">/100</span></div>
+          </div>
+          <div class="lq-bar-track">
+            <div class="lq-bar-fill" style="width:58%;background:linear-gradient(90deg,#f59e0b,#d97706)"></div>
+          </div>
+          <div class="lq-desc">Lower quality, younger demo skew. Creative fatigue detected on 2 top ads.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Insight callout -->
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <div class="insight-card">
+        <div class="insight-icon">💡</div>
+        <div>
+          <div class="insight-title">AI Recommendation</div>
+          <div class="insight-body">
+            Google Ads is generating <strong>70% higher quality leads</strong> vs Meta, with a <strong>$32 lower CPL</strong> and <strong>5.1% vs 3.2% conversion rate</strong>.<br><br>
+            Recommend shifting <strong>$50,000/month from Meta to Google Search</strong>. Projected impact:<br>
+            <strong>+0.3x ROAS</strong> · <strong>+180 high-quality leads/mo</strong> · <strong>−$22 CPL</strong>
+          </div>
+          <div class="insight-cta">Review Recommendation →</div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">
+        <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:12px">Projected Impact (Next 30 Days)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div style="text-align:center">
+            <div style="font-size:20px;font-weight:800;color:var(--green)">+0.3x</div>
+            <div style="font-size:11px;color:var(--muted)">ROAS lift</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:20px;font-weight:800;color:var(--cyan)">+180</div>
+            <div style="font-size:11px;color:var(--muted)">Quality leads</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:20px;font-weight:800;color:#a78bfa">−$22</div>
+            <div style="font-size:11px;color:var(--muted)">CPL reduction</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- .lq-grid -->
+
+  <!-- ─── RECENT ALERTS ─── -->
+  <div class="sec-hd">
+    <div class="sec-title">Recent Alerts</div>
+    <span class="sec-badge">Last 7 days · 4 notifications</span>
+  </div>
+  <div class="alerts-list">
+
+    <div class="al">
+      <div class="al-icon" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.18)">⚠️</div>
+      <div class="al-body">
+        <div class="al-title">TikTok Conversion Rate Decline</div>
+        <div class="al-desc">Your TikTok conversion rate dropped 18% vs 7-day average. Two creatives may be experiencing fatigue — your team has been notified and is reviewing replacements.</div>
+      </div>
+      <span class="al-time">Yesterday · 11:42 AM</span>
+    </div>
+
+    <div class="al">
+      <div class="al-icon" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.16)">✅</div>
+      <div class="al-body">
+        <div class="al-title">Meta ROAS Improvement — +8% Week over Week</div>
+        <div class="al-desc">Meta Ads ROAS improved from 2.96x to 3.2x this week. The updated lookalike audience launched Feb 20 is outperforming the previous audience by 22%.</div>
+      </div>
+      <span class="al-time">3 days ago</span>
+    </div>
+
+    <div class="al">
+      <div class="al-icon" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.16)">📤</div>
+      <div class="al-body">
+        <div class="al-title">Monthly Performance Report Delivered</div>
+        <div class="al-desc">Your February performance report was automatically compiled and delivered to your inbox. Includes ROAS breakdown, lead quality analysis, and March recommendations.</div>
+      </div>
+      <span class="al-time">5 days ago</span>
+    </div>
+
+    <div class="al">
+      <div class="al-icon" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.16)">🏆</div>
+      <div class="al-body">
+        <div class="al-title">Google Lead Quality Score Improved to 87/100</div>
+        <div class="al-desc">AI scoring detected an improvement in Google Ads lead quality following keyword negative list optimization. Close rate estimated to improve by 6–9% month over month.</div>
+      </div>
+      <span class="al-time">6 days ago</span>
+    </div>
+
+  </div>
+
+</div><!-- .page -->
+
+<script>
+  (function() {
+    var t = localStorage.getItem('plaid-theme');
+    if (t === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.addEventListener('DOMContentLoaded', function() {
+        var el = document.getElementById('theme-icon');
+        if (el) el.textContent = '🌙';
+      });
+    }
+  })();
+
+  function toggleTheme() {
+    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    var next = isLight ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = next === 'light' ? '🌙' : '☀️';
+    localStorage.setItem('plaid-theme', next);
+  }
+</script>
+</body>
+</html>
