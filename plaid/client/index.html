@@ -88,7 +88,7 @@
 
     .sec-hd {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px;
+      margin: 28px 0 14px; flex-wrap: wrap; gap: 8px;
     }
     .sec-title { font-size: 15px; font-weight: 600; color: #fff; }
 
@@ -545,6 +545,129 @@
       border-radius: 10px; font-size: 12.5px; color: var(--text); line-height: 1.5;
     }
     [data-theme="light"] .attr-note { color: #374151; background: rgba(0,184,217,0.06); }
+
+    /* ─── GOALS VS ACTUALS ─── */
+    .goals-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin-bottom: 32px; }
+    .goal-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px 20px;
+    }
+    [data-theme="light"] .goal-card { background: #FFFCF8; border-color: #DDD0C0; }
+    .goal-hd { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+    .goal-name { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    [data-theme="light"] .goal-name { color: #8A7B6C; }
+    .goal-vals { font-size: 12px; }
+    .goal-actual { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
+    [data-theme="light"] .goal-actual { color: #1B1A18; }
+    .goal-target { font-size: 11px; color: var(--muted); }
+    [data-theme="light"] .goal-target { color: #8A7B6C; }
+    .goal-track { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
+    [data-theme="light"] .goal-track { background: #DDD0C0; }
+    .goal-fill { height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+    .goal-foot { display: flex; justify-content: space-between; font-size: 11px; }
+    .goal-pct { font-weight: 700; }
+    .goal-gap { color: var(--muted); }
+    [data-theme="light"] .goal-gap { color: #8A7B6C; }
+
+    /* ─── CAMPAIGN BREAKDOWN ─── */
+    .camp-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 32px; }
+    [data-theme="light"] .camp-card { background: #FFFCF8; border-color: #DDD0C0; }
+    .camp-hd { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    [data-theme="light"] .camp-hd { border-bottom-color: #DDD0C0; }
+    .camp-title { font-size: 13px; font-weight: 700; color: var(--text); }
+    [data-theme="light"] .camp-title { color: #1B1A18; }
+    .camp-col-hd {
+      display: grid; grid-template-columns: 1fr 80px 70px 60px 60px 70px 52px;
+      gap: 8px; padding: 8px 20px;
+      font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+    }
+    [data-theme="light"] .camp-col-hd { color: #8A7B6C; border-bottom-color: #DDD0C0; }
+    .camp-row {
+      display: grid; grid-template-columns: 1fr 80px 70px 60px 60px 70px 52px;
+      gap: 8px; padding: 11px 20px; border-bottom: 1px solid var(--border);
+      align-items: center; transition: background 0.15s;
+    }
+    .camp-row:last-child { border-bottom: none; }
+    .camp-row:hover { background: rgba(255,255,255,0.02); }
+    [data-theme="light"] .camp-row { border-bottom-color: #ECE9E5; }
+    [data-theme="light"] .camp-row:hover { background: rgba(0,0,0,0.02); }
+    .camp-name { font-size: 12.5px; font-weight: 600; color: var(--text); }
+    [data-theme="light"] .camp-name { color: #1B1A18; }
+    .camp-sub { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+    [data-theme="light"] .camp-sub { color: #8A7B6C; }
+    .camp-ch { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 5px; width: fit-content; }
+    .camp-ch.meta  { background: rgba(24,119,242,0.14); color: #5ba4f5; }
+    .camp-ch.google { background: rgba(234,67,53,0.12); color: #ff6f6f; }
+    .camp-ch.tiktok { background: rgba(255,255,255,0.08); color: #ccc; }
+    .camp-num { font-size: 12px; font-weight: 600; color: var(--text); }
+    [data-theme="light"] .camp-num { color: #1B1A18; }
+    .camp-roas-hi { color: var(--green); font-weight: 700; font-size: 12.5px; }
+    .camp-roas-mid { color: var(--yellow); font-weight: 700; font-size: 12.5px; }
+    .camp-roas-lo { color: var(--red); font-weight: 700; font-size: 12.5px; }
+    .camp-trend-up { color: var(--green); font-size: 13px; font-weight: 700; }
+    .camp-trend-dn { color: var(--red); font-size: 13px; font-weight: 700; }
+    .camp-trend-nt { color: var(--muted); font-size: 13px; }
+    .camp-status { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; width: fit-content; }
+    .camp-status.active   { background: rgba(34,197,94,0.1); color: var(--green); }
+    .camp-status.review   { background: rgba(245,158,11,0.1); color: var(--yellow); }
+    .camp-status.paused   { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+    /* ─── AI RECOMMENDATIONS ─── */
+    .rec-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+    .rec-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px 20px;
+      display: grid; grid-template-columns: auto 1fr auto;
+      gap: 16px; align-items: start;
+    }
+    [data-theme="light"] .rec-card { background: #FFFCF8; border-color: #DDD0C0; }
+    .rec-card.high { border-left: 3px solid var(--yellow); }
+    .rec-card.medium { border-left: 3px solid var(--cyan); }
+    .rec-card.positive { border-left: 3px solid var(--green); }
+    .rec-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .rec-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+    [data-theme="light"] .rec-title { color: #1B1A18; }
+    .rec-body { font-size: 12px; color: var(--muted); line-height: 1.55; }
+    [data-theme="light"] .rec-body { color: #5C4F46; }
+    .rec-meta { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .rec-priority { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+    .pri-high    { background: rgba(245,158,11,0.12); color: var(--yellow); }
+    .pri-medium  { background: rgba(0,212,255,0.1);   color: var(--cyan); }
+    .pri-positive { background: rgba(34,197,94,0.1);   color: var(--green); }
+    .rec-channel { font-size: 10px; color: var(--muted); }
+    [data-theme="light"] .rec-channel { color: #8A7B6C; }
+    .rec-cta {
+      font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 8px; white-space: nowrap; flex-shrink: 0;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      color: var(--text); cursor: pointer; transition: all 0.15s;
+    }
+    .rec-cta:hover { background: rgba(255,255,255,0.1); }
+    [data-theme="light"] .rec-cta { background: #ECE9E5; border-color: #DDD0C0; color: #1B1A18; }
+    [data-theme="light"] .rec-cta:hover { background: #DDD0C0; }
+
+    /* ─── TOAST ─── */
+    .demo-toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(16px);
+      background: #1e1e2e; color: #f0f0f5; padding: 11px 22px; border-radius: 12px;
+      font-size: 13px; font-weight: 500; z-index: 99999;
+      border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      opacity: 0; transition: opacity 0.25s, transform 0.25s; white-space: nowrap;
+    }
+    .demo-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    [data-theme="light"] .demo-toast { background: #2d2416; color: #f5efe6; border-color: rgba(215,118,82,0.25); }
+
+    /* ─── PAPER TEXTURE (light mode) ─── */
+    [data-theme="light"] body::after {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+      background-size: 400px 400px; background-repeat: repeat;
+    }
+
+    /* ─── POLISH TWEAKS ─── */
+    .kpi-bar { border-bottom: 1px solid var(--border); }
+    [data-theme="light"] .kpi-bar { border-bottom-color: #DDD0C0; }
   </style>
 </head>
 <body>
@@ -631,6 +754,63 @@
       <div class="src-item"><div class="src-dot"></div>Snowflake</div>
       <div style="margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0">7 sources synced · last update 2 min ago</div>
     </div>
+  </div>
+
+  <!-- ─── MONTHLY GOALS ─── -->
+  <div class="sec-hd">
+    <div class="sec-title">Monthly Goals vs Actuals</div>
+    <span class="sec-badge">Feb 2026 · 4 KPIs tracked</span>
+  </div>
+  <div class="goals-grid">
+
+    <div class="goal-card">
+      <div class="goal-hd">
+        <div class="goal-name">Revenue Goal</div>
+        <div class="goal-vals"><span class="goal-actual">$2.83M</span> <span class="goal-target">/ $3.2M target</span></div>
+      </div>
+      <div class="goal-track"><div class="goal-fill" style="width:88.4%;background:linear-gradient(90deg,#22C55E,#16a34a)"></div></div>
+      <div class="goal-foot">
+        <span class="goal-pct" style="color:var(--green)">88.4% to goal</span>
+        <span class="goal-gap">$370K remaining · 2 days left</span>
+      </div>
+    </div>
+
+    <div class="goal-card">
+      <div class="goal-hd">
+        <div class="goal-name">Lead Target</div>
+        <div class="goal-vals"><span class="goal-actual">5,936</span> <span class="goal-target">/ 6,500 target</span></div>
+      </div>
+      <div class="goal-track"><div class="goal-fill" style="width:91.3%;background:linear-gradient(90deg,#22C55E,#16a34a)"></div></div>
+      <div class="goal-foot">
+        <span class="goal-pct" style="color:var(--green)">91.3% to goal</span>
+        <span class="goal-gap">564 leads remaining</span>
+      </div>
+    </div>
+
+    <div class="goal-card">
+      <div class="goal-hd">
+        <div class="goal-name">Blended ROAS</div>
+        <div class="goal-vals"><span class="goal-actual">3.4x</span> <span class="goal-target">/ 3.5x target</span></div>
+      </div>
+      <div class="goal-track"><div class="goal-fill" style="width:97.1%;background:linear-gradient(90deg,#00d4ff,#0090b3)"></div></div>
+      <div class="goal-foot">
+        <span class="goal-pct" style="color:var(--cyan)">97.1% to goal</span>
+        <span class="goal-gap">0.1x short · on track</span>
+      </div>
+    </div>
+
+    <div class="goal-card">
+      <div class="goal-hd">
+        <div class="goal-name">Cost Per Lead</div>
+        <div class="goal-vals"><span class="goal-actual">$139</span> <span class="goal-target">/ $150 max</span></div>
+      </div>
+      <div class="goal-track"><div class="goal-fill" style="width:100%;background:linear-gradient(90deg,#22C55E,#16a34a)"></div></div>
+      <div class="goal-foot">
+        <span class="goal-pct" style="color:var(--green)">✓ Under target</span>
+        <span class="goal-gap">$11 below cap</span>
+      </div>
+    </div>
+
   </div>
 
   <!-- ─── CHANNEL PERFORMANCE ─── -->
@@ -753,6 +933,96 @@
     </div>
 
   </div><!-- .ch-grid -->
+
+  <!-- ─── CAMPAIGN BREAKDOWN ─── -->
+  <div class="sec-hd">
+    <div class="sec-title">Campaign Breakdown</div>
+    <span class="sec-badge">6 active campaigns · Feb 2026</span>
+  </div>
+  <div class="camp-card">
+    <div class="camp-col-hd">
+      <span>Campaign</span><span>Channel</span><span>Status</span><span>Spend</span><span>Leads</span><span>ROAS</span><span>Trend</span>
+    </div>
+
+    <div class="camp-row">
+      <div>
+        <div class="camp-name">Before &amp; After — Seasonal Push</div>
+        <div class="camp-sub">Conversion · Lookalike 3%</div>
+      </div>
+      <div><span class="camp-ch meta">Meta</span></div>
+      <div><span class="camp-status active">Active</span></div>
+      <div class="camp-num">$156K</div>
+      <div class="camp-num">1,820</div>
+      <div class="camp-roas-hi">4.1x</div>
+      <div class="camp-trend-up">↑</div>
+    </div>
+
+    <div class="camp-row">
+      <div>
+        <div class="camp-name">Dr. Chen Explains — UGC v3</div>
+        <div class="camp-sub">Conversion · Retargeting</div>
+      </div>
+      <div><span class="camp-ch meta">Meta</span></div>
+      <div><span class="camp-status active">Active</span></div>
+      <div class="camp-num">$124K</div>
+      <div class="camp-num">1,340</div>
+      <div class="camp-roas-hi">3.8x</div>
+      <div class="camp-trend-up">↑</div>
+    </div>
+
+    <div class="camp-row">
+      <div>
+        <div class="camp-name">Brand Awareness — Spring Launch</div>
+        <div class="camp-sub">Awareness · Broad 25–55</div>
+      </div>
+      <div><span class="camp-ch meta">Meta</span></div>
+      <div><span class="camp-status active">Active</span></div>
+      <div class="camp-num">$98K</div>
+      <div class="camp-num">891</div>
+      <div class="camp-roas-mid">2.9x</div>
+      <div class="camp-trend-nt">→</div>
+    </div>
+
+    <div class="camp-row">
+      <div>
+        <div class="camp-name">Branded Search — Med Spa LA</div>
+        <div class="camp-sub">Search · Brand keywords</div>
+      </div>
+      <div><span class="camp-ch google">Google</span></div>
+      <div><span class="camp-status active">Active</span></div>
+      <div class="camp-num">$72K</div>
+      <div class="camp-num">621</div>
+      <div class="camp-roas-hi">5.2x</div>
+      <div class="camp-trend-up">↑</div>
+    </div>
+
+    <div class="camp-row">
+      <div>
+        <div class="camp-name">Non-Brand Keywords</div>
+        <div class="camp-sub">Search · Med spa + aesthetics</div>
+      </div>
+      <div><span class="camp-ch google">Google</span></div>
+      <div><span class="camp-status active">Active</span></div>
+      <div class="camp-num">$28K</div>
+      <div class="camp-num">270</div>
+      <div class="camp-roas-hi">3.9x</div>
+      <div class="camp-trend-up">↑</div>
+    </div>
+
+    <div class="camp-row">
+      <div>
+        <div class="camp-name">TikTok UGC Test — v2</div>
+        <div class="camp-sub">In-Feed Ads · 18–35 women</div>
+      </div>
+      <div><span class="camp-ch tiktok">TikTok</span></div>
+      <div><span class="camp-status review">Under Review</span></div>
+      <div class="camp-num">$30K</div>
+      <div class="camp-num">198</div>
+      <div class="camp-roas-lo">2.7x</div>
+      <div class="camp-trend-dn">↓</div>
+    </div>
+
+  </div>
 
   <!-- ─── DAY-PARTING HEATMAP ─── -->
   <div class="heatmap-section">
@@ -1263,6 +1533,54 @@
     </div>
   </div>
 
+  <!-- ─── AI RECOMMENDATIONS ─── -->
+  <div class="sec-hd">
+    <div class="sec-title">Agency Recommendations</div>
+    <span class="sec-badge">3 actions · Updated Mar 3</span>
+  </div>
+  <div class="rec-grid">
+
+    <div class="rec-card high">
+      <div class="rec-icon" style="background:rgba(245,158,11,0.1)">⚠️</div>
+      <div>
+        <div class="rec-title">Refresh TikTok Creatives — ROAS Below Threshold</div>
+        <div class="rec-body">Your TikTok UGC v2 campaign has declined to 2.7x ROAS over the past 10 days. Audience fatigue detected — the current creative has 1.1M impressions against the same core segment. We recommend 2 new UGC concepts focused on transformation outcomes rather than product features. Our team has drafted a brief and is ready to brief your creative team.</div>
+        <div class="rec-meta">
+          <span class="rec-priority pri-high">High Priority</span>
+          <span class="rec-channel">TikTok · Affects $30K/mo spend</span>
+        </div>
+      </div>
+      <button class="rec-cta" onclick="showToast('Creative brief sent to your inbox.')">Review Brief →</button>
+    </div>
+
+    <div class="rec-card medium">
+      <div class="rec-icon" style="background:rgba(0,212,255,0.08)">💡</div>
+      <div>
+        <div class="rec-title">Scale Google Branded Search — Highest ROAS Channel</div>
+        <div class="rec-body">Your Google Branded Search campaign is delivering 5.2x ROAS at $72K/mo — your single highest-performing campaign. Current impression share is 78%. We recommend a $20K/mo budget increase to capture the remaining 22% of branded searches. Estimated incremental leads: 172/mo at $116 CPL.</div>
+        <div class="rec-meta">
+          <span class="rec-priority pri-medium">Medium Priority</span>
+          <span class="rec-channel">Google · Projected +$104K revenue/mo</span>
+        </div>
+      </div>
+      <button class="rec-cta" onclick="showToast('Recommendation details sent to your inbox.')">View Details →</button>
+    </div>
+
+    <div class="rec-card positive">
+      <div class="rec-icon" style="background:rgba(34,197,94,0.08)">🏆</div>
+      <div>
+        <div class="rec-title">Before &amp; After Campaign Performing — Consider Expansion</div>
+        <div class="rec-body">Your "Before &amp; After — Seasonal Push" Meta campaign reached 4.1x ROAS this month with strong click-to-consult rates. Lookalike audience at 3% is showing diminishing returns above $160K spend. We recommend testing a 1% lookalike at $40K to find higher-intent prospects ahead of the spring booking season.</div>
+        <div class="rec-meta">
+          <span class="rec-priority pri-positive">Opportunity</span>
+          <span class="rec-channel">Meta · Spring booking season starts Mar 15</span>
+        </div>
+      </div>
+      <button class="rec-cta" onclick="showToast('Expansion brief sent to your inbox.')">Explore →</button>
+    </div>
+
+  </div>
+
   <!-- ─── RECENT ALERTS ─── -->
   <div class="sec-hd">
     <div class="sec-title">Recent Alerts</div>
@@ -1311,17 +1629,34 @@
 </div><!-- .page -->
 
 <script>
-  // Restore theme before paint — no label manipulation needed (CSS handles it)
-  (function() {
-    var t = localStorage.getItem('plaid-theme');
-    if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-  })();
-
   function toggleTheme() {
     var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('plaid-theme', next);
   }
+
+  function showToast(msg) {
+    var existing = document.querySelector('.demo-toast');
+    if (existing) existing.remove();
+    var t = document.createElement('div');
+    t.className = 'demo-toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function() { t.classList.add('show'); }, 30);
+    setTimeout(function() {
+      t.classList.remove('show');
+      setTimeout(function() { t.remove(); }, 300);
+    }, 4000);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    /* animate goal bars in after load */
+    document.querySelectorAll('.goal-fill').forEach(function(el) {
+      var w = el.style.width;
+      el.style.width = '0%';
+      setTimeout(function() { el.style.width = w; }, 200);
+    });
+  });
 </script>
 </body>
 </html>
