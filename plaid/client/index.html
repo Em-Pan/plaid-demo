@@ -296,13 +296,21 @@
     }
 
     /* ─── THEME TOGGLE ─── */
+    /* Theme toggle — CSS-driven label, no JS timing issues */
     .theme-toggle {
-      width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px; flex-shrink: 0;
       background: var(--surface); border: 1px solid var(--border);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      font-size: 15px;
+      cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap;
+      transition: all 0.2s;
     }
     .theme-toggle:hover { border-color: rgba(0,212,255,0.35); }
+    /* Icon and label via CSS — always correct, no FOUC */
+    .theme-toggle #theme-icon::after  { content: '☀️'; }
+    .theme-toggle #theme-label::after { content: 'Light'; }
+    [data-theme="light"] .theme-toggle #theme-icon::after  { content: '🌙'; }
+    [data-theme="light"] .theme-toggle #theme-label::after { content: 'Dark'; }
+    #theme-icon, #theme-label { font-size: 12px; }
 
     /* ─── TRANSITIONS ─── */
     body, .header, .kpi, .ch-card, .chart-card, .lq-card, .insight-card,
@@ -331,9 +339,12 @@
     [data-theme="light"] .brand-sub { color: rgba(255,255,255,0.45); }
     [data-theme="light"] .powered { color: rgba(255,255,255,0.45); }
     [data-theme="light"] .powered-logo { color: #D77652; }
-    [data-theme="light"] .date-chip { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.75); }
-    [data-theme="light"] .date-opt { color: rgba(255,255,255,0.5); }
-    [data-theme="light"] .date-opt.sel { background: rgba(215,118,82,0.15); color: #D77652; }
+    /* date-opts is a white-surface box on the dark header — text must be dark */
+    [data-theme="light"] .date-opts { background: #FFFCF8; border-color: rgba(255,255,255,0.22); }
+    [data-theme="light"] .date-opt { color: #8A7B6C; }
+    [data-theme="light"] .date-opt:hover { color: #1B1A18; background: rgba(60,51,47,0.07); }
+    [data-theme="light"] .date-opt.sel { background: rgba(215,118,82,0.12); color: #D77652; font-weight: 600; }
+    [data-theme="light"] .date-chip { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.8); }
     [data-theme="light"] .cross-link { color: #D77652; border-color: rgba(215,118,82,0.3); background: rgba(215,118,82,0.1); }
     [data-theme="light"] .cross-link:hover { background: rgba(215,118,82,0.18); }
     [data-theme="light"] .theme-toggle { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18) !important; color: rgba(255,255,255,0.7) !important; }
@@ -411,18 +422,9 @@
     [data-theme="light"] .demo-banner { background: rgba(215,118,82,0.07); border-color: rgba(215,118,82,0.18); color: #6b5347; }
 
     /* ─── THEME TOGGLE (labeled pill) ─── */
-    .theme-toggle {
-      display: flex !important; align-items: center; gap: 6px;
-      width: auto !important; height: auto !important;
-      padding: 6px 14px !important; border-radius: 99px !important;
-      font-size: 12px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s; white-space: nowrap;
-      overflow: visible !important;
-    }
-    [data-theme="dark"] .theme-toggle { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.7); }
+    /* Dark mode toggle colors */
+    [data-theme="dark"] .theme-toggle { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.75); }
     [data-theme="dark"] .theme-toggle:hover { background: rgba(255,255,255,0.13); }
-    [data-theme="light"] .theme-toggle { background: rgba(15,23,42,0.08); border: 1px solid rgba(15,23,42,0.15) !important; color: #374151; }
-    [data-theme="light"] .theme-toggle:hover { background: rgba(15,23,42,0.12); }
 
     /* ─── CONNECTED SOURCES BAR ─── */
     .sources-bar {
@@ -547,8 +549,8 @@
     <a href="/plaid" class="cross-link">← Agency View</a>
     <div class="powered">Powered by <span class="powered-logo">Plaid Testing</span></div>
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
-      <span id="theme-icon">☀️</span>
-      <span id="theme-label">Light</span>
+      <span id="theme-icon"></span>
+      <span id="theme-label"></span>
     </button>
     <div class="dl-btn">↓ Export PDF</div>
   </div>
@@ -1155,37 +1157,17 @@
 </div><!-- .page -->
 
 <script>
+  // Restore theme before paint — no label manipulation needed (CSS handles it)
   (function() {
     var t = localStorage.getItem('plaid-theme');
-    if (t === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
+    if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
   })();
 
   function toggleTheme() {
-    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    var next = isLight ? 'dark' : 'light';
+    var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', next);
-    var icon = document.getElementById('theme-icon');
-    var label = document.getElementById('theme-label');
-    if (icon) icon.textContent = next === 'light' ? '🌙' : '☀️';
-    if (label) label.textContent = next === 'light' ? 'Dark' : 'Light';
     localStorage.setItem('plaid-theme', next);
   }
-
-  // Set initial label state
-  (function() {
-    var stored = localStorage.getItem('plaid-theme');
-    var label = document.getElementById('theme-label');
-    var icon = document.getElementById('theme-icon');
-    if (stored === 'light') {
-      if (label) label.textContent = 'Dark';
-      if (icon) icon.textContent = '🌙';
-    } else {
-      if (label) label.textContent = 'Light';
-      if (icon) icon.textContent = '☀️';
-    }
-  })();
 </script>
 </body>
 </html>

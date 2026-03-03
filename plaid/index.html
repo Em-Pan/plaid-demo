@@ -411,13 +411,20 @@
     }
 
     /* ─── THEME TOGGLE ─── */
+    /* Theme toggle — CSS-driven label, zero FOUC */
     .theme-toggle {
-      width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px; flex-shrink: 0;
       background: var(--surface); border: 1px solid var(--border);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      font-size: 15px;
+      cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap;
+      transition: all 0.2s;
     }
     .theme-toggle:hover { border-color: rgba(0,212,255,0.35); }
+    .theme-toggle #theme-icon::after  { content: '☀️'; }
+    .theme-toggle #theme-label::after { content: 'Light'; }
+    [data-theme="light"] .theme-toggle #theme-icon::after  { content: '🌙'; }
+    [data-theme="light"] .theme-toggle #theme-label::after { content: 'Dark'; }
+    #theme-icon, #theme-label { font-size: 12px; }
 
     /* ─── TRANSITIONS ─── */
     body, .header, .stat-card, .cc, .met, .alert-item, .ai-card, .ai-row,
@@ -616,19 +623,9 @@
     }
     [data-theme="light"] .demo-banner { background: rgba(0,184,217,0.07); border-color: rgba(0,184,217,0.18); color: #475569; }
 
-    /* ─── THEME TOGGLE (labeled pill) ─── */
-    .theme-toggle {
-      display: flex; align-items: center; gap: 6px;
-      width: auto !important; height: auto !important;
-      padding: 6px 14px !important; border-radius: 99px !important;
-      font-size: 12px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s; white-space: nowrap;
-      overflow: visible !important;
-    }
-    [data-theme="dark"] .theme-toggle { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+    /* Dark mode explicit toggle colors */
+    [data-theme="dark"] .theme-toggle { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.75); }
     [data-theme="dark"] .theme-toggle:hover { background: rgba(255,255,255,0.13); }
-    [data-theme="light"] .theme-toggle { background: rgba(15,23,42,0.08); border: 1px solid rgba(15,23,42,0.15); color: #374151; }
-    [data-theme="light"] .theme-toggle:hover { background: rgba(15,23,42,0.12); }
 
     /* ─── TOAST ─── */
     .demo-toast {
@@ -752,8 +749,8 @@
       Live · Updated 2 min ago
     </div>
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
-      <span id="theme-icon">☀️</span>
-      <span id="theme-label">Light</span>
+      <span id="theme-icon"></span>
+      <span id="theme-label"></span>
     </button>
     <div class="user-chip">
       <div class="user-av">JL</div>
@@ -1624,42 +1621,17 @@
 
 
 <script>
-  // Restore saved theme before paint
+  // Restore theme before paint — label handled by CSS ::after, no JS needed
   (function() {
     var t = localStorage.getItem('plaid-theme');
-    if (t === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-      document.addEventListener('DOMContentLoaded', function() {
-        var el = document.getElementById('theme-icon');
-        if (el) el.textContent = '🌙';
-      });
-    }
+    if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
   })();
 
   function toggleTheme() {
-    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    var next = isLight ? 'dark' : 'light';
+    var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', next);
-    var icon = document.getElementById('theme-icon');
-    var label = document.getElementById('theme-label');
-    if (icon) icon.textContent = next === 'light' ? '🌙' : '☀️';
-    if (label) label.textContent = next === 'light' ? 'Dark' : 'Light';
     localStorage.setItem('plaid-theme', next);
   }
-
-  // Also fix initial label on load
-  (function() {
-    var stored = localStorage.getItem('plaid-theme');
-    var label = document.getElementById('theme-label');
-    var icon = document.getElementById('theme-icon');
-    if (stored === 'light') {
-      if (label) label.textContent = 'Dark';
-      if (icon) icon.textContent = '🌙';
-    } else {
-      if (label) label.textContent = 'Light';
-      if (icon) icon.textContent = '☀️';
-    }
-  })();
 
   /* ── PAGE / TAB SWITCHER ── */
   function showPage(name) {
