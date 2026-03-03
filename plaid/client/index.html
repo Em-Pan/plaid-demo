@@ -646,6 +646,44 @@
     [data-theme="light"] .rec-cta { background: #ECE9E5; border-color: #DDD0C0; color: #1B1A18; }
     [data-theme="light"] .rec-cta:hover { background: #DDD0C0; }
 
+    /* ─── LIVE DATA PULSE ─── */
+    @keyframes dot-breathe {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5), 0 0 4px rgba(34,197,94,0.6); opacity: 1; }
+      50%       { box-shadow: 0 0 0 4px rgba(34,197,94,0), 0 0 4px rgba(34,197,94,0.2); opacity: 0.75; }
+    }
+    .src-dot { animation: dot-breathe 2.6s ease-in-out infinite; }
+    .src-item:nth-child(2) .src-dot { animation-delay: 0.37s; }
+    .src-item:nth-child(3) .src-dot { animation-delay: 0.74s; }
+    .src-item:nth-child(4) .src-dot { animation-delay: 1.11s; }
+    .src-item:nth-child(5) .src-dot { animation-delay: 1.48s; }
+    .src-item:nth-child(6) .src-dot { animation-delay: 1.85s; }
+    .src-item:nth-child(7) .src-dot { animation-delay: 2.22s; }
+
+    @keyframes live-flash {
+      0%   { opacity: 1; }
+      15%  { opacity: 0.4; }
+      40%  { color: #22C55E; opacity: 1; }
+      100% { opacity: 1; }
+    }
+    .live-flash { animation: live-flash 0.65s ease-out forwards; }
+
+    /* Live badge in header */
+    .live-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 700; color: var(--green);
+      padding: 3px 9px; border-radius: 6px;
+      background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.22);
+      margin-left: 10px;
+    }
+    @keyframes live-dot-blink {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
+    }
+    .live-pill-dot {
+      width: 5px; height: 5px; border-radius: 50%; background: var(--green);
+      animation: live-dot-blink 1.4s ease-in-out infinite;
+    }
+    [data-theme="light"] .live-pill { background: rgba(22,163,74,0.08); border-color: rgba(22,163,74,0.2); }
+
     /* ─── TOAST ─── */
     .demo-toast {
       position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(16px);
@@ -675,7 +713,10 @@
 <!-- ─── HEADER ─── -->
 <header class="header">
   <div class="brand">
-    <div class="brand-name">Naked MD</div>
+    <div style="display:flex;align-items:center;gap:0">
+      <div class="brand-name">Naked MD</div>
+      <span class="live-pill"><span class="live-pill-dot"></span>LIVE</span>
+    </div>
     <div class="brand-sub">Performance Dashboard</div>
   </div>
 
@@ -716,17 +757,17 @@
   <div class="kpi-bar">
     <div class="kpi">
       <div class="kpi-label">Total Ad Spend</div>
-      <div class="kpi-value">$830K</div>
+      <div class="kpi-value" id="live-spend">$830K</div>
       <div class="kpi-sub"><span class="kpi-chg up">↑ 8.2%</span> vs last month</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Leads Generated</div>
-      <div class="kpi-value" style="color:#a78bfa">5,936</div>
+      <div class="kpi-value" id="live-leads" style="color:#a78bfa">5,936</div>
       <div class="kpi-sub"><span class="kpi-chg up">↑ 14.3%</span> vs last month</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Cost Per Lead</div>
-      <div class="kpi-value" style="color:#34d399">$139</div>
+      <div class="kpi-value" id="live-cpl" style="color:#34d399">$139</div>
       <div class="kpi-sub"><span class="kpi-chg up">↓ $18</span> vs last month</div>
     </div>
     <div class="kpi">
@@ -752,7 +793,7 @@
       <div class="src-item"><div class="src-dot"></div>GA4</div>
       <div class="src-item"><div class="src-dot"></div>LinkedIn Ads</div>
       <div class="src-item"><div class="src-dot"></div>Snowflake</div>
-      <div style="margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0">7 sources synced · last update 2 min ago</div>
+      <div id="live-sync" style="margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0">7 sources synced · last update just now</div>
     </div>
   </div>
 
@@ -778,12 +819,12 @@
     <div class="goal-card">
       <div class="goal-hd">
         <div class="goal-name">Lead Target</div>
-        <div class="goal-vals"><span class="goal-actual">5,936</span> <span class="goal-target">/ 6,500 target</span></div>
+        <div class="goal-vals"><span id="live-goal-leads" class="goal-actual">5,936</span> <span class="goal-target">/ 6,500 target</span></div>
       </div>
-      <div class="goal-track"><div class="goal-fill" style="width:91.3%;background:linear-gradient(90deg,#22C55E,#16a34a)"></div></div>
+      <div class="goal-track"><div id="live-goal-bar" class="goal-fill" style="width:91.3%;background:linear-gradient(90deg,#22C55E,#16a34a)"></div></div>
       <div class="goal-foot">
-        <span class="goal-pct" style="color:var(--green)">91.3% to goal</span>
-        <span class="goal-gap">564 leads remaining</span>
+        <span id="live-goal-pct" class="goal-pct" style="color:var(--green)">91.3% to goal</span>
+        <span id="live-goal-gap" class="goal-gap">564 leads remaining</span>
       </div>
     </div>
 
@@ -1649,13 +1690,92 @@
     }, 4000);
   }
 
+  /* ── LIVE DATA PULSE ── */
+  var LP = {
+    leads:    5936,
+    spend:    830000,
+    syncedAt: Date.now(),
+    tickCount: 0,
+
+    el: function(id) { return document.getElementById(id); },
+
+    flash: function(el) {
+      if (!el) return;
+      el.classList.remove('live-flash');
+      void el.offsetWidth; /* reflow to restart animation */
+      el.classList.add('live-flash');
+    },
+
+    fmtLeads: function(n) { return n.toLocaleString(); },
+    fmtSpend: function(n) { return '$' + Math.round(n / 1000) + 'K'; },
+    fmtCpl:   function(leads, spend) { return '$' + Math.round(spend / leads); },
+
+    updateSync: function() {
+      var el = LP.el('live-sync');
+      if (!el) return;
+      var s = Math.floor((Date.now() - LP.syncedAt) / 1000);
+      var txt = s < 5   ? '7 sources synced · just now'
+              : s < 60  ? '7 sources synced · ' + s + 's ago'
+              :            '7 sources synced · ' + Math.floor(s / 60) + 'm ago';
+      el.textContent = txt;
+    },
+
+    tick: function() {
+      LP.tickCount++;
+      LP.updateSync();
+
+      /* leads tick: ~1 lead every 30s = every 10 ticks at 3s interval */
+      if (LP.tickCount % 10 === 0 || (LP.tickCount % 5 === 0 && Math.random() < 0.35)) {
+        var newLeads = LP.leads + Math.floor(Math.random() * 2) + 1;
+        LP.leads = newLeads;
+
+        /* KPI bar */
+        var leadsEl = LP.el('live-leads');
+        if (leadsEl) {
+          leadsEl.textContent = LP.fmtLeads(LP.leads);
+          LP.flash(leadsEl);
+        }
+
+        /* spend ticks with leads (~$144 CPL avg) */
+        LP.spend += Math.floor(Math.random() * 180 + 80);
+        var spendEl = LP.el('live-spend');
+        if (spendEl) spendEl.textContent = LP.fmtSpend(LP.spend);
+
+        /* CPL updates */
+        var cplEl = LP.el('live-cpl');
+        if (cplEl) cplEl.textContent = LP.fmtCpl(LP.leads, LP.spend);
+
+        /* Goals section stays in sync */
+        var goalLeads = LP.el('live-goal-leads');
+        if (goalLeads) {
+          goalLeads.textContent = LP.fmtLeads(LP.leads);
+          LP.flash(goalLeads);
+        }
+        var pct = Math.min(100, (LP.leads / 6500) * 100);
+        var goalBar = LP.el('live-goal-bar');
+        if (goalBar) goalBar.style.width = pct.toFixed(1) + '%';
+        var goalPct = LP.el('live-goal-pct');
+        if (goalPct) goalPct.textContent = pct.toFixed(1) + '% to goal';
+        var goalGap = LP.el('live-goal-gap');
+        if (goalGap) {
+          var rem = 6500 - LP.leads;
+          goalGap.textContent = rem > 0 ? rem.toLocaleString() + ' leads remaining' : '✓ Goal reached!';
+        }
+      }
+    }
+  };
+
   document.addEventListener('DOMContentLoaded', function() {
-    /* animate goal bars in after load */
+    /* animate goal bars in on load */
     document.querySelectorAll('.goal-fill').forEach(function(el) {
       var w = el.style.width;
       el.style.width = '0%';
       setTimeout(function() { el.style.width = w; }, 200);
     });
+    /* start live pulse */
+    LP.syncedAt = Date.now();
+    setInterval(LP.tick, 3000);
+    setInterval(LP.updateSync, 1000); /* sync timer updates every second */
   });
 </script>
 </body>

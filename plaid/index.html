@@ -859,6 +859,26 @@
     .sim-reset-btn:hover { background: rgba(255,255,255,0.1); }
     [data-theme="light"] .sim-reset-btn:hover { background: rgba(0,0,0,0.07); }
 
+    /* ─── LIVE DATA PULSE ─── */
+    @keyframes dot-breathe {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5), 0 0 4px rgba(34,197,94,0.6); opacity: 1; }
+      50%       { box-shadow: 0 0 0 4px rgba(34,197,94,0), 0 0 4px rgba(34,197,94,0.2); opacity: 0.75; }
+    }
+    .src-dot { animation: dot-breathe 2.6s ease-in-out infinite; }
+    .src-item:nth-child(2) .src-dot { animation-delay: 0.37s; }
+    .src-item:nth-child(3) .src-dot { animation-delay: 0.74s; }
+    .src-item:nth-child(4) .src-dot { animation-delay: 1.11s; }
+    .src-item:nth-child(5) .src-dot { animation-delay: 1.48s; }
+    .src-item:nth-child(6) .src-dot { animation-delay: 1.85s; }
+    .src-item:nth-child(7) .src-dot { animation-delay: 2.22s; }
+    @keyframes live-flash {
+      0%   { opacity: 1; }
+      15%  { opacity: 0.4; }
+      40%  { color: #22C55E; opacity: 1; }
+      100% { opacity: 1; }
+    }
+    .live-flash { animation: live-flash 0.65s ease-out forwards; }
+
     /* ─── PAPER TEXTURE (light mode only) ─── */
     [data-theme="light"] body::after {
       content: '';
@@ -899,7 +919,7 @@
     <a href="/plaid/client" class="cross-link">Client View →</a>
     <div class="live-badge">
       <div class="live-dot"></div>
-      Live · Updated 2 min ago
+      <span id="int-live-badge">Live · just now</span>
     </div>
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
       <span class="t-dark">☀️ Light</span>
@@ -971,7 +991,7 @@
     <div class="src-item"><div class="src-dot"></div>GA4</div>
     <div class="src-item"><div class="src-dot"></div>LinkedIn Ads</div>
     <div class="src-item"><div class="src-dot"></div>Snowflake</div>
-    <div style="margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0">7 / 7 sources live · last sync 4 min ago</div>
+    <div id="int-sync" style="margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0">7 / 7 sources live · just now</div>
   </div>
 </div>
 
@@ -2330,11 +2350,36 @@
     updateSimulator();
   }
 
+  /* ── LIVE DATA PULSE ── */
+  var ILP = {
+    syncedAt: Date.now(),
+    tickCount: 0,
+
+    updateSync: function() {
+      var s = Math.floor((Date.now() - ILP.syncedAt) / 1000);
+      var txt = s < 5   ? 'just now'
+              : s < 60  ? s + 's ago'
+              :            Math.floor(s / 60) + 'm ago';
+      var badge = document.getElementById('int-live-badge');
+      if (badge) badge.textContent = 'Live · ' + txt;
+      var sync = document.getElementById('int-sync');
+      if (sync) sync.textContent = '7 / 7 sources live · ' + txt;
+    },
+
+    tick: function() {
+      ILP.tickCount++;
+      ILP.updateSync();
+    }
+  };
+
   /* ── PAGE INIT ── */
   document.addEventListener('DOMContentLoaded', function() {
     showPage('dashboard');
     switchAdsTab('top');
     updateSimulator();
+    ILP.syncedAt = Date.now();
+    setInterval(ILP.tick, 3000);
+    setInterval(ILP.updateSync, 1000);
   });
 </script>
 </body>
