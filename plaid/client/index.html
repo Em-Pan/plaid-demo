@@ -297,21 +297,20 @@
     }
 
     /* ─── THEME TOGGLE ─── */
-    /* Theme toggle — CSS-driven label, no JS timing issues */
+    /* Theme toggle */
     .theme-toggle {
       display: flex; align-items: center; gap: 6px;
       padding: 6px 14px; border-radius: 99px; flex-shrink: 0;
       background: var(--surface); border: 1px solid var(--border);
       cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap;
-      transition: all 0.2s;
+      color: var(--text); transition: all 0.2s;
     }
     .theme-toggle:hover { border-color: rgba(0,212,255,0.35); }
-    /* Icon and label via CSS — always correct, no FOUC */
-    .theme-toggle #theme-icon::after  { content: '☀️'; }
-    .theme-toggle #theme-label::after { content: 'Light'; }
-    [data-theme="light"] .theme-toggle #theme-icon::after  { content: '🌙'; }
-    [data-theme="light"] .theme-toggle #theme-label::after { content: 'Dark'; }
-    #theme-icon, #theme-label { font-size: 12px; }
+    /* Show correct label per theme — FOUC-free via head script + CSS */
+    .t-dark { display: inline; }
+    .t-light { display: none; }
+    [data-theme="light"] .t-dark { display: none; }
+    [data-theme="light"] .t-light { display: inline; }
 
     /* ─── TRANSITIONS ─── */
     body, .header, .kpi, .ch-card, .chart-card, .lq-card, .insight-card,
@@ -574,8 +573,8 @@
     <a href="/plaid" class="cross-link">← Agency View</a>
     <div class="powered">Powered by <span class="powered-logo">Plaid Testing</span></div>
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
-      <span id="theme-icon"></span>
-      <span id="theme-label"></span>
+      <span class="t-dark">☀️ Light</span>
+      <span class="t-light">🌙 Dark</span>
     </button>
     <div class="dl-btn">↓ Export PDF</div>
   </div>
@@ -584,7 +583,7 @@
 <!-- ─── DEMO BANNER ─── -->
 <div class="demo-banner" id="demo-banner">
   <span style="opacity:0.7">🔬</span>
-  <span><strong>Demo Environment</strong> — All data is illustrative. Connect Meta, Google, TikTok, Pinterest, Shopify, GA4, LinkedIn & Snowflake to activate real-time sync.</span>
+  <span><strong>Demo Environment</strong> — All data is illustrative. Connect Meta, Google, TikTok, Shopify, GA4, LinkedIn & Snowflake to activate real-time sync.</span>
   <button onclick="document.getElementById('demo-banner').style.display='none'" style="margin-left:auto;background:none;border:none;color:inherit;opacity:0.5;cursor:pointer;font-size:16px;padding:0 4px">×</button>
 </div>
 
@@ -626,12 +625,11 @@
       <div class="src-item"><div class="src-dot"></div>Meta Ads</div>
       <div class="src-item"><div class="src-dot"></div>Google Ads</div>
       <div class="src-item"><div class="src-dot"></div>TikTok Ads</div>
-      <div class="src-item"><div class="src-dot"></div>Pinterest</div>
       <div class="src-item"><div class="src-dot"></div>Shopify</div>
       <div class="src-item"><div class="src-dot"></div>GA4</div>
       <div class="src-item"><div class="src-dot"></div>LinkedIn Ads</div>
       <div class="src-item"><div class="src-dot"></div>Snowflake</div>
-      <div style="margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0">8 sources synced · last update 2 min ago</div>
+      <div style="margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0">7 sources synced · last update 2 min ago</div>
     </div>
   </div>
 

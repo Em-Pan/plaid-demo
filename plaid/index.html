@@ -413,20 +413,20 @@
     }
 
     /* ─── THEME TOGGLE ─── */
-    /* Theme toggle — CSS-driven label, zero FOUC */
+    /* Theme toggle */
     .theme-toggle {
       display: flex; align-items: center; gap: 6px;
       padding: 6px 14px; border-radius: 99px; flex-shrink: 0;
       background: var(--surface); border: 1px solid var(--border);
       cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap;
-      transition: all 0.2s;
+      color: var(--text); transition: all 0.2s;
     }
     .theme-toggle:hover { border-color: rgba(0,212,255,0.35); }
-    .theme-toggle #theme-icon::after  { content: '☀️'; }
-    .theme-toggle #theme-label::after { content: 'Light'; }
-    [data-theme="light"] .theme-toggle #theme-icon::after  { content: '🌙'; }
-    [data-theme="light"] .theme-toggle #theme-label::after { content: 'Dark'; }
-    #theme-icon, #theme-label { font-size: 12px; }
+    /* show correct label per theme — driven by CSS, FOUC-free */
+    .t-dark { display: inline; }
+    .t-light { display: none; }
+    [data-theme="light"] .t-dark { display: none; }
+    [data-theme="light"] .t-light { display: inline; }
 
     /* ─── TRANSITIONS ─── */
     body, .header, .stat-card, .cc, .met, .alert-item, .ai-card, .ai-row,
@@ -894,8 +894,8 @@
       Live · Updated 2 min ago
     </div>
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
-      <span id="theme-icon"></span>
-      <span id="theme-label"></span>
+      <span class="t-dark">☀️ Light</span>
+      <span class="t-light">🌙 Dark</span>
     </button>
     <div class="user-chip">
       <div class="user-av">JL</div>
@@ -907,7 +907,7 @@
 <!-- ─── DEMO BANNER ─── -->
 <div class="demo-banner" id="demo-banner">
   <span style="opacity:0.7">🔬</span>
-  <span><strong>Demo Environment</strong> — All data is illustrative. Connect Meta, Google, TikTok, Pinterest, Shopify, GA4, LinkedIn & Snowflake to activate real-time sync.</span>
+  <span><strong>Demo Environment</strong> — All data is illustrative. Connect Meta, Google, TikTok, Shopify, GA4, LinkedIn & Snowflake to activate real-time sync.</span>
   <button onclick="document.getElementById('demo-banner').style.display='none'" style="margin-left:auto;background:none;border:none;color:inherit;opacity:0.5;cursor:pointer;font-size:16px;padding:0 4px">×</button>
 </div>
 
@@ -959,12 +959,11 @@
     <div class="src-item"><div class="src-dot"></div>Meta Ads</div>
     <div class="src-item"><div class="src-dot"></div>Google Ads</div>
     <div class="src-item"><div class="src-dot"></div>TikTok Ads</div>
-    <div class="src-item"><div class="src-dot"></div>Pinterest</div>
     <div class="src-item"><div class="src-dot"></div>Shopify</div>
     <div class="src-item"><div class="src-dot"></div>GA4</div>
     <div class="src-item"><div class="src-dot"></div>LinkedIn Ads</div>
     <div class="src-item"><div class="src-dot"></div>Snowflake</div>
-    <div style="margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0">8 / 8 sources live · last sync 4 min ago</div>
+    <div style="margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0">7 / 7 sources live · last sync 4 min ago</div>
   </div>
 </div>
 
@@ -1081,7 +1080,6 @@
             <div class="plat" style="background:rgba(24,119,242,0.18);color:#5ba4f5" title="Meta">M</div>
             <div class="plat" style="background:rgba(234,67,53,0.14);color:#ff6f6f" title="Google">G</div>
             <div class="plat" style="background:rgba(255,255,255,0.08);color:#ccc" title="TikTok">TK</div>
-            <div class="plat" style="background:rgba(230,0,35,0.12);color:#f06;opacity:.85" title="Pinterest">P</div>
           </div>
           <div class="ret">
             <div class="ret-val">$2,400/mo</div>
@@ -1133,7 +1131,6 @@
           <div class="platforms">
             <div class="plat" style="background:rgba(24,119,242,0.18);color:#5ba4f5" title="Meta">M</div>
             <div class="plat" style="background:rgba(255,255,255,0.08);color:#ccc" title="TikTok">TK</div>
-            <div class="plat" style="background:rgba(230,0,35,0.12);color:#f06;opacity:.85" title="Pinterest">P</div>
           </div>
           <div class="ret">
             <div class="ret-val">$3,000/mo</div>
@@ -2021,26 +2018,11 @@
               TikTok Ads
             </div>
             <div>
-              <span class="sim-ch-spend" id="tiktok-spend">$91K</span>
+              <span class="sim-ch-spend" id="tiktok-spend">$112K</span>
               <span class="sim-ch-roas" id="tiktok-roas"> · 5.4x</span>
             </div>
           </div>
-          <input type="range" class="sim-slider" id="tiktok-slider" min="0" max="700000" step="5000" value="91000" oninput="updateSimulator()" style="accent-color:#69c9d0">
-        </div>
-
-        <!-- Pinterest -->
-        <div class="sim-ch-row">
-          <div class="sim-ch-hd">
-            <div class="sim-ch-name">
-              <div class="sim-ch-icon" style="background:rgba(230,0,35,0.2);color:#f87171">P</div>
-              Pinterest
-            </div>
-            <div>
-              <span class="sim-ch-spend" id="pinterest-spend">$21K</span>
-              <span class="sim-ch-roas" id="pinterest-roas"> · 1.9x</span>
-            </div>
-          </div>
-          <input type="range" class="sim-slider" id="pinterest-slider" min="0" max="700000" step="5000" value="21000" oninput="updateSimulator()" style="accent-color:#e60023">
+          <input type="range" class="sim-slider" id="tiktok-slider" min="0" max="700000" step="5000" value="112000" oninput="updateSimulator()" style="accent-color:#69c9d0">
         </div>
 
         <div class="sim-total-row">
@@ -2055,20 +2037,20 @@
           <div class="sim-compare-card">
             <div class="sim-cmp-label">Current ROAS</div>
             <div class="sim-cmp-roas sim-cmp-roas-cur">3.4x</div>
-            <div class="sim-cmp-sub">$2.38M revenue / mo</div>
+            <div class="sim-cmp-sub">$2.39M revenue / mo</div>
           </div>
           <div class="sim-compare-card active">
             <div class="sim-cmp-label">Projected ROAS</div>
             <div class="sim-cmp-roas sim-cmp-roas-proj" id="proj-roas">3.4x</div>
-            <div class="sim-cmp-sub" id="proj-revenue">$2.38M revenue / mo</div>
+            <div class="sim-cmp-sub" id="proj-revenue">$2.39M revenue / mo</div>
           </div>
         </div>
 
         <div class="sim-metrics">
           <div class="sim-met">
             <div class="sim-met-lbl">Conversions / mo</div>
-            <div class="sim-met-cur">4,847</div>
-            <div class="sim-met-proj" id="proj-conv">4,847</div>
+            <div class="sim-met-cur">4,857</div>
+            <div class="sim-met-proj" id="proj-conv">4,857</div>
             <div class="sim-met-delta" id="proj-conv-delta" style="color:var(--muted)">—</div>
           </div>
           <div class="sim-met">
@@ -2230,16 +2212,16 @@
   /* ── BUDGET SIMULATOR ── */
   var SIM = {
     total: 700000,
-    base: { meta: 420000, google: 168000, tiktok: 91000, pinterest: 21000 },
-    baseRoas: { meta: 3.0, google: 3.5, tiktok: 5.4, pinterest: 1.9 },
-    // saturation: how fast ROAS drops per extra $100K above base
-    sat: { meta: 0.08, google: 0.12, tiktok: 0.22, pinterest: 0.06 },
+    base: { meta: 420000, google: 168000, tiktok: 112000 },
+    baseRoas: { meta: 3.0, google: 3.5, tiktok: 4.8 },
+    // saturation: ROAS drop per extra $100K above base allocation
+    sat: { meta: 0.08, google: 0.12, tiktok: 0.22 },
     lastMoved: null
   };
 
   function chRoas(ch, spend) {
     var base = SIM.base[ch];
-    var delta = (spend - base) / 100000;  // units of $100K
+    var delta = (spend - base) / 100000;
     var roas = SIM.baseRoas[ch] - SIM.sat[ch] * delta;
     return Math.max(0.8, Math.min(roas, SIM.baseRoas[ch] + SIM.sat[ch] * 0.5));
   }
@@ -2250,7 +2232,7 @@
   }
 
   function updateSimulator() {
-    var channels = ['meta','google','tiktok','pinterest'];
+    var channels = ['meta','google','tiktok'];
     var sliders = {};
     var vals = {};
     channels.forEach(function(ch) {
@@ -2258,12 +2240,11 @@
       vals[ch] = parseInt(sliders[ch].value);
     });
 
-    var total = vals.meta + vals.google + vals.tiktok + vals.pinterest;
+    var total = vals.meta + vals.google + vals.tiktok;
     var over = total - SIM.total;
 
     // Proportionally clamp if over budget
     if (over > 0) {
-      // find the last moved slider and reduce others
       var movingId = event && event.target ? event.target.id.replace('-slider','') : null;
       var others = channels.filter(function(c) { return c !== movingId; });
       var othersTotal = others.reduce(function(s,c) { return s + vals[c]; }, 0);
@@ -2285,8 +2266,8 @@
       document.getElementById(ch + '-roas').textContent = ' · ' + roas.toFixed(1) + 'x';
     });
     var blendedRoas = blendedRev / SIM.total;
-    var baseRev = 2380000;
-    var projConv = Math.round(4847 * (blendedRoas / 3.4));
+    var baseRev = 2385600;  // 420K*3.0 + 168K*3.5 + 112K*4.8
+    var projConv = Math.round(4857 * (blendedRoas / 3.41));
     var projCpl = Math.round(SIM.total / projConv);
     var revDelta = blendedRev - baseRev;
 
@@ -2294,9 +2275,9 @@
     document.getElementById('proj-revenue').textContent = fmtK(Math.round(blendedRev)) + ' revenue / mo';
     document.getElementById('proj-conv').textContent = projConv.toLocaleString();
     document.getElementById('proj-cpl').textContent = '$' + projCpl;
-    document.getElementById('total-allocated').textContent = fmtK(vals.meta+vals.google+vals.tiktok+vals.pinterest) + ' / $700K';
+    document.getElementById('total-allocated').textContent = fmtK(vals.meta + vals.google + vals.tiktok) + ' / $700K';
 
-    var convDelta = projConv - 4847;
+    var convDelta = projConv - 4857;
     var cplDelta = projCpl - 144;
     var el;
 
@@ -2318,31 +2299,24 @@
 
     // Dynamic ROAS card color
     var projRoasEl = document.getElementById('proj-roas');
-    projRoasEl.style.color = blendedRoas > 3.4 ? 'var(--green)' : blendedRoas < 3.2 ? 'var(--red)' : 'var(--cyan)';
+    projRoasEl.style.color = blendedRoas > 3.41 ? 'var(--green)' : blendedRoas < 3.2 ? 'var(--red)' : 'var(--cyan)';
 
-    // Update AI suggestion
-    var best = channels.reduce(function(a,b) {
-      return (vals[a]/SIM.base[a] < vals[b]/SIM.base[b]) && SIM.baseRoas[b] > SIM.baseRoas[a] ? b : a;
-    });
-    var worst = channels.reduce(function(a,b) {
-      return (SIM.baseRoas[a] < SIM.baseRoas[b]) && vals[a] > SIM.base[a]*0.3 ? a : b;
-    });
+    // Dynamic AI suggestion
     var suggestEl = document.getElementById('sim-ai-suggestion');
-    if (Math.abs(blendedRoas - 3.4) < 0.05) {
-      suggestEl.innerHTML = '<strong style="color:var(--cyan)">💡 AI Recommendation:</strong><br>Move <strong>$55K from Meta → TikTok</strong>. TikTok is your most efficient channel at 5.4x ROAS but receives only 13% of budget. Projected impact: <strong>+0.18x blended ROAS → 3.58x, +$128K revenue / mo</strong>.';
+    if (Math.abs(blendedRoas - 3.41) < 0.06) {
+      suggestEl.innerHTML = '<strong style="color:var(--cyan)">💡 AI Recommendation:</strong><br>Move <strong>$40K from Meta → TikTok</strong>. TikTok leads at 4.8x ROAS with room to scale. Projected impact: <strong>+0.10x blended ROAS → 3.51x, +$71K revenue / mo</strong>.';
     } else if (blendedRoas > 3.7) {
-      suggestEl.innerHTML = '<strong style="color:var(--green)">✓ Strong allocation.</strong> This mix projects <strong>' + blendedRoas.toFixed(1) + 'x blended ROAS</strong>. Consider testing this split for 2 weeks before locking in. TikTok saturation risk increases above $180K/mo.';
+      suggestEl.innerHTML = '<strong style="color:var(--green)">✓ Strong allocation.</strong> This mix projects <strong>' + blendedRoas.toFixed(1) + 'x blended ROAS</strong>. Consider locking this split for 2 weeks. Watch TikTok saturation above $200K/mo.';
     } else if (blendedRoas < 3.1) {
-      suggestEl.innerHTML = '<strong style="color:var(--red)">⚠️ Suboptimal allocation.</strong> Shifting spend toward lower-ROAS channels. Recommend reverting Meta + Google balance. <strong>TikTok efficiency drops sharply above $200K/mo</strong> due to audience saturation.';
+      suggestEl.innerHTML = '<strong style="color:var(--red)">⚠️ Suboptimal allocation.</strong> Over-indexing on lower-ROAS channels. Rebalance toward TikTok (4.8x) or Google (3.5x). TikTok efficiency drops sharply past $220K/mo due to audience saturation.';
     } else {
-      suggestEl.innerHTML = '<strong style="color:var(--cyan)">💡 AI Note:</strong> Moderate improvement vs baseline. For maximum efficiency, reduce Pinterest allocation (2.1x ROAS) and route freed budget to Google (3.8x) or TikTok (5.8x, pre-saturation).';
+      suggestEl.innerHTML = '<strong style="color:var(--cyan)">💡 AI Note:</strong> Modest improvement vs baseline. For max efficiency, shift additional Meta budget to Google (3.5x, low saturation risk) or TikTok (4.8x, moderate saturation risk above $200K).';
     }
   }
 
   function resetSimulator() {
-    var channels = ['meta','google','tiktok','pinterest'];
-    var defaults = { meta: 420000, google: 168000, tiktok: 91000, pinterest: 21000 };
-    channels.forEach(function(ch) {
+    var defaults = { meta: 420000, google: 168000, tiktok: 112000 };
+    ['meta','google','tiktok'].forEach(function(ch) {
       document.getElementById(ch + '-slider').value = defaults[ch];
     });
     updateSimulator();
