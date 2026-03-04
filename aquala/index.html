@@ -76,7 +76,7 @@
   .nav-tab.active { color: var(--accent-light); border-bottom-color: var(--accent); }
 
   /* ─── CONTENT ─── */
-  .content { padding: 24px 28px 40px; max-width: 1280px; margin: 0 auto; }
+  .content { padding: 24px 28px 40px; max-width: 1320px; margin: 0 auto; }
   .page { display: none; }
   .page.active { display: block; }
 
@@ -97,6 +97,7 @@
   .badge.blue { background: rgba(0,102,204,0.12); border-color: rgba(0,102,204,0.3); color: var(--accent-light); }
   .badge.red { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.25); color: var(--red); }
   .badge.yellow { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.25); color: var(--yellow); }
+  .badge.cyan { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.2); color: #66d9ff; }
 
   /* ─── CARDS ─── */
   .card {
@@ -112,6 +113,7 @@
 
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
   .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
 
   /* ─── BRAND HEALTH CARDS ─── */
@@ -206,16 +208,85 @@
   .footer-sub { font-size: 13px; color: var(--muted); }
   .footer-phase2 { margin-top: 10px; font-size: 12px; color: var(--accent-light); }
 
+  /* ─── LIVE DASHBOARD — STAT CARDS ─── */
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 20px; position: relative; overflow: hidden;
+  }
+  .stat-card::after {
+    content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px;
+    border-radius: 0 0 0 80px; opacity: 0.04;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 800; color: var(--white); letter-spacing: -0.02em; line-height: 1; }
+  .stat-change {
+    display: inline-flex; align-items: center; gap: 4px; margin-top: 8px;
+    padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700;
+  }
+  .stat-change.up { background: rgba(34,197,94,0.1); color: var(--green); }
+  .stat-sub { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+
+  /* ─── LIVE DASHBOARD — LAYOUT ─── */
+  .dash-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+  .dash-main { min-width: 0; }
+  .dash-sidebar { min-width: 0; }
+
+  /* ─── CONTENT PIPELINE ─── */
+  .pipeline-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .pipeline-item:last-child { border-bottom: none; }
+  .pipeline-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+    background: rgba(0,102,204,0.08); border: 1px solid rgba(0,102,204,0.15);
+  }
+  .pipeline-title { font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 2px; }
+  .pipeline-meta { font-size: 11.5px; color: var(--muted); }
+  .pipeline-right { margin-left: auto; text-align: right; flex-shrink: 0; }
+
+  /* ─── EMAIL PERF TABLE ─── */
+  .email-table { width: 100%; }
+  .email-table th {
+    font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
+    font-weight: 700; text-align: left; padding: 0 0 10px;
+  }
+  .email-table th:last-child { text-align: right; }
+  .email-table td {
+    padding: 10px 0; border-top: 1px solid var(--border);
+    font-size: 12.5px; vertical-align: middle;
+  }
+  .email-table td:last-child { text-align: right; font-weight: 700; color: var(--green); }
+  .email-flow-name { font-weight: 600; color: var(--text); }
+  .email-flow-count { font-size: 11px; color: var(--muted); }
+  .email-metric { color: var(--text); font-weight: 600; }
+
+  /* ─── AGENT LOG ─── */
+  .agent-log-item {
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    font-size: 12px; line-height: 1.55;
+  }
+  .agent-log-item:last-child { border-bottom: none; }
+  .agent-log-who { font-weight: 700; color: var(--accent-light); }
+  .agent-log-action { color: var(--text); }
+  .agent-log-time { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+
   /* ─── SECTION SPACING ─── */
   .section { margin-bottom: 28px; }
 
   /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .dash-layout { grid-template-columns: 1fr; }
+  }
   @media (max-width: 768px) {
     .content { padding: 16px 14px 30px; }
-    .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
+    .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
     .header { padding: 12px 16px; }
-    .nav-bar { padding: 0 16px; }
-    .nav-tab { padding: 11px 14px; font-size: 12px; }
+    .nav-bar { padding: 0 16px; overflow-x: auto; }
+    .nav-tab { padding: 11px 14px; font-size: 12px; white-space: nowrap; }
+    .stat-value { font-size: 22px; }
   }
 
   /* ─── GRAIN TEXTURE ─── */
@@ -245,17 +316,293 @@
 
 <!-- ─── NAV ─── -->
 <div class="nav-bar">
-  <div class="nav-tab active" data-page="status" onclick="showPage('status')">System Status</div>
+  <div class="nav-tab active" data-page="dashboard" onclick="showPage('dashboard')">Live Dashboard</div>
+  <div class="nav-tab" data-page="status" onclick="showPage('status')">Current State</div>
   <div class="nav-tab" data-page="proposal" onclick="showPage('proposal')">Phase 1 Proposal</div>
 </div>
 
 <!-- ─── CONTENT ─── -->
 <div class="content">
 
-<!-- ════════════════════════════════════════════ -->
-<!--              SYSTEM STATUS PAGE             -->
-<!-- ════════════════════════════════════════════ -->
-<div class="page active" id="page-status">
+<!-- ════════════════════════════════════════════════ -->
+<!--     TAB 1 — LIVE DASHBOARD (30 days post-P1)   -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="page active" id="page-dashboard">
+
+  <!-- REVENUE IMPACT CARDS -->
+  <div class="section">
+    <div class="section-hd">
+      <div>
+        <div class="section-title">Revenue Impact</div>
+        <div class="section-sub">March 2026 — 30 days post-activation</div>
+      </div>
+      <span class="badge green" style="font-size:11px;padding:4px 14px">All Systems Active</span>
+    </div>
+    <div class="grid-4">
+      <div class="stat-card">
+        <div class="stat-label">Email Revenue This Month</div>
+        <div class="stat-value">$28,400</div>
+        <div class="stat-change up">↑ 340% from pre-automation</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Abandoned Cart Recovered</div>
+        <div class="stat-value">$8,200</div>
+        <div class="stat-sub">47 carts recovered · 23% recovery rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Content Assets Generated</div>
+        <div class="stat-value">34</div>
+        <div class="stat-sub">12 FB/IG · 8 Google · 14 TikTok this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active Email Subscribers</div>
+        <div class="stat-value">4,847</div>
+        <div class="stat-change up">↑ 312 this week</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN + SIDEBAR LAYOUT -->
+  <div class="dash-layout">
+    <div class="dash-main">
+
+      <!-- CONTENT PIPELINE -->
+      <div class="section">
+        <div class="section-hd">
+          <div>
+            <div class="section-title">Content Pipeline</div>
+            <div class="section-sub">Recent agent outputs — auto-generated creative assets</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="pipeline-item">
+            <div class="pipeline-icon" style="background:rgba(24,119,242,0.1);border-color:rgba(24,119,242,0.2)">📱</div>
+            <div>
+              <div class="pipeline-title">AQUALA Hero Ad — Facebook / Instagram</div>
+              <div class="pipeline-meta">Premium filter lifestyle creative · 3 variants (carousel, single, story)</div>
+            </div>
+            <div class="pipeline-right">
+              <span class="badge yellow" style="font-size:9px">Pending Review</span>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">2h ago</div>
+            </div>
+          </div>
+
+          <div class="pipeline-item">
+            <div class="pipeline-icon" style="background:rgba(234,67,53,0.08);border-color:rgba(234,67,53,0.15)">🔍</div>
+            <div>
+              <div class="pipeline-title">Google Search Campaign — 8 headlines, 4 descriptions</div>
+              <div class="pipeline-meta">Targeting "premium water filter" cluster · Quality Score: 8/10 avg</div>
+            </div>
+            <div class="pipeline-right">
+              <span class="badge green" style="font-size:9px">Live</span>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">Yesterday</div>
+            </div>
+          </div>
+
+          <div class="pipeline-item">
+            <div class="pipeline-icon" style="background:rgba(105,201,208,0.1);border-color:rgba(105,201,208,0.2)">🎬</div>
+            <div>
+              <div class="pipeline-title">TikTok Script — "Water quality at home" angle</div>
+              <div class="pipeline-meta">Hook: "What's actually in your tap water?" · 30s format · UGC style</div>
+            </div>
+            <div class="pipeline-right">
+              <span class="badge cyan" style="font-size:9px">In Production</span>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">3h ago</div>
+            </div>
+          </div>
+
+          <div class="pipeline-item">
+            <div class="pipeline-icon">📧</div>
+            <div>
+              <div class="pipeline-title">Email — Replenishment Reminder Sequence (3 emails)</div>
+              <div class="pipeline-meta">Auto-triggered at 60/75/85 days post-purchase · personalized by product</div>
+            </div>
+            <div class="pipeline-right">
+              <span class="badge green" style="font-size:9px">Deployed</span>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">2 days ago</div>
+            </div>
+          </div>
+
+          <div class="pipeline-item">
+            <div class="pipeline-icon" style="background:rgba(0,102,204,0.08);border-color:rgba(0,102,204,0.15)">📊</div>
+            <div>
+              <div class="pipeline-title">Creative Brief — Counter-messaging for new market entrant</div>
+              <div class="pipeline-meta">Strategist-generated from competitor scraper intel · emphasize certifications</div>
+            </div>
+            <div class="pipeline-right">
+              <span class="badge blue" style="font-size:9px">Queued</span>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">4h ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMAIL PERFORMANCE -->
+      <div class="section">
+        <div class="section-hd">
+          <div>
+            <div class="section-title">Email Performance</div>
+            <div class="section-sub">Top 5 Klaviyo flows — this month</div>
+          </div>
+          <div style="font-size:12.5px;color:var(--green);font-weight:700">$28,400 total attributed</div>
+        </div>
+        <div class="card">
+          <table class="email-table">
+            <thead>
+              <tr>
+                <th>Flow</th>
+                <th>Key Metric</th>
+                <th>Revenue</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="email-flow-name">Welcome Series</div>
+                  <div class="email-flow-count">5 emails</div>
+                </td>
+                <td><span class="email-metric">42% avg open rate</span></td>
+                <td>$6,200</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="email-flow-name">Abandoned Cart</div>
+                  <div class="email-flow-count">3 emails</div>
+                </td>
+                <td><span class="email-metric">28% recovery rate</span></td>
+                <td>$8,200</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="email-flow-name">Post-Purchase</div>
+                  <div class="email-flow-count">4 emails</div>
+                </td>
+                <td><span class="email-metric">38% open · 12% upsell conv</span></td>
+                <td>$7,400</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="email-flow-name">Browse Abandonment</div>
+                  <div class="email-flow-count">2 emails</div>
+                </td>
+                <td><span class="email-metric">19% click rate</span></td>
+                <td>$3,100</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="email-flow-name">Win-Back</div>
+                  <div class="email-flow-count">3 emails</div>
+                </td>
+                <td><span class="email-metric">11% reactivation · 84 recovered</span></td>
+                <td>$3,500</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- COMPETITOR INTEL -->
+      <div class="section">
+        <div class="section-hd">
+          <div>
+            <div class="section-title">Competitor Intel Feed</div>
+            <div class="section-sub">Automated weekly scraper outputs</div>
+          </div>
+          <span class="badge blue">Auto-Updated</span>
+        </div>
+        <div class="intel-item">
+          Competitor X dropped filter pricing 12% — AQUALA premium positioning holding, no action needed. Monitoring for volume impact over next 14 days.
+          <div class="intel-time">Scraper run · Feb 28, 2026</div>
+        </div>
+        <div class="intel-item" style="border-left-color:var(--yellow)">
+          New entrant targeting "clean water" keywords on Google — brief sent to Creative Strategist for counter-messaging. Recommended: emphasize filtration certifications + lab test results.
+          <div class="intel-time">Scraper run · Mar 2, 2026</div>
+        </div>
+        <div class="intel-item">
+          MDC Water competitor case study targeting mining sector — 3 new B2B keyword opportunities flagged. Additions queued for Google Search campaign.
+          <div class="intel-time">Scraper run · Feb 21, 2026</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDEBAR — AGENT LOG -->
+    <div class="dash-sidebar">
+      <div class="section">
+        <div class="section-hd">
+          <div>
+            <div class="section-title">Agent Activity</div>
+            <div class="section-sub">Last 24 hours</div>
+          </div>
+        </div>
+        <div class="card" style="padding:14px 16px">
+
+          <div class="agent-log-item">
+            <div><span class="agent-log-who">Creative Strategist</span> <span class="agent-log-action">→ analyzed 14-day ad performance → generated 3 new creative briefs</span></div>
+            <div class="agent-log-time">1h ago</div>
+          </div>
+
+          <div class="agent-log-item">
+            <div><span class="agent-log-who">Content Creator</span> <span class="agent-log-action">→ produced 4 Facebook ad variants for AQUALA filter launch</span></div>
+            <div class="agent-log-time">3h ago</div>
+          </div>
+
+          <div class="agent-log-item">
+            <div><span class="agent-log-who">Competitor Scraper</span> <span class="agent-log-action">→ weekly crawl complete → 7 insights stored in Intelligence Vault</span></div>
+            <div class="agent-log-time">Yesterday</div>
+          </div>
+
+          <div class="agent-log-item">
+            <div><span class="agent-log-who">Ad Designer</span> <span class="agent-log-action">→ 6 image prompts generated → assets queued for review</span></div>
+            <div class="agent-log-time">Yesterday</div>
+          </div>
+
+          <div class="agent-log-item">
+            <div><span class="agent-log-who">Klaviyo Sync</span> <span class="agent-log-action">→ 47 new subscribers added to Welcome flow</span></div>
+            <div class="agent-log-time">2h ago</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SYSTEM HEALTH MINI -->
+      <div class="section">
+        <div class="section-hd">
+          <div class="section-title">System Health</div>
+        </div>
+        <div class="card" style="padding:14px 16px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(34,197,94,0.5)"></div>
+            <span style="font-size:12px;font-weight:600;color:var(--green)">All systems operational</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.7">
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+              <span>Content Factory</span><span style="color:var(--green);font-weight:600">● Online</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+              <span>Competitor Scraper</span><span style="color:var(--green);font-weight:600">● Online</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+              <span>Intelligence Vault</span><span style="color:var(--green);font-weight:600">● Online</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+              <span>Shopify Integration</span><span style="color:var(--green);font-weight:600">● Connected</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0">
+              <span>Klaviyo</span><span style="color:var(--green);font-weight:600">● 10 flows live</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!--        TAB 2 — CURRENT STATE (audit view)      -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="page" id="page-status">
 
   <!-- BRAND HEALTH -->
   <div class="section">
@@ -266,8 +613,6 @@
       </div>
     </div>
     <div class="grid-2">
-
-      <!-- AQUALA D2C -->
       <div class="card brand-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
           <div class="card-title" style="font-size:18px;margin:0">AQUALA</div>
@@ -287,8 +632,6 @@
           <span class="ch-pill">TikTok</span>
         </div>
       </div>
-
-      <!-- MDC Water B2B -->
       <div class="card brand-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
           <div class="card-title" style="font-size:18px;margin:0">MDC Water</div>
@@ -299,9 +642,7 @@
           <div class="brand-target-label">Lead Strategy</div>
           <div class="brand-target-val">Cross-sell from AQUALA consumer audience</div>
         </div>
-        <div style="margin-top:10px;font-size:12px;color:var(--muted)">
-          Enterprise clients via intent signals from D2C traffic
-        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted)">Enterprise clients via intent signals from D2C traffic</div>
         <div class="brand-channels">
           <span class="ch-pill">Google Search</span>
           <span class="ch-pill">LinkedIn</span>
@@ -361,8 +702,6 @@
       </div>
     </div>
     <div class="grid-3">
-
-      <!-- Content Creator -->
       <div class="card agent-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
           <div class="agent-name">🖊️ Content Creator</div>
@@ -372,8 +711,6 @@
         <div class="agent-row"><span class="agent-row-label">Last run</span><span class="agent-row-val" style="color:var(--yellow)">Manual</span></div>
         <div class="agent-row"><span class="agent-row-label">Pending</span><span class="agent-row-val" style="color:var(--muted)">Auto-schedule on Shopify events</span></div>
       </div>
-
-      <!-- Creative Strategist -->
       <div class="card agent-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
           <div class="agent-name">📊 Creative Strategist</div>
@@ -383,8 +720,6 @@
         <div class="agent-row"><span class="agent-row-label">Last run</span><span class="agent-row-val" style="color:var(--yellow)">Manual</span></div>
         <div class="agent-row"><span class="agent-row-label">Pending</span><span class="agent-row-val" style="color:var(--muted)">Weekly performance analysis cron</span></div>
       </div>
-
-      <!-- Ad Designer -->
       <div class="card agent-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
           <div class="agent-name">🎨 Ad Designer</div>
@@ -413,40 +748,24 @@
         </div>
         <div class="progress-label">0% complete — <span style="color:var(--red);font-weight:600">Awaiting Klaviyo + Shopify connection</span></div>
       </div>
-
       <div class="flow-row">
-        <div>
-          <div class="flow-name">Welcome Series <span class="flow-detail">(5 emails)</span></div>
-          <div class="flow-trigger">Trigger: New subscriber</div>
-        </div>
+        <div><div class="flow-name">Welcome Series <span class="flow-detail">(5 emails)</span></div><div class="flow-trigger">Trigger: New subscriber</div></div>
         <span class="badge red" style="font-size:9px">Not Deployed</span>
       </div>
       <div class="flow-row">
-        <div>
-          <div class="flow-name">Abandoned Cart <span class="flow-detail">(3 emails)</span></div>
-          <div class="flow-trigger">Trigger: Cart abandonment</div>
-        </div>
+        <div><div class="flow-name">Abandoned Cart <span class="flow-detail">(3 emails)</span></div><div class="flow-trigger">Trigger: Cart abandonment</div></div>
         <span class="badge red" style="font-size:9px">Not Deployed</span>
       </div>
       <div class="flow-row">
-        <div>
-          <div class="flow-name">Post-Purchase <span class="flow-detail">(4 emails)</span></div>
-          <div class="flow-trigger">Trigger: Order complete</div>
-        </div>
+        <div><div class="flow-name">Post-Purchase <span class="flow-detail">(4 emails)</span></div><div class="flow-trigger">Trigger: Order complete</div></div>
         <span class="badge red" style="font-size:9px">Not Deployed</span>
       </div>
       <div class="flow-row">
-        <div>
-          <div class="flow-name">Win-Back <span class="flow-detail">(3 emails)</span></div>
-          <div class="flow-trigger">Trigger: 60 days inactive</div>
-        </div>
+        <div><div class="flow-name">Win-Back <span class="flow-detail">(3 emails)</span></div><div class="flow-trigger">Trigger: 60 days inactive</div></div>
         <span class="badge red" style="font-size:9px">Not Deployed</span>
       </div>
       <div class="flow-row">
-        <div>
-          <div class="flow-name">Browse Abandonment <span class="flow-detail">(2 emails)</span></div>
-          <div class="flow-trigger">Trigger: Product page view</div>
-        </div>
+        <div><div class="flow-name">Browse Abandonment <span class="flow-detail">(2 emails)</span></div><div class="flow-trigger">Trigger: Product page view</div></div>
         <span class="badge red" style="font-size:9px">Not Deployed</span>
       </div>
       <div style="padding:8px 0 0;font-size:11.5px;color:var(--muted)">+ 21 more flows documented (Education, VIP, Replenishment, Review, Upsell…)</div>
@@ -462,7 +781,6 @@
       </div>
       <span class="badge blue">Auto-Updated</span>
     </div>
-
     <div class="intel-item">
       Competitor A reduced pricing on residential filters by 12% — potential positioning opportunity for AQUALA premium tier. Recommend emphasizing quality + filtration certifications in next Meta ad cycle.
       <div class="intel-time">Scraper run · Feb 28, 2026</div>
@@ -479,9 +797,9 @@
 
 </div>
 
-<!-- ════════════════════════════════════════════ -->
-<!--            PHASE 1 PROPOSAL PAGE            -->
-<!-- ════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════ -->
+<!--          TAB 3 — PHASE 1 PROPOSAL              -->
+<!-- ════════════════════════════════════════════════ -->
 <div class="page" id="page-proposal">
 
   <div class="proposal-header">
@@ -490,8 +808,6 @@
   </div>
 
   <div class="grid-2" style="gap:20px">
-
-    <!-- 1. Shopify Integration -->
     <div class="card delivery-card">
       <div class="delivery-num">1</div>
       <div class="delivery-title">Shopify Integration</div>
@@ -504,8 +820,6 @@
       </div>
       <div class="delivery-impact">🔓 Unlocks: All 26 email automation triggers</div>
     </div>
-
-    <!-- 2. Klaviyo Deployment -->
     <div class="card delivery-card">
       <div class="delivery-num">2</div>
       <div class="delivery-title">Klaviyo Deployment — Top 10 Flows</div>
@@ -518,8 +832,6 @@
       </div>
       <div class="delivery-impact">💰 Estimated revenue impact: <strong>$15–40K/month</strong> in recovered/generated revenue</div>
     </div>
-
-    <!-- 3. Agent Automation -->
     <div class="card delivery-card">
       <div class="delivery-num">3</div>
       <div class="delivery-title">Agent Automation</div>
@@ -532,8 +844,6 @@
       </div>
       <div class="delivery-impact">🤖 Fully autonomous — agents operate without human triggers</div>
     </div>
-
-    <!-- 4. Live Dashboard -->
     <div class="card delivery-card">
       <div class="delivery-num">4</div>
       <div class="delivery-title">Live Dashboard</div>
@@ -548,7 +858,6 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
   <div class="proposal-footer">
     <div class="footer-main">Timeline: 3 weeks &nbsp;·&nbsp; Investment: $6,000</div>
     <div class="footer-sub">Full system activation — Shopify, Klaviyo, agents, dashboard</div>
