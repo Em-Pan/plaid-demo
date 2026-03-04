@@ -45,8 +45,8 @@
   .logo-area { display: flex; align-items: center; gap: 14px; }
   .logo-img { height: 26px; width: auto; }
   .logo-divider { width: 1px; height: 28px; background: var(--border); margin: 0 2px; }
-  .logo-text { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; }
-  .logo-sub { font-size: 10px; color: rgba(123,139,163,0.6); font-weight: 500; margin-top: 1px; }
+  .logo-text { font-size: 13px; font-weight: 600; color: #c0cfe0; letter-spacing: 0.04em; }
+  .logo-sub { font-size: 10px; color: #8a9bb5; font-weight: 500; margin-top: 1px; }
   .header-right { display: flex; align-items: center; gap: 14px; }
   .live-pill {
     display: flex; align-items: center; gap: 6px;
@@ -208,7 +208,8 @@
 
   /* ─── LIVE DASHBOARD — STAT CARDS ─── */
   .stat-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid var(--border); border-radius: 14px;
     padding: 20px; position: relative; overflow: hidden;
     animation: fadeUp 0.4s ease both;
   }
@@ -286,17 +287,21 @@
   .agent-log-action { color: var(--text); }
   .agent-log-time { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
 
-  /* ─── REVENUE CHART ─── */
+  /* ─── CHARTS ─── */
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .chart-card { padding: 20px; }
-  .chart-area { position: relative; width: 100%; height: 160px; margin-top: 12px; }
-  .chart-svg { width: 100%; height: 100%; }
-  .chart-grid-line { stroke: var(--border); stroke-width: 1; }
-  .chart-line { fill: none; stroke: var(--accent-light); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-  .chart-area-fill { fill: url(#chartGrad); }
-  .chart-dot { fill: var(--accent-light); stroke: var(--navy); stroke-width: 2; }
-  .chart-dot-current { fill: var(--green); stroke: var(--navy); stroke-width: 2; filter: drop-shadow(0 0 4px rgba(34,197,94,0.5)); }
+  .chart-card-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
+  .chart-card-title { font-size: 13px; font-weight: 700; color: var(--white); }
+  .chart-card-val { font-size: 13px; font-weight: 700; }
+  .chart-card-sub { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .chart-area { position: relative; width: 100%; height: 140px; }
+  .chart-grid-line { stroke: var(--border); stroke-width: 0.5; }
+  .chart-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .chart-area-fill { opacity: 0.8; }
+  .chart-dot { stroke: var(--navy); stroke-width: 2; }
+  .chart-dot-current { stroke: var(--navy); stroke-width: 2; }
   .chart-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10px; color: var(--muted); }
-  .chart-y-label { position: absolute; left: 0; font-size: 10px; color: var(--muted); }
+  @media (max-width: 768px) { .charts-row { grid-template-columns: 1fr; } }
 
   /* ─── SECTION SPACING ─── */
   .section { margin-bottom: 28px; }
@@ -378,7 +383,7 @@
       <span class="badge green" style="font-size:11px;padding:4px 14px">All Systems Active</span>
     </div>
     <div class="grid-4">
-      <div class="stat-card">
+      <div class="stat-card" style="border-top:2px solid var(--green)">
         <div class="stat-label">Email Revenue This Month</div>
         <div class="stat-value">$28,400</div>
         <div class="stat-change up">↑ 340% from pre-automation</div>
@@ -388,7 +393,7 @@
           </svg>
         </div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" style="border-top:2px solid var(--accent-light)">
         <div class="stat-label">Abandoned Cart Recovered</div>
         <div class="stat-value">$8,200</div>
         <div class="stat-sub">47 carts recovered · <strong style="color:var(--green)">23% recovery rate</strong></div>
@@ -398,7 +403,7 @@
           </svg>
         </div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" style="border-top:2px solid var(--aqua)">
         <div class="stat-label">Content Assets Generated</div>
         <div class="stat-value">34 <span style="font-size:14px;color:var(--muted);font-weight:500">this week</span></div>
         <div class="stat-sub">12 FB/IG · 8 Google · 14 TikTok</div>
@@ -408,7 +413,7 @@
           </svg>
         </div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" style="border-top:2px solid var(--accent)">
         <div class="stat-label">Active Email Subscribers</div>
         <div class="stat-value">4,847</div>
         <div class="stat-change up">↑ 312 this week</div>
@@ -421,49 +426,84 @@
     </div>
   </div>
 
-  <!-- REVENUE CHART -->
+  <!-- CHARTS ROW -->
   <div class="section">
-    <div class="section-hd">
-      <div>
-        <div class="section-title">Email Revenue — 30-Day Trend</div>
-        <div class="section-sub">Daily attributed revenue from all Klaviyo flows</div>
+    <div class="charts-row">
+
+      <!-- Chart 1: Email Revenue -->
+      <div class="card chart-card">
+        <div class="chart-card-hd">
+          <div class="chart-card-title">Email Revenue — 30 Days</div>
+          <div class="chart-card-val" style="color:var(--green)">$28,400</div>
+        </div>
+        <div class="chart-card-sub">Daily attributed · avg $947/day</div>
+        <div class="chart-area">
+          <svg width="100%" height="140" viewBox="0 0 300 140" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(0,102,204,0.2)"/>
+                <stop offset="100%" stop-color="rgba(0,102,204,0)"/>
+              </linearGradient>
+            </defs>
+            <line x1="30" y1="35" x2="290" y2="35" class="chart-grid-line"/>
+            <line x1="30" y1="70" x2="290" y2="70" class="chart-grid-line"/>
+            <line x1="30" y1="105" x2="290" y2="105" class="chart-grid-line"/>
+            <text x="2" y="38" fill="#5a6d85" font-size="8">$1.5K</text>
+            <text x="2" y="73" fill="#5a6d85" font-size="8">$1.0K</text>
+            <text x="2" y="108" fill="#5a6d85" font-size="8">$500</text>
+            <!-- Area fill -->
+            <polygon fill="url(#revGrad)" points="35,120 45,118 55,116 65,112 80,114 95,108 110,105 125,110 140,100 155,94 170,97 185,88 200,84 215,78 230,72 245,68 255,62 265,55 275,48 285,40 290,38 290,130 35,130"/>
+            <!-- Line -->
+            <polyline class="chart-line" stroke="#3399ff" points="35,120 45,118 55,116 65,112 80,114 95,108 110,105 125,110 140,100 155,94 170,97 185,88 200,84 215,78 230,72 245,68 255,62 265,55 275,48 285,40 290,38"/>
+            <circle cx="35" cy="120" r="2.5" fill="#3399ff" class="chart-dot"/>
+            <circle cx="140" cy="100" r="2.5" fill="#3399ff" class="chart-dot"/>
+            <circle cx="215" cy="78" r="2.5" fill="#3399ff" class="chart-dot"/>
+            <circle cx="290" cy="38" r="4" fill="#22c55e" class="chart-dot-current" style="filter:drop-shadow(0 0 4px rgba(34,197,94,0.6))"/>
+            <text x="272" y="32" fill="#22c55e" font-size="9" font-weight="700">$1,420</text>
+          </svg>
+        </div>
+        <div class="chart-labels">
+          <span>Mar 1</span><span>Mar 10</span><span>Mar 20</span><span style="color:var(--green);font-weight:700">Today</span>
+        </div>
       </div>
-      <div style="font-size:13px;font-weight:700;color:var(--green)">$28,400 total · avg $947/day</div>
-    </div>
-    <div class="card chart-card">
-      <div class="chart-area">
-        <svg class="chart-svg" viewBox="0 0 600 160" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="rgba(0,102,204,0.25)"/>
-              <stop offset="100%" stop-color="rgba(0,102,204,0)"/>
-            </linearGradient>
-          </defs>
-          <!-- Grid lines -->
-          <line x1="0" y1="40" x2="600" y2="40" class="chart-grid-line"/>
-          <line x1="0" y1="80" x2="600" y2="80" class="chart-grid-line"/>
-          <line x1="0" y1="120" x2="600" y2="120" class="chart-grid-line"/>
-          <!-- Y-axis labels -->
-          <text x="4" y="38" fill="#7b8ba3" font-size="9">$1,500</text>
-          <text x="4" y="78" fill="#7b8ba3" font-size="9">$1,000</text>
-          <text x="4" y="118" fill="#7b8ba3" font-size="9">$500</text>
-          <!-- Area -->
-          <polygon class="chart-area-fill" points="40,145 60,140 80,138 100,130 120,135 140,125 160,120 180,128 200,115 220,108 240,112 260,100 280,95 300,102 320,88 340,80 360,85 380,72 400,68 420,75 440,62 460,55 480,60 500,48 520,42 540,38 560,30 580,26 580,155 40,155"/>
-          <!-- Line -->
-          <polyline class="chart-line" points="40,145 60,140 80,138 100,130 120,135 140,125 160,120 180,128 200,115 220,108 240,112 260,100 280,95 300,102 320,88 340,80 360,85 380,72 400,68 420,75 440,62 460,55 480,60 500,48 520,42 540,38 560,30 580,26"/>
-          <!-- Dots (key points) -->
-          <circle cx="40" cy="145" r="3" class="chart-dot"/>
-          <circle cx="200" cy="115" r="3" class="chart-dot"/>
-          <circle cx="340" cy="80" r="3" class="chart-dot"/>
-          <circle cx="460" cy="55" r="3" class="chart-dot"/>
-          <circle cx="580" cy="26" r="5" class="chart-dot-current"/>
-          <!-- Current value label -->
-          <text x="560" y="18" fill="#22c55e" font-size="11" font-weight="700">$1,420</text>
-        </svg>
+
+      <!-- Chart 2: Subscriber Growth -->
+      <div class="card chart-card">
+        <div class="chart-card-hd">
+          <div class="chart-card-title">Subscriber Growth — 30 Days</div>
+          <div class="chart-card-val" style="color:var(--aqua)">4,847</div>
+        </div>
+        <div class="chart-card-sub">+312 this week · 6.9% growth rate</div>
+        <div class="chart-area">
+          <svg width="100%" height="140" viewBox="0 0 300 140" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="subGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(0,184,212,0.18)"/>
+                <stop offset="100%" stop-color="rgba(0,184,212,0)"/>
+              </linearGradient>
+            </defs>
+            <line x1="30" y1="35" x2="290" y2="35" class="chart-grid-line"/>
+            <line x1="30" y1="70" x2="290" y2="70" class="chart-grid-line"/>
+            <line x1="30" y1="105" x2="290" y2="105" class="chart-grid-line"/>
+            <text x="2" y="38" fill="#5a6d85" font-size="8">5.0K</text>
+            <text x="2" y="73" fill="#5a6d85" font-size="8">4.7K</text>
+            <text x="2" y="108" fill="#5a6d85" font-size="8">4.4K</text>
+            <!-- Area fill -->
+            <polygon fill="url(#subGrad)" points="35,115 55,112 75,108 95,106 115,102 135,98 155,94 175,90 195,85 215,78 235,72 255,64 275,52 290,42 290,130 35,130"/>
+            <!-- Line -->
+            <polyline class="chart-line" stroke="#00b8d4" points="35,115 55,112 75,108 95,106 115,102 135,98 155,94 175,90 195,85 215,78 235,72 255,64 275,52 290,42"/>
+            <circle cx="35" cy="115" r="2.5" fill="#00b8d4" class="chart-dot"/>
+            <circle cx="155" cy="94" r="2.5" fill="#00b8d4" class="chart-dot"/>
+            <circle cx="235" cy="72" r="2.5" fill="#00b8d4" class="chart-dot"/>
+            <circle cx="290" cy="42" r="4" fill="#00b8d4" class="chart-dot-current" style="filter:drop-shadow(0 0 4px rgba(0,184,212,0.6))"/>
+            <text x="268" y="36" fill="#00b8d4" font-size="9" font-weight="700">4,847</text>
+          </svg>
+        </div>
+        <div class="chart-labels">
+          <span>Mar 1</span><span>Mar 10</span><span>Mar 20</span><span style="color:var(--aqua);font-weight:700">Today</span>
+        </div>
       </div>
-      <div class="chart-labels">
-        <span>Mar 1</span><span>Mar 7</span><span>Mar 14</span><span>Mar 21</span><span>Mar 28</span><span style="color:var(--green);font-weight:700">Today</span>
-      </div>
+
     </div>
   </div>
 
