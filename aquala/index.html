@@ -11,6 +11,7 @@
     --navy-mid: #142640;
     --accent: #0066cc;
     --accent-light: #3399ff;
+    --aqua: #00b8d4;
     --white: #ffffff;
     --grey: #f5f7fa;
     --text: #e8ecf2;
@@ -35,22 +36,18 @@
   /* ─── HEADER ─── */
   .header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 28px;
+    padding: 14px 28px;
     background: rgba(10,22,40,0.95);
     border-bottom: 1px solid var(--border);
     backdrop-filter: blur(20px);
     position: sticky; top: 0; z-index: 100;
   }
   .logo-area { display: flex; align-items: center; gap: 14px; }
-  .logo-mark {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: linear-gradient(135deg, #0066cc 0%, #3399ff 100%);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 900; font-size: 16px; color: #fff; letter-spacing: -0.02em;
-  }
-  .logo-text { font-size: 17px; font-weight: 800; color: var(--white); letter-spacing: -0.01em; }
-  .logo-sub { font-size: 11px; color: var(--muted); font-weight: 500; margin-top: 1px; }
-  .header-right { display: flex; align-items: center; gap: 16px; }
+  .logo-img { height: 26px; width: auto; }
+  .logo-divider { width: 1px; height: 28px; background: var(--border); margin: 0 2px; }
+  .logo-text { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; }
+  .logo-sub { font-size: 10px; color: rgba(123,139,163,0.6); font-weight: 500; margin-top: 1px; }
+  .header-right { display: flex; align-items: center; gap: 14px; }
   .live-pill {
     display: flex; align-items: center; gap: 6px;
     padding: 4px 12px; border-radius: 99px;
@@ -59,6 +56,8 @@
   }
   .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); } 50% { opacity:0.7; box-shadow: 0 0 0 6px rgba(34,197,94,0); } }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes countUp { from { opacity:0.3; } to { opacity:1; } }
   .date-label { font-size: 12px; color: var(--muted); }
 
   /* ─── NAV TABS ─── */
@@ -70,22 +69,28 @@
   .nav-tab {
     padding: 13px 22px; font-size: 13px; font-weight: 600; color: var(--muted);
     cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s;
-    user-select: none;
+    user-select: none; position: relative;
   }
   .nav-tab:hover { color: var(--text); }
   .nav-tab.active { color: var(--accent-light); border-bottom-color: var(--accent); }
+  .tab-hint {
+    position: absolute; top: 6px; right: 6px;
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .tab-hint.green { background: var(--green); }
+  .tab-hint.red { background: var(--red); animation: pulse 2s ease-in-out infinite; }
 
   /* ─── CONTENT ─── */
   .content { padding: 24px 28px 40px; max-width: 1320px; margin: 0 auto; }
   .page { display: none; }
-  .page.active { display: block; }
+  .page.active { display: block; animation: fadeUp 0.3s ease; }
 
   .section-title {
     font-size: 15px; font-weight: 800; color: var(--white); margin-bottom: 4px;
     letter-spacing: -0.01em;
   }
   .section-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
-  .section-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .section-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
 
   .badge {
     display: inline-flex; align-items: center; gap: 5px;
@@ -174,20 +179,15 @@
   .intel-time { font-size: 10.5px; color: var(--muted); margin-top: 6px; opacity: 0.7; }
 
   /* ─── PROPOSAL VIEW ─── */
-  .proposal-header {
-    text-align: center; padding: 40px 20px 30px;
-  }
+  .proposal-header { text-align: center; padding: 40px 20px 30px; }
   .proposal-header h1 {
-    font-size: 28px; font-weight: 800; color: var(--white); letter-spacing: -0.02em;
-    margin-bottom: 6px;
+    font-size: 28px; font-weight: 800; color: var(--white); letter-spacing: -0.02em; margin-bottom: 6px;
   }
   .proposal-header p { font-size: 14px; color: var(--muted); }
-
   .delivery-card { position: relative; padding: 24px; }
   .delivery-num {
     position: absolute; top: 16px; right: 18px;
-    font-size: 40px; font-weight: 900; color: rgba(0,102,204,0.08);
-    line-height: 1;
+    font-size: 40px; font-weight: 900; color: rgba(0,102,204,0.08); line-height: 1;
   }
   .delivery-title { font-size: 16px; font-weight: 800; color: var(--white); margin-bottom: 8px; }
   .delivery-body { font-size: 13px; color: var(--muted); line-height: 1.7; }
@@ -198,11 +198,9 @@
     background: rgba(0,102,204,0.06); border: 1px solid rgba(0,102,204,0.15);
     border-radius: 8px; font-size: 12px; color: var(--accent-light);
   }
-
   .proposal-footer {
     text-align: center; margin-top: 40px; padding: 28px 20px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
   }
   .footer-main { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
   .footer-sub { font-size: 13px; color: var(--muted); }
@@ -212,11 +210,12 @@
   .stat-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     padding: 20px; position: relative; overflow: hidden;
+    animation: fadeUp 0.4s ease both;
   }
-  .stat-card::after {
-    content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px;
-    border-radius: 0 0 0 80px; opacity: 0.04;
-  }
+  .stat-card:nth-child(1) { animation-delay: 0s; }
+  .stat-card:nth-child(2) { animation-delay: 0.06s; }
+  .stat-card:nth-child(3) { animation-delay: 0.12s; }
+  .stat-card:nth-child(4) { animation-delay: 0.18s; }
   .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; margin-bottom: 8px; }
   .stat-value { font-size: 28px; font-weight: 800; color: var(--white); letter-spacing: -0.02em; line-height: 1; }
   .stat-change {
@@ -225,6 +224,9 @@
   }
   .stat-change.up { background: rgba(34,197,94,0.1); color: var(--green); }
   .stat-sub { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+
+  /* ─── SPARKLINE (mini SVG chart in stat cards) ─── */
+  .sparkline-wrap { position: absolute; bottom: 0; right: 0; width: 100px; height: 40px; opacity: 0.3; }
 
   /* ─── LIVE DASHBOARD — LAYOUT ─── */
   .dash-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
@@ -263,6 +265,17 @@
   .email-flow-count { font-size: 11px; color: var(--muted); }
   .email-metric { color: var(--text); font-weight: 600; }
 
+  /* ─── INLINE BAR (for email perf) ─── */
+  .inline-bar { display: flex; align-items: center; gap: 8px; }
+  .inline-bar-bg { flex: 1; height: 6px; border-radius: 99px; background: rgba(255,255,255,0.06); overflow: hidden; max-width: 80px; }
+  .inline-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); }
+
+  /* ─── DONUT CHART ─── */
+  .donut-wrap { display: flex; align-items: center; gap: 16px; }
+  .donut-legend { display: flex; flex-direction: column; gap: 6px; }
+  .donut-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
   /* ─── AGENT LOG ─── */
   .agent-log-item {
     padding: 12px 0; border-bottom: 1px solid var(--border);
@@ -273,13 +286,32 @@
   .agent-log-action { color: var(--text); }
   .agent-log-time { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
 
+  /* ─── REVENUE CHART ─── */
+  .chart-card { padding: 20px; }
+  .chart-area { position: relative; width: 100%; height: 160px; margin-top: 12px; }
+  .chart-svg { width: 100%; height: 100%; }
+  .chart-grid-line { stroke: var(--border); stroke-width: 1; }
+  .chart-line { fill: none; stroke: var(--accent-light); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .chart-area-fill { fill: url(#chartGrad); }
+  .chart-dot { fill: var(--accent-light); stroke: var(--navy); stroke-width: 2; }
+  .chart-dot-current { fill: var(--green); stroke: var(--navy); stroke-width: 2; filter: drop-shadow(0 0 4px rgba(34,197,94,0.5)); }
+  .chart-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10px; color: var(--muted); }
+  .chart-y-label { position: absolute; left: 0; font-size: 10px; color: var(--muted); }
+
   /* ─── SECTION SPACING ─── */
   .section { margin-bottom: 28px; }
 
-  /* ─── RESPONSIVE ─── */
-  @media (max-width: 900px) {
-    .dash-layout { grid-template-columns: 1fr; }
+  /* ─── GAP ANALYSIS CONNECTOR ─── */
+  .gap-connector {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px 20px; margin: 20px 0;
+    background: rgba(0,102,204,0.04); border: 1px dashed rgba(0,102,204,0.2);
+    border-radius: 10px; font-size: 13px; color: var(--accent-light);
   }
+  .gap-arrow { font-size: 18px; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) { .dash-layout { grid-template-columns: 1fr; } }
   @media (max-width: 768px) {
     .content { padding: 16px 14px 30px; }
     .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
@@ -289,7 +321,7 @@
     .stat-value { font-size: 22px; }
   }
 
-  /* ─── GRAIN TEXTURE ─── */
+  /* ─── GRAIN ─── */
   body::after {
     content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
@@ -302,10 +334,11 @@
 <!-- ─── HEADER ─── -->
 <div class="header">
   <div class="logo-area">
-    <div class="logo-mark">A</div>
+    <img src="https://aquala.au/cdn/shop/files/AQUALA_AUSTRALIA.png?v=1756803092&width=500" alt="AQUALA" class="logo-img">
+    <div class="logo-divider"></div>
     <div>
-      <div class="logo-text">AQUALA Intelligence</div>
-      <div class="logo-sub">AI Marketing System — Live Dashboard</div>
+      <div class="logo-text">Intelligence Platform</div>
+      <div class="logo-sub">AI Marketing System</div>
     </div>
   </div>
   <div class="header-right">
@@ -316,17 +349,23 @@
 
 <!-- ─── NAV ─── -->
 <div class="nav-bar">
-  <div class="nav-tab active" data-page="dashboard" onclick="showPage('dashboard')">Live Dashboard</div>
-  <div class="nav-tab" data-page="status" onclick="showPage('status')">Current State</div>
+  <div class="nav-tab active" data-page="dashboard" onclick="showPage('dashboard')">
+    Live Dashboard
+    <span class="tab-hint green"></span>
+  </div>
+  <div class="nav-tab" data-page="status" onclick="showPage('status')">
+    Current State
+    <span class="tab-hint red"></span>
+  </div>
   <div class="nav-tab" data-page="proposal" onclick="showPage('proposal')">Phase 1 Proposal</div>
 </div>
 
 <!-- ─── CONTENT ─── -->
 <div class="content">
 
-<!-- ════════════════════════════════════════════════ -->
-<!--     TAB 1 — LIVE DASHBOARD (30 days post-P1)   -->
-<!-- ════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════ -->
+<!--     TAB 1 — LIVE DASHBOARD (30 days post-P1)       -->
+<!-- ════════════════════════════════════════════════════ -->
 <div class="page active" id="page-dashboard">
 
   <!-- REVENUE IMPACT CARDS -->
@@ -343,21 +382,87 @@
         <div class="stat-label">Email Revenue This Month</div>
         <div class="stat-value">$28,400</div>
         <div class="stat-change up">↑ 340% from pre-automation</div>
+        <div class="sparkline-wrap">
+          <svg viewBox="0 0 100 40" preserveAspectRatio="none">
+            <polyline points="0,38 15,35 30,30 45,28 55,20 65,18 75,14 85,10 100,6" fill="none" stroke="rgba(34,197,94,0.5)" stroke-width="2"/>
+          </svg>
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Abandoned Cart Recovered</div>
         <div class="stat-value">$8,200</div>
-        <div class="stat-sub">47 carts recovered · 23% recovery rate</div>
+        <div class="stat-sub">47 carts recovered · <strong style="color:var(--green)">23% recovery rate</strong></div>
+        <div class="sparkline-wrap">
+          <svg viewBox="0 0 100 40" preserveAspectRatio="none">
+            <polyline points="0,30 15,28 30,32 45,22 55,25 65,18 75,15 85,12 100,10" fill="none" stroke="rgba(0,102,204,0.5)" stroke-width="2"/>
+          </svg>
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Content Assets Generated</div>
-        <div class="stat-value">34</div>
-        <div class="stat-sub">12 FB/IG · 8 Google · 14 TikTok this week</div>
+        <div class="stat-value">34 <span style="font-size:14px;color:var(--muted);font-weight:500">this week</span></div>
+        <div class="stat-sub">12 FB/IG · 8 Google · 14 TikTok</div>
+        <div class="sparkline-wrap">
+          <svg viewBox="0 0 100 40" preserveAspectRatio="none">
+            <polyline points="0,32 15,28 30,30 45,24 55,22 65,26 75,18 85,14 100,10" fill="none" stroke="rgba(0,184,212,0.5)" stroke-width="2"/>
+          </svg>
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Active Email Subscribers</div>
         <div class="stat-value">4,847</div>
         <div class="stat-change up">↑ 312 this week</div>
+        <div class="sparkline-wrap">
+          <svg viewBox="0 0 100 40" preserveAspectRatio="none">
+            <polyline points="0,36 15,34 30,30 45,26 55,24 65,20 75,16 85,12 100,8" fill="none" stroke="rgba(34,197,94,0.5)" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVENUE CHART -->
+  <div class="section">
+    <div class="section-hd">
+      <div>
+        <div class="section-title">Email Revenue — 30-Day Trend</div>
+        <div class="section-sub">Daily attributed revenue from all Klaviyo flows</div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--green)">$28,400 total · avg $947/day</div>
+    </div>
+    <div class="card chart-card">
+      <div class="chart-area">
+        <svg class="chart-svg" viewBox="0 0 600 160" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(0,102,204,0.25)"/>
+              <stop offset="100%" stop-color="rgba(0,102,204,0)"/>
+            </linearGradient>
+          </defs>
+          <!-- Grid lines -->
+          <line x1="0" y1="40" x2="600" y2="40" class="chart-grid-line"/>
+          <line x1="0" y1="80" x2="600" y2="80" class="chart-grid-line"/>
+          <line x1="0" y1="120" x2="600" y2="120" class="chart-grid-line"/>
+          <!-- Y-axis labels -->
+          <text x="4" y="38" fill="#7b8ba3" font-size="9">$1,500</text>
+          <text x="4" y="78" fill="#7b8ba3" font-size="9">$1,000</text>
+          <text x="4" y="118" fill="#7b8ba3" font-size="9">$500</text>
+          <!-- Area -->
+          <polygon class="chart-area-fill" points="40,145 60,140 80,138 100,130 120,135 140,125 160,120 180,128 200,115 220,108 240,112 260,100 280,95 300,102 320,88 340,80 360,85 380,72 400,68 420,75 440,62 460,55 480,60 500,48 520,42 540,38 560,30 580,26 580,155 40,155"/>
+          <!-- Line -->
+          <polyline class="chart-line" points="40,145 60,140 80,138 100,130 120,135 140,125 160,120 180,128 200,115 220,108 240,112 260,100 280,95 300,102 320,88 340,80 360,85 380,72 400,68 420,75 440,62 460,55 480,60 500,48 520,42 540,38 560,30 580,26"/>
+          <!-- Dots (key points) -->
+          <circle cx="40" cy="145" r="3" class="chart-dot"/>
+          <circle cx="200" cy="115" r="3" class="chart-dot"/>
+          <circle cx="340" cy="80" r="3" class="chart-dot"/>
+          <circle cx="460" cy="55" r="3" class="chart-dot"/>
+          <circle cx="580" cy="26" r="5" class="chart-dot-current"/>
+          <!-- Current value label -->
+          <text x="560" y="18" fill="#22c55e" font-size="11" font-weight="700">$1,420</text>
+        </svg>
+      </div>
+      <div class="chart-labels">
+        <span>Mar 1</span><span>Mar 7</span><span>Mar 14</span><span>Mar 21</span><span>Mar 28</span><span style="color:var(--green);font-weight:700">Today</span>
       </div>
     </div>
   </div>
@@ -365,77 +470,6 @@
   <!-- MAIN + SIDEBAR LAYOUT -->
   <div class="dash-layout">
     <div class="dash-main">
-
-      <!-- CONTENT PIPELINE -->
-      <div class="section">
-        <div class="section-hd">
-          <div>
-            <div class="section-title">Content Pipeline</div>
-            <div class="section-sub">Recent agent outputs — auto-generated creative assets</div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="pipeline-item">
-            <div class="pipeline-icon" style="background:rgba(24,119,242,0.1);border-color:rgba(24,119,242,0.2)">📱</div>
-            <div>
-              <div class="pipeline-title">AQUALA Hero Ad — Facebook / Instagram</div>
-              <div class="pipeline-meta">Premium filter lifestyle creative · 3 variants (carousel, single, story)</div>
-            </div>
-            <div class="pipeline-right">
-              <span class="badge yellow" style="font-size:9px">Pending Review</span>
-              <div style="font-size:10px;color:var(--muted);margin-top:4px">2h ago</div>
-            </div>
-          </div>
-
-          <div class="pipeline-item">
-            <div class="pipeline-icon" style="background:rgba(234,67,53,0.08);border-color:rgba(234,67,53,0.15)">🔍</div>
-            <div>
-              <div class="pipeline-title">Google Search Campaign — 8 headlines, 4 descriptions</div>
-              <div class="pipeline-meta">Targeting "premium water filter" cluster · Quality Score: 8/10 avg</div>
-            </div>
-            <div class="pipeline-right">
-              <span class="badge green" style="font-size:9px">Live</span>
-              <div style="font-size:10px;color:var(--muted);margin-top:4px">Yesterday</div>
-            </div>
-          </div>
-
-          <div class="pipeline-item">
-            <div class="pipeline-icon" style="background:rgba(105,201,208,0.1);border-color:rgba(105,201,208,0.2)">🎬</div>
-            <div>
-              <div class="pipeline-title">TikTok Script — "Water quality at home" angle</div>
-              <div class="pipeline-meta">Hook: "What's actually in your tap water?" · 30s format · UGC style</div>
-            </div>
-            <div class="pipeline-right">
-              <span class="badge cyan" style="font-size:9px">In Production</span>
-              <div style="font-size:10px;color:var(--muted);margin-top:4px">3h ago</div>
-            </div>
-          </div>
-
-          <div class="pipeline-item">
-            <div class="pipeline-icon">📧</div>
-            <div>
-              <div class="pipeline-title">Email — Replenishment Reminder Sequence (3 emails)</div>
-              <div class="pipeline-meta">Auto-triggered at 60/75/85 days post-purchase · personalized by product</div>
-            </div>
-            <div class="pipeline-right">
-              <span class="badge green" style="font-size:9px">Deployed</span>
-              <div style="font-size:10px;color:var(--muted);margin-top:4px">2 days ago</div>
-            </div>
-          </div>
-
-          <div class="pipeline-item">
-            <div class="pipeline-icon" style="background:rgba(0,102,204,0.08);border-color:rgba(0,102,204,0.15)">📊</div>
-            <div>
-              <div class="pipeline-title">Creative Brief — Counter-messaging for new market entrant</div>
-              <div class="pipeline-meta">Strategist-generated from competitor scraper intel · emphasize certifications</div>
-            </div>
-            <div class="pipeline-right">
-              <span class="badge blue" style="font-size:9px">Queued</span>
-              <div style="font-size:10px;color:var(--muted);margin-top:4px">4h ago</div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- EMAIL PERFORMANCE -->
       <div class="section">
@@ -452,52 +486,99 @@
               <tr>
                 <th>Flow</th>
                 <th>Key Metric</th>
+                <th style="text-align:center">Performance</th>
                 <th>Revenue</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>
-                  <div class="email-flow-name">Welcome Series</div>
-                  <div class="email-flow-count">5 emails</div>
-                </td>
+                <td><div class="email-flow-name">Welcome Series</div><div class="email-flow-count">5 emails</div></td>
                 <td><span class="email-metric">42% avg open rate</span></td>
+                <td><div class="inline-bar"><div class="inline-bar-bg"><div class="inline-bar-fill" style="width:84%;background:var(--green)"></div></div><span style="font-size:10px;color:var(--green);font-weight:700">84%</span></div></td>
                 <td>$6,200</td>
               </tr>
               <tr>
-                <td>
-                  <div class="email-flow-name">Abandoned Cart</div>
-                  <div class="email-flow-count">3 emails</div>
-                </td>
+                <td><div class="email-flow-name">Abandoned Cart</div><div class="email-flow-count">3 emails</div></td>
                 <td><span class="email-metric">28% recovery rate</span></td>
+                <td><div class="inline-bar"><div class="inline-bar-bg"><div class="inline-bar-fill" style="width:72%;background:var(--green)"></div></div><span style="font-size:10px;color:var(--green);font-weight:700">72%</span></div></td>
                 <td>$8,200</td>
               </tr>
               <tr>
-                <td>
-                  <div class="email-flow-name">Post-Purchase</div>
-                  <div class="email-flow-count">4 emails</div>
-                </td>
-                <td><span class="email-metric">38% open · 12% upsell conv</span></td>
+                <td><div class="email-flow-name">Post-Purchase</div><div class="email-flow-count">4 emails</div></td>
+                <td><span class="email-metric">38% open · 12% upsell</span></td>
+                <td><div class="inline-bar"><div class="inline-bar-bg"><div class="inline-bar-fill" style="width:68%;background:var(--accent-light)"></div></div><span style="font-size:10px;color:var(--accent-light);font-weight:700">68%</span></div></td>
                 <td>$7,400</td>
               </tr>
               <tr>
-                <td>
-                  <div class="email-flow-name">Browse Abandonment</div>
-                  <div class="email-flow-count">2 emails</div>
-                </td>
+                <td><div class="email-flow-name">Browse Abandonment</div><div class="email-flow-count">2 emails</div></td>
                 <td><span class="email-metric">19% click rate</span></td>
+                <td><div class="inline-bar"><div class="inline-bar-bg"><div class="inline-bar-fill" style="width:52%;background:var(--accent-light)"></div></div><span style="font-size:10px;color:var(--accent-light);font-weight:700">52%</span></div></td>
                 <td>$3,100</td>
               </tr>
               <tr>
-                <td>
-                  <div class="email-flow-name">Win-Back</div>
-                  <div class="email-flow-count">3 emails</div>
-                </td>
+                <td><div class="email-flow-name">Win-Back</div><div class="email-flow-count">3 emails</div></td>
                 <td><span class="email-metric">11% reactivation · 84 recovered</span></td>
+                <td><div class="inline-bar"><div class="inline-bar-bg"><div class="inline-bar-fill" style="width:38%;background:var(--yellow)"></div></div><span style="font-size:10px;color:var(--yellow);font-weight:700">38%</span></div></td>
                 <td>$3,500</td>
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- CONTENT PIPELINE -->
+      <div class="section">
+        <div class="section-hd">
+          <div>
+            <div class="section-title">Content Pipeline</div>
+            <div class="section-sub">Recent agent outputs</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="pipeline-item">
+            <div class="pipeline-icon" style="background:rgba(24,119,242,0.1);border-color:rgba(24,119,242,0.2)">📱</div>
+            <div>
+              <div class="pipeline-title">AQUALA P500 Hero Ad — Facebook / Instagram</div>
+              <div class="pipeline-meta">Premium filter lifestyle creative · 3 variants (carousel, single, story) · Targeting: AU 25-54 homeowners</div>
+            </div>
+            <div class="pipeline-right">
+              <span class="badge yellow" style="font-size:9px">Pending Review</span>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">2h ago</div>
+            </div>
+          </div>
+          <div class="pipeline-item">
+            <div class="pipeline-icon" style="background:rgba(234,67,53,0.08);border-color:rgba(234,67,53,0.15)">🔍</div>
+            <div>
+              <div class="pipeline-title">Google Search — "premium water filter australia" cluster</div>
+              <div class="pipeline-meta">8 headlines, 4 descriptions · Quality Score: 8/10 avg · Bid strategy: tROAS</div>
+            </div>
+            <div class="pipeline-right">
+              <span class="badge green" style="font-size:9px">Live</span>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">Yesterday</div>
+            </div>
+          </div>
+          <div class="pipeline-item">
+            <div class="pipeline-icon" style="background:rgba(105,201,208,0.1);border-color:rgba(105,201,208,0.2)">🎬</div>
+            <div>
+              <div class="pipeline-title">TikTok Script — "What's actually in your tap water?"</div>
+              <div class="pipeline-meta">30s UGC format · Hook: fear-based, filtration reveal · Trending: "clean water at home" +34% WoW</div>
+            </div>
+            <div class="pipeline-right">
+              <span class="badge cyan" style="font-size:9px">In Production</span>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">3h ago</div>
+            </div>
+          </div>
+          <div class="pipeline-item">
+            <div class="pipeline-icon">📧</div>
+            <div>
+              <div class="pipeline-title">Replenishment Reminder Sequence (3 emails)</div>
+              <div class="pipeline-meta">Auto-triggered at 60/75/85 days post-purchase · personalized by filter model</div>
+            </div>
+            <div class="pipeline-right">
+              <span class="badge green" style="font-size:9px">Deployed</span>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">2 days ago</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -511,11 +592,11 @@
           <span class="badge blue">Auto-Updated</span>
         </div>
         <div class="intel-item">
-          Competitor X dropped filter pricing 12% — AQUALA premium positioning holding, no action needed. Monitoring for volume impact over next 14 days.
+          Competitor X dropped filter pricing 12% — AQUALA premium positioning holding, no action needed. Monitoring for volume impact over next 14 days. WaterMark certification remains a key differentiator competitors lack.
           <div class="intel-time">Scraper run · Feb 28, 2026</div>
         </div>
         <div class="intel-item" style="border-left-color:var(--yellow)">
-          New entrant targeting "clean water" keywords on Google — brief sent to Creative Strategist for counter-messaging. Recommended: emphasize filtration certifications + lab test results.
+          New entrant targeting "clean water" keywords on Google — brief sent to Creative Strategist for counter-messaging. Recommended: emphasize WaterMark certification + lab test results in ad copy.
           <div class="intel-time">Scraper run · Mar 2, 2026</div>
         </div>
         <div class="intel-item">
@@ -523,11 +604,43 @@
           <div class="intel-time">Scraper run · Feb 21, 2026</div>
         </div>
       </div>
-
     </div>
 
-    <!-- RIGHT SIDEBAR — AGENT LOG -->
+    <!-- RIGHT SIDEBAR -->
     <div class="dash-sidebar">
+
+      <!-- REVENUE DONUT -->
+      <div class="section">
+        <div class="section-hd"><div class="section-title">Revenue by Flow</div></div>
+        <div class="card" style="padding:16px">
+          <div class="donut-wrap">
+            <svg width="90" height="90" viewBox="0 0 90 90">
+              <circle cx="45" cy="45" r="36" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+              <!-- Abandoned Cart: 28.9% -->
+              <circle cx="45" cy="45" r="36" fill="none" stroke="#22c55e" stroke-width="10" stroke-dasharray="65.3 160.8" stroke-dashoffset="0" transform="rotate(-90 45 45)"/>
+              <!-- Post-Purchase: 26.1% -->
+              <circle cx="45" cy="45" r="36" fill="none" stroke="#3399ff" stroke-width="10" stroke-dasharray="59 167.1" stroke-dashoffset="-65.3" transform="rotate(-90 45 45)"/>
+              <!-- Welcome: 21.8% -->
+              <circle cx="45" cy="45" r="36" fill="none" stroke="#0066cc" stroke-width="10" stroke-dasharray="49.3 176.8" stroke-dashoffset="-124.3" transform="rotate(-90 45 45)"/>
+              <!-- Browse: 10.9% -->
+              <circle cx="45" cy="45" r="36" fill="none" stroke="#00b8d4" stroke-width="10" stroke-dasharray="24.7 201.4" stroke-dashoffset="-173.6" transform="rotate(-90 45 45)"/>
+              <!-- Win-Back: 12.3% -->
+              <circle cx="45" cy="45" r="36" fill="none" stroke="#f59e0b" stroke-width="10" stroke-dasharray="27.8 198.3" stroke-dashoffset="-198.3" transform="rotate(-90 45 45)"/>
+              <text x="45" y="43" text-anchor="middle" fill="#fff" font-size="14" font-weight="800">$28.4K</text>
+              <text x="45" y="55" text-anchor="middle" fill="#7b8ba3" font-size="8">this month</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="donut-row"><div class="donut-dot" style="background:#22c55e"></div><span style="color:var(--text);font-weight:600">Cart</span><span style="color:var(--muted)">$8.2K</span></div>
+              <div class="donut-row"><div class="donut-dot" style="background:#3399ff"></div><span style="color:var(--text);font-weight:600">Post-Purch</span><span style="color:var(--muted)">$7.4K</span></div>
+              <div class="donut-row"><div class="donut-dot" style="background:#0066cc"></div><span style="color:var(--text);font-weight:600">Welcome</span><span style="color:var(--muted)">$6.2K</span></div>
+              <div class="donut-row"><div class="donut-dot" style="background:#f59e0b"></div><span style="color:var(--text);font-weight:600">Win-Back</span><span style="color:var(--muted)">$3.5K</span></div>
+              <div class="donut-row"><div class="donut-dot" style="background:#00b8d4"></div><span style="color:var(--text);font-weight:600">Browse</span><span style="color:var(--muted)">$3.1K</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AGENT ACTIVITY LOG -->
       <div class="section">
         <div class="section-hd">
           <div>
@@ -536,72 +649,53 @@
           </div>
         </div>
         <div class="card" style="padding:14px 16px">
-
           <div class="agent-log-item">
             <div><span class="agent-log-who">Creative Strategist</span> <span class="agent-log-action">→ analyzed 14-day ad performance → generated 3 new creative briefs</span></div>
             <div class="agent-log-time">1h ago</div>
           </div>
-
           <div class="agent-log-item">
-            <div><span class="agent-log-who">Content Creator</span> <span class="agent-log-action">→ produced 4 Facebook ad variants for AQUALA filter launch</span></div>
+            <div><span class="agent-log-who">Content Creator</span> <span class="agent-log-action">→ produced 4 Facebook ad variants for P500 filter launch</span></div>
             <div class="agent-log-time">3h ago</div>
           </div>
-
           <div class="agent-log-item">
             <div><span class="agent-log-who">Competitor Scraper</span> <span class="agent-log-action">→ weekly crawl complete → 7 insights stored in Intelligence Vault</span></div>
             <div class="agent-log-time">Yesterday</div>
           </div>
-
           <div class="agent-log-item">
             <div><span class="agent-log-who">Ad Designer</span> <span class="agent-log-action">→ 6 image prompts generated → assets queued for review</span></div>
             <div class="agent-log-time">Yesterday</div>
           </div>
-
           <div class="agent-log-item">
             <div><span class="agent-log-who">Klaviyo Sync</span> <span class="agent-log-action">→ 47 new subscribers added to Welcome flow</span></div>
             <div class="agent-log-time">2h ago</div>
           </div>
-
         </div>
       </div>
 
-      <!-- SYSTEM HEALTH MINI -->
+      <!-- SYSTEM HEALTH -->
       <div class="section">
-        <div class="section-hd">
-          <div class="section-title">System Health</div>
-        </div>
+        <div class="section-hd"><div class="section-title">System Health</div></div>
         <div class="card" style="padding:14px 16px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
             <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(34,197,94,0.5)"></div>
             <span style="font-size:12px;font-weight:600;color:var(--green)">All systems operational</span>
           </div>
           <div style="font-size:11px;color:var(--muted);line-height:1.7">
-            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
-              <span>Content Factory</span><span style="color:var(--green);font-weight:600">● Online</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
-              <span>Competitor Scraper</span><span style="color:var(--green);font-weight:600">● Online</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
-              <span>Intelligence Vault</span><span style="color:var(--green);font-weight:600">● Online</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
-              <span>Shopify Integration</span><span style="color:var(--green);font-weight:600">● Connected</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:4px 0">
-              <span>Klaviyo</span><span style="color:var(--green);font-weight:600">● 10 flows live</span>
-            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Content Factory</span><span style="color:var(--green);font-weight:600">● Online</span></div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Competitor Scraper</span><span style="color:var(--green);font-weight:600">● Online</span></div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Intelligence Vault</span><span style="color:var(--green);font-weight:600">● Online</span></div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Shopify</span><span style="color:var(--green);font-weight:600">● Connected</span></div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0"><span>Klaviyo</span><span style="color:var(--green);font-weight:600">● 10 flows live</span></div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════════ -->
-<!--        TAB 2 — CURRENT STATE (audit view)      -->
-<!-- ════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════ -->
+<!--        TAB 2 — CURRENT STATE (audit view)          -->
+<!-- ════════════════════════════════════════════════════ -->
 <div class="page" id="page-status">
 
   <!-- BRAND HEALTH -->
@@ -618,19 +712,15 @@
           <div class="card-title" style="font-size:18px;margin:0">AQUALA</div>
           <span class="badge green"><span style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span> Scaling</span>
         </div>
-        <div class="card-meta">Premium D2C water brand — direct-to-consumer e-commerce</div>
+        <div class="card-meta">Premium D2C water filtration — Shopify · Australia-wide</div>
         <div class="brand-target">
           <div class="brand-target-label">Revenue Target</div>
           <div class="brand-target-val">$1M / month by Dec 2026</div>
         </div>
-        <div style="margin-top:10px;font-size:12px;color:var(--muted)">
-          <span style="color:var(--yellow);font-weight:600">⏳ Pre-system-connection phase</span> — Shopify + Klaviyo integration pending
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;font-size:12px;color:var(--yellow)">
+          ⏳ Pre-system-connection — Shopify + Klaviyo not integrated. Email automation blocked.
         </div>
-        <div class="brand-channels">
-          <span class="ch-pill">Meta</span>
-          <span class="ch-pill">Google</span>
-          <span class="ch-pill">TikTok</span>
-        </div>
+        <div class="brand-channels"><span class="ch-pill">Meta</span><span class="ch-pill">Google</span><span class="ch-pill">TikTok</span></div>
       </div>
       <div class="card brand-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -643,10 +733,7 @@
           <div class="brand-target-val">Cross-sell from AQUALA consumer audience</div>
         </div>
         <div style="margin-top:10px;font-size:12px;color:var(--muted)">Enterprise clients via intent signals from D2C traffic</div>
-        <div class="brand-channels">
-          <span class="ch-pill">Google Search</span>
-          <span class="ch-pill">LinkedIn</span>
-        </div>
+        <div class="brand-channels"><span class="ch-pill">Google Search</span><span class="ch-pill">LinkedIn</span></div>
       </div>
     </div>
   </div>
@@ -658,6 +745,7 @@
         <div class="section-title">System Infrastructure</div>
         <div class="section-sub">Core components — live status and gap analysis</div>
       </div>
+      <div style="font-size:12px"><span style="color:var(--green);font-weight:700">3 live</span> · <span style="color:var(--red);font-weight:700">2 blocking</span></div>
     </div>
     <div class="grid-5">
       <div class="card infra-card">
@@ -691,6 +779,14 @@
         <div class="infra-impact" style="color:var(--red)">26 flows documented, 0 deployed</div>
       </div>
     </div>
+  </div>
+
+  <!-- GAP CONNECTOR -->
+  <div class="gap-connector">
+    <span class="gap-arrow">⚠️</span>
+    <span>Shopify + Klaviyo are the only blockers between current state and <strong>$15-40K/month</strong> in automated email revenue</span>
+    <span class="gap-arrow">→</span>
+    <span style="cursor:pointer;text-decoration:underline" onclick="showPage('proposal')">View Phase 1 Proposal</span>
   </div>
 
   <!-- AGENT STATUS -->
@@ -743,9 +839,7 @@
     </div>
     <div class="card">
       <div class="progress-bar-wrap">
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill" style="width:0%"></div>
-        </div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0%"></div></div>
         <div class="progress-label">0% complete — <span style="color:var(--red);font-weight:600">Awaiting Klaviyo + Shopify connection</span></div>
       </div>
       <div class="flow-row">
@@ -768,7 +862,7 @@
         <div><div class="flow-name">Browse Abandonment <span class="flow-detail">(2 emails)</span></div><div class="flow-trigger">Trigger: Product page view</div></div>
         <span class="badge red" style="font-size:9px">Not Deployed</span>
       </div>
-      <div style="padding:8px 0 0;font-size:11.5px;color:var(--muted)">+ 21 more flows documented (Education, VIP, Replenishment, Review, Upsell…)</div>
+      <div style="padding:8px 0 0;font-size:11.5px;color:var(--muted)">+ 21 more flows documented (Education, VIP, Replenishment, Review, Upsell...)</div>
     </div>
   </div>
 
@@ -782,29 +876,29 @@
       <span class="badge blue">Auto-Updated</span>
     </div>
     <div class="intel-item">
-      Competitor A reduced pricing on residential filters by 12% — potential positioning opportunity for AQUALA premium tier. Recommend emphasizing quality + filtration certifications in next Meta ad cycle.
+      Competitor A reduced pricing on residential filters by 12% — potential positioning opportunity for AQUALA premium tier. WaterMark certification is key differentiator.
       <div class="intel-time">Scraper run · Feb 28, 2026</div>
     </div>
     <div class="intel-item">
-      MDC Water competitor launched new industrial case study targeting mining sector — 3 new keyword opportunities identified. Suggested additions pushed to Google Search campaign queue.
+      MDC Water competitor launched new industrial case study targeting mining sector — 3 new keyword opportunities identified.
       <div class="intel-time">Scraper run · Feb 21, 2026</div>
     </div>
     <div class="intel-item" style="border-left-color:var(--green)">
-      TikTok trend: "clean water at home" content +34% engagement week-over-week — brief generated for Content Creator agent. Recommended hook: "What's actually in your tap water?"
+      TikTok trend: "clean water at home" +34% engagement WoW — brief generated for Content Creator. Recommended hook: "What's actually in your tap water?"
       <div class="intel-time">Trend alert · Mar 3, 2026</div>
     </div>
   </div>
 
 </div>
 
-<!-- ════════════════════════════════════════════════ -->
-<!--          TAB 3 — PHASE 1 PROPOSAL              -->
-<!-- ════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════ -->
+<!--          TAB 3 — PHASE 1 PROPOSAL                  -->
+<!-- ════════════════════════════════════════════════════ -->
 <div class="page" id="page-proposal">
 
   <div class="proposal-header">
     <h1>Phase 1 — Core Infrastructure</h1>
-    <p>Everything needed to activate the full system</p>
+    <p>Everything needed to go from Current State → Live Dashboard</p>
   </div>
 
   <div class="grid-2" style="gap:20px">
@@ -830,7 +924,7 @@
           <li>All copy written, segmentation configured, A/B tests ready</li>
         </ul>
       </div>
-      <div class="delivery-impact">💰 Estimated revenue impact: <strong>$15–40K/month</strong> in recovered/generated revenue</div>
+      <div class="delivery-impact">💰 Estimated revenue impact: <strong>$15-40K/month</strong> in recovered/generated revenue</div>
     </div>
     <div class="card delivery-card">
       <div class="delivery-num">3</div>
@@ -875,6 +969,7 @@ function showPage(page) {
   document.querySelectorAll('.nav-tab').forEach(function(el) { el.classList.remove('active'); });
   document.getElementById('page-' + page).classList.add('active');
   document.querySelector('.nav-tab[data-page="' + page + '"]').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
 
