@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AQUALA Intelligence — AI Marketing System</title>
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-light: #0f1d32;
+    --navy-mid: #142640;
+    --accent: #0066cc;
+    --accent-light: #3399ff;
+    --white: #ffffff;
+    --grey: #f5f7fa;
+    --text: #e8ecf2;
+    --muted: #7b8ba3;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --border: rgba(255,255,255,0.07);
+    --surface: rgba(255,255,255,0.04);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 28px;
+    background: rgba(10,22,40,0.95);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo-area { display: flex; align-items: center; gap: 14px; }
+  .logo-mark {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #0066cc 0%, #3399ff 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 16px; color: #fff; letter-spacing: -0.02em;
+  }
+  .logo-text { font-size: 17px; font-weight: 800; color: var(--white); letter-spacing: -0.01em; }
+  .logo-sub { font-size: 11px; color: var(--muted); font-weight: 500; margin-top: 1px; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .live-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 99px;
+    background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25);
+    font-size: 11px; font-weight: 700; color: var(--green);
+  }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); } 50% { opacity:0.7; box-shadow: 0 0 0 6px rgba(34,197,94,0); } }
+  .date-label { font-size: 12px; color: var(--muted); }
+
+  /* ─── NAV TABS ─── */
+  .nav-bar {
+    display: flex; gap: 0; padding: 0 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,22,40,0.6);
+  }
+  .nav-tab {
+    padding: 13px 22px; font-size: 13px; font-weight: 600; color: var(--muted);
+    cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s;
+    user-select: none;
+  }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--accent-light); border-bottom-color: var(--accent); }
+
+  /* ─── CONTENT ─── */
+  .content { padding: 24px 28px 40px; max-width: 1280px; margin: 0 auto; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .section-title {
+    font-size: 15px; font-weight: 800; color: var(--white); margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+  .section-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .section-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 99px;
+    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+    border: 1px solid;
+  }
+  .badge.green { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.25); color: var(--green); }
+  .badge.blue { background: rgba(0,102,204,0.12); border-color: rgba(0,102,204,0.3); color: var(--accent-light); }
+  .badge.red { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.25); color: var(--red); }
+  .badge.yellow { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.25); color: var(--yellow); }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(255,255,255,0.12); }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 3px; }
+  .card-meta { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+
+  /* ─── BRAND HEALTH CARDS ─── */
+  .brand-card { position: relative; overflow: hidden; }
+  .brand-card .card-title { font-size: 18px; margin-bottom: 8px; }
+  .brand-target { margin-top: 12px; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; }
+  .brand-target-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; margin-bottom: 3px; }
+  .brand-target-val { font-size: 14px; font-weight: 700; color: var(--white); }
+  .brand-channels { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .ch-pill {
+    padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 600;
+    background: rgba(0,102,204,0.08); border: 1px solid rgba(0,102,204,0.2); color: var(--accent-light);
+  }
+
+  /* ─── INFRASTRUCTURE GRID ─── */
+  .infra-card { text-align: center; padding: 16px 12px; }
+  .infra-icon { font-size: 22px; margin-bottom: 8px; }
+  .infra-name { font-size: 12px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+  .infra-impact { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* ─── AGENT CARDS ─── */
+  .agent-card { position: relative; }
+  .agent-name { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 2px; }
+  .agent-function { font-size: 12px; color: var(--muted); line-height: 1.6; margin-top: 8px; }
+  .agent-row { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; margin-top: 6px; }
+  .agent-row-label { color: var(--muted); }
+  .agent-row-val { font-weight: 600; }
+
+  /* ─── EMAIL FLOWS ─── */
+  .progress-bar-wrap { margin: 16px 0; }
+  .progress-bar-bg {
+    height: 10px; border-radius: 99px;
+    background: rgba(255,255,255,0.06); overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    transition: width 0.8s ease;
+  }
+  .progress-label { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .flow-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 12.5px;
+  }
+  .flow-row:last-child { border-bottom: none; }
+  .flow-name { font-weight: 600; color: var(--text); }
+  .flow-detail { color: var(--muted); font-size: 11.5px; }
+  .flow-trigger { color: var(--muted); font-size: 11px; }
+
+  /* ─── INTEL FEED ─── */
+  .intel-item {
+    padding: 14px 16px; margin-bottom: 10px;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 10px;
+    font-size: 12.5px; color: var(--muted); line-height: 1.6;
+  }
+  .intel-time { font-size: 10.5px; color: var(--muted); margin-top: 6px; opacity: 0.7; }
+
+  /* ─── PROPOSAL VIEW ─── */
+  .proposal-header {
+    text-align: center; padding: 40px 20px 30px;
+  }
+  .proposal-header h1 {
+    font-size: 28px; font-weight: 800; color: var(--white); letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .proposal-header p { font-size: 14px; color: var(--muted); }
+
+  .delivery-card { position: relative; padding: 24px; }
+  .delivery-num {
+    position: absolute; top: 16px; right: 18px;
+    font-size: 40px; font-weight: 900; color: rgba(0,102,204,0.08);
+    line-height: 1;
+  }
+  .delivery-title { font-size: 16px; font-weight: 800; color: var(--white); margin-bottom: 8px; }
+  .delivery-body { font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .delivery-body ul { padding-left: 16px; margin-top: 6px; }
+  .delivery-body li { margin-bottom: 4px; }
+  .delivery-impact {
+    margin-top: 12px; padding: 8px 12px;
+    background: rgba(0,102,204,0.06); border: 1px solid rgba(0,102,204,0.15);
+    border-radius: 8px; font-size: 12px; color: var(--accent-light);
+  }
+
+  .proposal-footer {
+    text-align: center; margin-top: 40px; padding: 28px 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+  .footer-main { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+  .footer-sub { font-size: 13px; color: var(--muted); }
+  .footer-phase2 { margin-top: 10px; font-size: 12px; color: var(--accent-light); }
+
+  /* ─── SECTION SPACING ─── */
+  .section { margin-bottom: 28px; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .content { padding: 16px 14px 30px; }
+    .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
+    .header { padding: 12px 16px; }
+    .nav-bar { padding: 0 16px; }
+    .nav-tab { padding: 11px 14px; font-size: 12px; }
+  }
+
+  /* ─── GRAIN TEXTURE ─── */
+  body::after {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    background-size: 400px 400px; background-repeat: repeat;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<div class="header">
+  <div class="logo-area">
+    <div class="logo-mark">A</div>
+    <div>
+      <div class="logo-text">AQUALA Intelligence</div>
+      <div class="logo-sub">AI Marketing System — Live Dashboard</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-pill"><div class="live-dot"></div>System Online</div>
+    <div class="date-label">March 4, 2026</div>
+  </div>
+</div>
+
+<!-- ─── NAV ─── -->
+<div class="nav-bar">
+  <div class="nav-tab active" data-page="status" onclick="showPage('status')">System Status</div>
+  <div class="nav-tab" data-page="proposal" onclick="showPage('proposal')">Phase 1 Proposal</div>
+</div>
+
+<!-- ─── CONTENT ─── -->
+<div class="content">
+
+<!-- ════════════════════════════════════════════ -->
+<!--              SYSTEM STATUS PAGE             -->
+<!-- ════════════════════════════════════════════ -->
+<div class="page active" id="page-status">
+
+  <!-- BRAND HEALTH -->
+  <div class="section">
+    <div class="section-hd">
+      <div>
+        <div class="section-title">Brand Health</div>
+        <div class="section-sub">Real-time status across both brands</div>
+      </div>
+    </div>
+    <div class="grid-2">
+
+      <!-- AQUALA D2C -->
+      <div class="card brand-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div class="card-title" style="font-size:18px;margin:0">AQUALA</div>
+          <span class="badge green"><span style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span> Scaling</span>
+        </div>
+        <div class="card-meta">Premium D2C water brand — direct-to-consumer e-commerce</div>
+        <div class="brand-target">
+          <div class="brand-target-label">Revenue Target</div>
+          <div class="brand-target-val">$1M / month by Dec 2026</div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted)">
+          <span style="color:var(--yellow);font-weight:600">⏳ Pre-system-connection phase</span> — Shopify + Klaviyo integration pending
+        </div>
+        <div class="brand-channels">
+          <span class="ch-pill">Meta</span>
+          <span class="ch-pill">Google</span>
+          <span class="ch-pill">TikTok</span>
+        </div>
+      </div>
+
+      <!-- MDC Water B2B -->
+      <div class="card brand-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div class="card-title" style="font-size:18px;margin:0">MDC Water</div>
+          <span class="badge blue"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent-light)"></span> Active</span>
+        </div>
+        <div class="card-meta">28-year-old industrial water engineering brand — B2B</div>
+        <div class="brand-target">
+          <div class="brand-target-label">Lead Strategy</div>
+          <div class="brand-target-val">Cross-sell from AQUALA consumer audience</div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted)">
+          Enterprise clients via intent signals from D2C traffic
+        </div>
+        <div class="brand-channels">
+          <span class="ch-pill">Google Search</span>
+          <span class="ch-pill">LinkedIn</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SYSTEM INFRASTRUCTURE -->
+  <div class="section">
+    <div class="section-hd">
+      <div>
+        <div class="section-title">System Infrastructure</div>
+        <div class="section-sub">Core components — live status and gap analysis</div>
+      </div>
+    </div>
+    <div class="grid-5">
+      <div class="card infra-card">
+        <div class="infra-icon">📝</div>
+        <div class="infra-name">Content Factory</div>
+        <span class="badge green" style="margin-bottom:8px">Live</span>
+        <div class="infra-impact">Generating FB/IG/Google/TikTok assets on demand</div>
+      </div>
+      <div class="card infra-card">
+        <div class="infra-icon">🕵️</div>
+        <div class="infra-name">Competitor Scraper</div>
+        <span class="badge green" style="margin-bottom:8px">Live</span>
+        <div class="infra-impact">Weekly autonomous competitor analysis</div>
+      </div>
+      <div class="card infra-card">
+        <div class="infra-icon">🧠</div>
+        <div class="infra-name">Intelligence Vault</div>
+        <span class="badge green" style="margin-bottom:8px">Live</span>
+        <div class="infra-impact">Central Supabase database, AI-searchable</div>
+      </div>
+      <div class="card infra-card" style="border-color:rgba(239,68,68,0.2)">
+        <div class="infra-icon">🛒</div>
+        <div class="infra-name">Shopify Integration</div>
+        <span class="badge red" style="margin-bottom:8px">Not Connected</span>
+        <div class="infra-impact" style="color:var(--red)">Blocking all email automation triggers</div>
+      </div>
+      <div class="card infra-card" style="border-color:rgba(239,68,68,0.2)">
+        <div class="infra-icon">📧</div>
+        <div class="infra-name">Klaviyo Deployment</div>
+        <span class="badge red" style="margin-bottom:8px">Not Connected</span>
+        <div class="infra-impact" style="color:var(--red)">26 flows documented, 0 deployed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGENT STATUS -->
+  <div class="section">
+    <div class="section-hd">
+      <div>
+        <div class="section-title">Agent Status</div>
+        <div class="section-sub">AI agents — current activation state</div>
+      </div>
+    </div>
+    <div class="grid-3">
+
+      <!-- Content Creator -->
+      <div class="card agent-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div class="agent-name">🖊️ Content Creator</div>
+          <span class="badge yellow">Manual Only</span>
+        </div>
+        <div class="agent-function">Writes ad copy, email sequences, landing pages</div>
+        <div class="agent-row"><span class="agent-row-label">Last run</span><span class="agent-row-val" style="color:var(--yellow)">Manual</span></div>
+        <div class="agent-row"><span class="agent-row-label">Pending</span><span class="agent-row-val" style="color:var(--muted)">Auto-schedule on Shopify events</span></div>
+      </div>
+
+      <!-- Creative Strategist -->
+      <div class="card agent-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div class="agent-name">📊 Creative Strategist</div>
+          <span class="badge yellow">Manual Only</span>
+        </div>
+        <div class="agent-function">Analyzes performance data, creates data-backed creative briefs</div>
+        <div class="agent-row"><span class="agent-row-label">Last run</span><span class="agent-row-val" style="color:var(--yellow)">Manual</span></div>
+        <div class="agent-row"><span class="agent-row-label">Pending</span><span class="agent-row-val" style="color:var(--muted)">Weekly performance analysis cron</span></div>
+      </div>
+
+      <!-- Ad Designer -->
+      <div class="card agent-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div class="agent-name">🎨 Ad Designer</div>
+          <span class="badge yellow">Manual Only</span>
+        </div>
+        <div class="agent-function">Image generation prompts, creative storage management</div>
+        <div class="agent-row"><span class="agent-row-label">Last run</span><span class="agent-row-val" style="color:var(--yellow)">Manual</span></div>
+        <div class="agent-row"><span class="agent-row-label">Pending</span><span class="agent-row-val" style="color:var(--muted)">Triggered by Strategist output</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAIL FLOW DEPLOYMENT -->
+  <div class="section">
+    <div class="section-hd">
+      <div>
+        <div class="section-title">Email Flow Deployment</div>
+        <div class="section-sub">Klaviyo automation — 26 flows documented</div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--red)">0 / 26 deployed</div>
+    </div>
+    <div class="card">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width:0%"></div>
+        </div>
+        <div class="progress-label">0% complete — <span style="color:var(--red);font-weight:600">Awaiting Klaviyo + Shopify connection</span></div>
+      </div>
+
+      <div class="flow-row">
+        <div>
+          <div class="flow-name">Welcome Series <span class="flow-detail">(5 emails)</span></div>
+          <div class="flow-trigger">Trigger: New subscriber</div>
+        </div>
+        <span class="badge red" style="font-size:9px">Not Deployed</span>
+      </div>
+      <div class="flow-row">
+        <div>
+          <div class="flow-name">Abandoned Cart <span class="flow-detail">(3 emails)</span></div>
+          <div class="flow-trigger">Trigger: Cart abandonment</div>
+        </div>
+        <span class="badge red" style="font-size:9px">Not Deployed</span>
+      </div>
+      <div class="flow-row">
+        <div>
+          <div class="flow-name">Post-Purchase <span class="flow-detail">(4 emails)</span></div>
+          <div class="flow-trigger">Trigger: Order complete</div>
+        </div>
+        <span class="badge red" style="font-size:9px">Not Deployed</span>
+      </div>
+      <div class="flow-row">
+        <div>
+          <div class="flow-name">Win-Back <span class="flow-detail">(3 emails)</span></div>
+          <div class="flow-trigger">Trigger: 60 days inactive</div>
+        </div>
+        <span class="badge red" style="font-size:9px">Not Deployed</span>
+      </div>
+      <div class="flow-row">
+        <div>
+          <div class="flow-name">Browse Abandonment <span class="flow-detail">(2 emails)</span></div>
+          <div class="flow-trigger">Trigger: Product page view</div>
+        </div>
+        <span class="badge red" style="font-size:9px">Not Deployed</span>
+      </div>
+      <div style="padding:8px 0 0;font-size:11.5px;color:var(--muted)">+ 21 more flows documented (Education, VIP, Replenishment, Review, Upsell…)</div>
+    </div>
+  </div>
+
+  <!-- COMPETITOR INTEL FEED -->
+  <div class="section">
+    <div class="section-hd">
+      <div>
+        <div class="section-title">Competitor Intel Feed</div>
+        <div class="section-sub">Automated weekly scraper results</div>
+      </div>
+      <span class="badge blue">Auto-Updated</span>
+    </div>
+
+    <div class="intel-item">
+      Competitor A reduced pricing on residential filters by 12% — potential positioning opportunity for AQUALA premium tier. Recommend emphasizing quality + filtration certifications in next Meta ad cycle.
+      <div class="intel-time">Scraper run · Feb 28, 2026</div>
+    </div>
+    <div class="intel-item">
+      MDC Water competitor launched new industrial case study targeting mining sector — 3 new keyword opportunities identified. Suggested additions pushed to Google Search campaign queue.
+      <div class="intel-time">Scraper run · Feb 21, 2026</div>
+    </div>
+    <div class="intel-item" style="border-left-color:var(--green)">
+      TikTok trend: "clean water at home" content +34% engagement week-over-week — brief generated for Content Creator agent. Recommended hook: "What's actually in your tap water?"
+      <div class="intel-time">Trend alert · Mar 3, 2026</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!--            PHASE 1 PROPOSAL PAGE            -->
+<!-- ════════════════════════════════════════════ -->
+<div class="page" id="page-proposal">
+
+  <div class="proposal-header">
+    <h1>Phase 1 — Core Infrastructure</h1>
+    <p>Everything needed to activate the full system</p>
+  </div>
+
+  <div class="grid-2" style="gap:20px">
+
+    <!-- 1. Shopify Integration -->
+    <div class="card delivery-card">
+      <div class="delivery-num">1</div>
+      <div class="delivery-title">Shopify Integration</div>
+      <div class="delivery-body">
+        <ul>
+          <li>Connect AQUALA storefront to Intelligence Vault</li>
+          <li>Order data, cart events, browse behavior flowing in real-time</li>
+          <li>Full event taxonomy mapped to automation triggers</li>
+        </ul>
+      </div>
+      <div class="delivery-impact">🔓 Unlocks: All 26 email automation triggers</div>
+    </div>
+
+    <!-- 2. Klaviyo Deployment -->
+    <div class="card delivery-card">
+      <div class="delivery-num">2</div>
+      <div class="delivery-title">Klaviyo Deployment — Top 10 Flows</div>
+      <div class="delivery-body">
+        <ul>
+          <li>Welcome, Abandoned Cart, Post-Purchase, Win-Back, Browse Abandonment</li>
+          <li>Education Series, VIP, Replenishment, Review Request, Upsell</li>
+          <li>All copy written, segmentation configured, A/B tests ready</li>
+        </ul>
+      </div>
+      <div class="delivery-impact">💰 Estimated revenue impact: <strong>$15–40K/month</strong> in recovered/generated revenue</div>
+    </div>
+
+    <!-- 3. Agent Automation -->
+    <div class="card delivery-card">
+      <div class="delivery-num">3</div>
+      <div class="delivery-title">Agent Automation</div>
+      <div class="delivery-body">
+        <ul>
+          <li>Content Creator, Creative Strategist, Ad Designer run on schedule</li>
+          <li>Competitor data auto-feeds into weekly creative briefs</li>
+          <li>Zero manual activation required</li>
+        </ul>
+      </div>
+      <div class="delivery-impact">🤖 Fully autonomous — agents operate without human triggers</div>
+    </div>
+
+    <!-- 4. Live Dashboard -->
+    <div class="card delivery-card">
+      <div class="delivery-num">4</div>
+      <div class="delivery-title">Live Dashboard</div>
+      <div class="delivery-body">
+        <ul>
+          <li>Real-time visibility across both brands</li>
+          <li>Content pipeline, email performance, competitor intel</li>
+          <li>Executive-ready — shareable with stakeholders</li>
+        </ul>
+      </div>
+      <div class="delivery-impact">📊 Single source of truth for all marketing intelligence</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="proposal-footer">
+    <div class="footer-main">Timeline: 3 weeks &nbsp;·&nbsp; Investment: $6,000</div>
+    <div class="footer-sub">Full system activation — Shopify, Klaviyo, agents, dashboard</div>
+    <div class="footer-phase2">Phase 2: Ad Publishing Pipeline + Closed-Loop ROAS Feedback — $1,500/month</div>
+  </div>
+
+</div>
+
+</div>
+
+<!-- ─── JS ─── -->
+<script>
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.nav-tab').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector('.nav-tab[data-page="' + page + '"]').classList.add('active');
+}
+</script>
+
+</body>
+</html>
