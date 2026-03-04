@@ -533,6 +533,15 @@
     [data-theme="light"] .sys-name { color: #8A7B6C; }
     [data-theme="light"] .sys-row { border-bottom-color: #DDD0C0; }
 
+    /* ── ALERTS PAGE ── */
+    [data-theme="light"] .alert-full-card { background: #fff; border-color: #e0d4c5; }
+    [data-theme="light"] .afc-client-name { color: #1B1A18; }
+    [data-theme="light"] .afc-why { color: #5a4e43; }
+    [data-theme="light"] .afc-action-box { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); color: #2d2418; }
+    [data-theme="light"] .afbtn { background: #f5f0ea; border-color: #DDD0C0; color: #8A7B6C; }
+    [data-theme="light"] .afbtn.active, [data-theme="light"] .afbtn:hover { background: rgba(0,180,220,0.1); border-color: rgba(0,180,220,0.25); color: #007ba0; }
+    [data-theme="light"] .afc-action-label { color: #8A7B6C; }
+
     /* ── AI ACTIVITY ── */
     [data-theme="light"] .ai-desc { color: #4a3e35; }
     [data-theme="light"] .ai-desc strong { color: #1B1A18; }
@@ -916,6 +925,88 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
       background-size: 400px 400px; background-repeat: repeat;
     }
+
+    /* ─── ALERTS PAGE ─── */
+    .alerts-page-section {
+      padding: 0 28px 28px;
+    }
+    .alerts-page-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+    }
+    .alerts-counts {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .alert-count-pill {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 700;
+      border: 1px solid;
+    }
+    .alert-count-pill.crit { background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.25); color:var(--red); }
+    .alert-count-pill.warn { background:rgba(234,179,8,0.1); border-color:rgba(234,179,8,0.25); color:var(--yellow); }
+    .alert-count-pill.info-pill { background:rgba(0,212,255,0.08); border-color:rgba(0,212,255,0.2); color:var(--cyan); }
+    .alert-count-dot { width:7px; height:7px; border-radius:50%; }
+    .alert-count-dot.crit { background:var(--red); animation:blink 1.4s ease-in-out infinite; }
+    .alert-count-dot.warn { background:var(--yellow); }
+    .alert-count-dot.info-dot { background:var(--cyan); }
+    .alert-filter-bar {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .afbtn {
+      padding: 5px 14px; border-radius: 99px; font-size: 11.5px; font-weight: 600;
+      cursor: pointer; border: 1px solid var(--border);
+      background: var(--surface); color: var(--muted); transition: all 0.15s;
+    }
+    .afbtn.active, .afbtn:hover { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.28); color: var(--cyan); }
+    .alert-full-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 4px solid; border-radius: 13px;
+      padding: 18px 20px; margin-bottom: 12px; transition: border-color 0.2s;
+    }
+    .alert-full-card.crit { border-left-color: var(--red); }
+    .alert-full-card.warn { border-left-color: var(--yellow); }
+    .alert-full-card.info { border-left-color: var(--cyan); }
+    .afc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .afc-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .afc-sev {
+      padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.06em; border: 1px solid;
+    }
+    .afc-sev.crit { background:rgba(239,68,68,0.12); border-color:rgba(239,68,68,0.3); color:var(--red); }
+    .afc-sev.warn { background:rgba(234,179,8,0.12); border-color:rgba(234,179,8,0.3); color:var(--yellow); }
+    .afc-sev.info { background:rgba(0,212,255,0.08); border-color:rgba(0,212,255,0.2); color:var(--cyan); }
+    .afc-client-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .afc-status {
+      padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 700;
+      border: 1px solid;
+    }
+    .afc-status.new { background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.2); color:var(--red); }
+    .afc-status.review { background:rgba(234,179,8,0.08); border-color:rgba(234,179,8,0.2); color:var(--yellow); }
+    .afc-status.resolved { background:rgba(34,197,94,0.08); border-color:rgba(34,197,94,0.2); color:var(--green); }
+    .afc-time { font-size: 11px; color: var(--muted); }
+    .afc-trigger {
+      font-size: 13px; font-weight: 700; margin-bottom: 5px;
+    }
+    .afc-trigger.crit { color: var(--red); }
+    .afc-trigger.warn { color: var(--yellow); }
+    .afc-trigger.info { color: var(--cyan); }
+    .afc-why { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+    .afc-action-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; margin-bottom: 5px; }
+    .afc-action-box {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--text); line-height: 1.65;
+    }
+    .afc-action-box ol { margin: 0; padding-left: 16px; }
+    .afc-action-box li { margin-bottom: 2px; }
+    .afc-impact {
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-top: 10px; padding: 4px 12px;
+      border-radius: 99px; font-size: 11.5px; font-weight: 600; border: 1px solid;
+    }
+    .afc-impact.neg { background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.2); color:var(--red); }
+    .afc-impact.pos { background:rgba(34,197,94,0.08); border-color:rgba(34,197,94,0.2); color:var(--green); }
+    .afc-impact.neu { background:rgba(0,212,255,0.06); border-color:rgba(0,212,255,0.15); color:var(--cyan); }
+    @media (max-width:600px) { .alerts-page-section { padding:0 12px 20px; } }
   </style>
 </head>
 <body>
@@ -1899,6 +1990,7 @@
         <div class="health-sub-row"><span class="health-sub-lbl">Lead Quality</span><span class="health-sub-val" style="color:var(--green)">3.4x · High</span></div>
         <div class="health-sub-row"><span class="health-sub-lbl">Comms Cadence</span><span class="health-sub-val" style="color:var(--green)">On track</span></div>
       </div>
+      <div style="margin-top:10px;padding:7px 10px;background:rgba(234,179,8,0.07);border:1px solid rgba(234,179,8,0.18);border-radius:7px;font-size:11px;color:var(--yellow);line-height:1.5">⚡ Pause 2 aging TikTok ads · brief 3 fresh UGC creatives this week</div>
     </div>
 
     <!-- Velocity Boards: 91 (Healthy) -->
@@ -1926,6 +2018,7 @@
         <div class="health-sub-row"><span class="health-sub-lbl">Lead Quality</span><span class="health-sub-val" style="color:var(--green)">5.8x · Elite</span></div>
         <div class="health-sub-row"><span class="health-sub-lbl">Comms Cadence</span><span class="health-sub-val" style="color:var(--green)">Excellent</span></div>
       </div>
+      <div style="margin-top:10px;padding:7px 10px;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.18);border-radius:7px;font-size:11px;color:var(--green);line-height:1.5">✅ Scale 3 winning creatives +25% budget · duplicate to lookalike audiences</div>
     </div>
 
     <!-- Luminary Skin: 84 (Healthy) -->
@@ -1953,6 +2046,7 @@
         <div class="health-sub-row"><span class="health-sub-lbl">Lead Quality</span><span class="health-sub-val" style="color:var(--green)">4.1x · High</span></div>
         <div class="health-sub-row"><span class="health-sub-lbl">Comms Cadence</span><span class="health-sub-val" style="color:var(--green)">On track</span></div>
       </div>
+      <div style="margin-top:10px;padding:7px 10px;background:rgba(234,179,8,0.07);border:1px solid rgba(234,179,8,0.18);border-radius:7px;font-size:11px;color:var(--yellow);line-height:1.5">⚠ Replace 1 aging ad before it crosses the fatigue threshold (currently day 21)</div>
     </div>
 
     <!-- Atlas Financial: 49 (At Risk) -->
@@ -1980,6 +2074,7 @@
         <div class="health-sub-row"><span class="health-sub-lbl">Lead Quality</span><span class="health-sub-val" style="color:var(--red)">2.9x · Low</span></div>
         <div class="health-sub-row"><span class="health-sub-lbl">Comms Cadence</span><span class="health-sub-val" style="color:var(--yellow)">1 missed</span></div>
       </div>
+      <div style="margin-top:10px;padding:7px 10px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:7px;font-size:11px;color:var(--red);line-height:1.5">🔴 Creative brief this week + client check-in Thursday (ROAS recovery plan)</div>
     </div>
 
   </div>
@@ -2098,6 +2193,152 @@
           Move <strong>$55K from Meta → TikTok</strong>. TikTok is your most efficient channel at 5.4x ROAS but receives only 13% of budget. This shift projects <strong>+0.18x blended ROAS → 3.58x</strong> and <strong>+$128K additional revenue/mo</strong> before TikTok audience saturation.
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ALERTS PAGE ─── -->
+<div class="alerts-page-section" data-pages="alerts">
+  <div class="alerts-page-hd">
+    <div>
+      <div class="section-title" style="margin-bottom:6px">Alert Center</div>
+      <div style="font-size:12.5px;color:var(--muted)">Real-time anomaly detection across all client accounts · Auto-diagnosed root causes</div>
+    </div>
+    <div class="alerts-counts">
+      <div class="alert-count-pill crit"><div class="alert-count-dot crit"></div>2 Critical</div>
+      <div class="alert-count-pill warn"><div class="alert-count-dot warn"></div>1 Warning</div>
+      <div class="alert-count-pill info-pill"><div class="alert-count-dot info-dot"></div>2 Info</div>
+    </div>
+  </div>
+
+  <div class="alert-filter-bar">
+    <div class="afbtn active">All</div>
+    <div class="afbtn">Critical</div>
+    <div class="afbtn">Warning</div>
+    <div class="afbtn">Info</div>
+    <div class="afbtn">Resolved</div>
+    <div class="afbtn">Atlas Financial</div>
+    <div class="afbtn">Naked MD</div>
+  </div>
+
+  <!-- Alert 1 — Atlas: CPM spike — CRITICAL NEW -->
+  <div class="alert-full-card crit">
+    <div class="afc-top">
+      <div class="afc-left">
+        <span class="afc-sev crit">Critical</span>
+        <span class="afc-client-name">Atlas Financial</span>
+        <span class="afc-time">6h ago</span>
+      </div>
+      <span class="afc-status new">New</span>
+    </div>
+    <div class="afc-trigger crit">📈 Google Display CPM +47% in 6 hours ($4.10 → $6.03)</div>
+    <div class="afc-why">AI detected 3 new financial services advertisers entering the Google Display auction targeting your exact keyword clusters (debt consolidation, credit score). This is driving CPM up across all Atlas ad sets simultaneously — not creative fatigue. Frequency is now at 4.2 impressions/user/week on remarketing, above the 3.0 efficiency threshold. If uncorrected by Monday, projected monthly overspend is <strong style="color:var(--red)">+$18,400</strong> above budget with declining ROAS.</div>
+    <div class="afc-action-label">Recommended action</div>
+    <div class="afc-action-box">
+      <ol>
+        <li>Cap Google Display daily budget at <strong>$3,200/day</strong> (down from $4,100) — protects monthly ceiling</li>
+        <li>Add frequency cap: <strong>3 impressions/user/7 days</strong> on remarketing campaigns</li>
+        <li>Separate prospecting + remarketing audiences into distinct campaigns — shared audience is causing auction overlap</li>
+        <li>Monitor CPM for 48 hours before restoring original budget</li>
+      </ol>
+    </div>
+    <span class="afc-impact neg">⚠ Est. impact if unaddressed: −$18.4K overspend + −0.4x ROAS by month end</span>
+  </div>
+
+  <!-- Alert 2 — Atlas: ROAS floor breach — CRITICAL IN REVIEW -->
+  <div class="alert-full-card crit">
+    <div class="afc-top">
+      <div class="afc-left">
+        <span class="afc-sev crit">Critical</span>
+        <span class="afc-client-name">Atlas Financial</span>
+        <span class="afc-time">3 days ago</span>
+      </div>
+      <span class="afc-status review">In Review</span>
+    </div>
+    <div class="afc-trigger crit">📉 ROAS below 2.5x floor for 3rd consecutive week (current: 2.1x)</div>
+    <div class="afc-why">ROAS has declined week-over-week for 21 days. Root cause analysis: all 5 active creatives are 25+ days old (average age: 31 days), above the observed 18-day creative fatigue threshold for financial services lead gen. Lead quality score has also dropped — CPL is up 34% ($67 → $90) while the conversion rate from lead → booked call is stable. This points to audience exhaustion, not funnel issues downstream.</div>
+    <div class="afc-action-label">Recommended action</div>
+    <div class="afc-action-box">
+      <ol>
+        <li>Request <strong>3 new creative variants</strong> from client this week — provide brief with top-performing hooks from Velocity Boards (similar audience)</li>
+        <li>Pause bottom 2 ad sets by CTR (keep top 3 running at reduced budget)</li>
+        <li>Schedule <strong>client check-in by Thursday</strong> — set expectation that recovery takes 2-3 weeks after creative refresh</li>
+        <li>Prepare 30-day recovery plan with milestone metrics (ROAS 2.5x → 3.0x)</li>
+      </ol>
+    </div>
+    <span class="afc-impact neg">⚠ Without creative refresh: projected ROAS 1.8x by Week 4 · client retention at risk</span>
+  </div>
+
+  <!-- Alert 3 — Naked MD: TikTok conv rate drop — WARNING -->
+  <div class="alert-full-card warn">
+    <div class="afc-top">
+      <div class="afc-left">
+        <span class="afc-sev warn">Warning</span>
+        <span class="afc-client-name">Naked MD</span>
+        <span class="afc-time">11h ago</span>
+      </div>
+      <span class="afc-status review">In Review</span>
+    </div>
+    <div class="afc-trigger warn">📉 TikTok conversion rate −18% vs 7-day rolling average (3.4% → 2.8%)</div>
+    <div class="afc-why">Three TikTok ads have been running 14, 18, and 21 days respectively — all past the 12-day median fatigue point for med spa creative. The budget simulator confirms TikTok is your most efficient channel at 5.4x post-refresh ROAS. Pausing and refreshing creatives now — before CPL degrades further — protects this channel's efficiency. Meta and Google are holding steady, so this is isolated to TikTok creative, not audience or funnel.</div>
+    <div class="afc-action-label">Recommended action</div>
+    <div class="afc-action-box">
+      <ol>
+        <li>Pause the 2 lowest-performing TikTok ads by Conv Rate (keep the 18-day ad running at 50% budget — still above floor)</li>
+        <li>Brief client for <strong>3 new UGC-style TikTok creatives</strong> this week — hook formats: problem/agitate/solve, before/after, social proof</li>
+        <li>Reallocate paused TikTok budget to Google temporarily (+$28K) until new creatives are live</li>
+        <li>Set a 10-day creative refresh cycle for TikTok going forward</li>
+      </ol>
+    </div>
+    <span class="afc-impact neg">⚠ If not refreshed within 7 days: est. CPL +$22 and potential −$180K/mo revenue gap</span>
+  </div>
+
+  <!-- Alert 4 — Velocity Boards: winners detected — INFO -->
+  <div class="alert-full-card info">
+    <div class="afc-top">
+      <div class="afc-left">
+        <span class="afc-sev info">Info</span>
+        <span class="afc-client-name">Velocity Boards</span>
+        <span class="afc-time">14h ago</span>
+      </div>
+      <span class="afc-status new">New</span>
+    </div>
+    <div class="afc-trigger info">✨ 3 creatives showing early winning signals (2.3x–3.1x above baseline CTR)</div>
+    <div class="afc-why">AI detected 3 ad creatives exceeding the 1.8x early-signal threshold within 72 hours of launch. This pattern historically predicts top-quartile performers with 78% accuracy across sports eCommerce accounts. Current budget allocation gives each creative $1,200/day — well below the efficiency ceiling. Scaling now captures opportunity before the learning phase window closes (typically days 4-7).</div>
+    <div class="afc-action-label">Recommended action</div>
+    <div class="afc-action-box">
+      <ol>
+        <li>Increase daily budget on all 3 winning creatives by <strong>25%</strong> ($1,200 → $1,500/day each)</li>
+        <li>Duplicate top performer to <strong>2 lookalike audiences</strong> (1% and 3% lookalike from purchasers)</li>
+        <li>Monitor 48h — if ROAS holds above 5.0x, scale to $2,000/day</li>
+      </ol>
+    </div>
+    <span class="afc-impact pos">✓ Est. upside if actioned: +$38K additional revenue/mo at current ROAS trajectory</span>
+  </div>
+
+  <!-- Alert 5 — Luminary: report sent — INFO RESOLVED -->
+  <div class="alert-full-card info">
+    <div class="afc-top">
+      <div class="afc-left">
+        <span class="afc-sev info">Info</span>
+        <span class="afc-client-name">Luminary Skin</span>
+        <span class="afc-time">Yesterday · 9:14am</span>
+      </div>
+      <span class="afc-status resolved">Resolved</span>
+    </div>
+    <div class="afc-trigger info">📧 Weekly performance report auto-generated and delivered</div>
+    <div class="afc-why">Report included: 7-day ROAS summary (4.1x), channel breakdown (Meta/Google/TikTok), creative performance table with top 3 ads, and a 1 aging creative flagged with replacement brief pre-drafted. Delivered to client contact Sarah Chen at 9:14am. Open confirmed at 9:31am.</div>
+    <div class="afc-action-label">No action needed</div>
+    <div class="afc-action-box">Fully automated. Client acknowledged report via email. Next report scheduled: Monday 9:00am.</div>
+    <span class="afc-impact neu">ℹ 0 human-hours required · client notified · brief pre-drafted for aging creative</span>
+  </div>
+
+  <!-- Portfolio alert summary -->
+  <div style="margin-top:6px;padding:14px 18px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);border-radius:12px;font-size:13px;line-height:1.6">
+    <strong style="color:var(--red)">Priority this week:</strong> Atlas Financial needs both a client check-in (ROAS recovery plan) and a creative brief. Naked MD needs 3 fresh TikTok creatives. Combined, these two accounts represent <strong style="color:var(--text)">$785K/mo in managed spend</strong> — resolving these alerts is the highest-leverage action in your pipeline.
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+      <span style="font-size:11.5px;color:var(--muted)">Portfolio alert score:</span>
+      <span style="font-size:11.5px;font-weight:700;color:var(--yellow)">Moderate risk · 2 accounts need immediate attention</span>
     </div>
   </div>
 </div>
