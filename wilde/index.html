@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wilde OS — AI Command Center</title>
+<style>
+  :root {
+    --bg: #0c0a14;
+    --bg-light: #13101e;
+    --bg-mid: #1a1528;
+    --bg-card: #1e1830;
+    --purple: #7c3aed;
+    --purple-light: #a78bfa;
+    --purple-glow: rgba(124,58,237,0.15);
+    --gold: #d4a853;
+    --gold-light: #e8c97a;
+    --gold-glow: rgba(212,168,83,0.12);
+    --white: #f0eef5;
+    --text: #d4d0e0;
+    --muted: #8a82a0;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --blue: #3b82f6;
+    --border: rgba(255,255,255,0.06);
+    --surface: rgba(255,255,255,0.03);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(124,58,237,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 0%, rgba(212,168,83,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 50% at 50% 100%, rgba(124,58,237,0.04) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  @keyframes pulse { 0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); } 50% { opacity:0.7; box-shadow: 0 0 0 6px rgba(34,197,94,0); } }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes slideIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
+  @keyframes goldPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(212,168,83,0.3); } 50% { box-shadow: 0 0 12px 4px rgba(212,168,83,0.08); } }
+  @keyframes progressFill { from { width: 0; } }
+  @keyframes popIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+  @keyframes breathe { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
+
+  /* ─── HEADER ─── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 28px;
+    background: linear-gradient(180deg, rgba(12,10,20,0.98), rgba(12,10,20,0.92));
+    border-bottom: 1px solid rgba(212,168,83,0.08);
+    backdrop-filter: blur(20px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo-area { display: flex; align-items: center; gap: 14px; }
+  .logo-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--purple), var(--gold));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 900; color: white;
+  }
+  .logo-text-group { display: flex; flex-direction: column; }
+  .logo-title { font-size: 14px; font-weight: 700; color: var(--white); letter-spacing: 0.02em; }
+  .logo-sub { font-size: 10px; color: var(--muted); font-weight: 500; }
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  .live-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 99px;
+    background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25);
+    font-size: 11px; font-weight: 700; color: var(--green);
+  }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
+  .date-label { font-size: 12px; color: var(--muted); }
+
+  /* ─── NAV TABS ─── */
+  .nav-bar {
+    display: flex; gap: 0; padding: 0 28px;
+    border-bottom: 1px solid rgba(212,168,83,0.06);
+    background: linear-gradient(180deg, rgba(12,10,20,0.7), rgba(12,10,20,0.5));
+    overflow-x: auto;
+  }
+  .nav-tab {
+    padding: 13px 22px; font-size: 13px; font-weight: 600; color: var(--muted);
+    cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
+    user-select: none; position: relative; display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab-icon { font-size: 14px; }
+  .tab-badge {
+    font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 99px;
+    background: var(--purple); color: white;
+  }
+
+  /* ─── CONTENT ─── */
+  .content { padding: 24px 28px 80px; max-width: 1320px; margin: 0 auto; }
+  .page { display: none; }
+  .page.active { display: block; animation: fadeUp 0.3s ease; }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: linear-gradient(135deg, var(--bg-card), rgba(26,21,40,0.9));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.2s;
+  }
+  .card:hover { border-color: rgba(255,255,255,0.08); }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--white); }
+  .card-subtitle { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* ─── GRID ─── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  .section-hd {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+  }
+  .section-title { font-size: 15px; font-weight: 800; color: var(--white); letter-spacing: -0.01em; }
+  .section-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ─── BADGES ─── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 99px;
+    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .badge-green { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+  .badge-gold { background: var(--gold-glow); color: var(--gold); border: 1px solid rgba(212,168,83,0.2); }
+  .badge-purple { background: var(--purple-glow); color: var(--purple-light); border: 1px solid rgba(124,58,237,0.2); }
+  .badge-red { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+  .badge-blue { background: rgba(59,130,246,0.1); color: var(--blue); border: 1px solid rgba(59,130,246,0.2); }
+
+  /* ─── STAT CARDS ─── */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 768px) { .stat-row { grid-template-columns: repeat(2, 1fr); } }
+  .stat-card {
+    background: linear-gradient(135deg, var(--bg-card), rgba(30,24,48,0.8));
+    border: 1px solid rgba(124,58,237,0.08);
+    border-radius: 10px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+  .stat-card:hover { border-color: rgba(212,168,83,0.15); }
+  .stat-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--purple), var(--gold));
+  }
+  .stat-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .stat-value { font-size: 26px; font-weight: 800; color: var(--white); letter-spacing: -0.02em; }
+  .stat-change { font-size: 11px; font-weight: 600; margin-top: 4px; }
+  .stat-change.up { color: var(--green); }
+
+  /* ─── MORNING BRIEF ─── */
+  .morning-brief {
+    background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(212,168,83,0.04), rgba(124,58,237,0.03));
+    border: 1px solid rgba(212,168,83,0.12);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+    box-shadow: 0 4px 32px rgba(124,58,237,0.06), 0 0 80px rgba(212,168,83,0.03);
+  }
+  .morning-brief::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--purple), var(--gold));
+    border-radius: 14px 14px 0 0;
+  }
+  .mb-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  }
+  .mb-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--purple), var(--gold));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .mb-title { font-size: 14px; font-weight: 800; color: var(--gold); }
+  .mb-time { font-size: 10px; color: var(--muted); }
+  .mb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 768px) { .mb-grid { grid-template-columns: 1fr; } }
+  .mb-item {
+    padding: 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .mb-item-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .mb-item-label.gold { color: var(--gold); }
+  .mb-item-label.purple { color: var(--purple-light); }
+  .mb-item-label.green { color: var(--green); }
+  .mb-item-label.blue { color: var(--blue); }
+  .mb-item-content { font-size: 12px; color: var(--text); line-height: 1.6; }
+  .mb-item-content strong { color: var(--white); }
+  .mb-bullet { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 4px; }
+  .mb-bullet::before { content: '→'; color: var(--gold); font-weight: 700; flex-shrink: 0; font-size: 11px; }
+
+  /* ─── TRANSCRIPT STYLES ─── */
+  .transcript-container {
+    background: var(--bg-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    max-height: 480px;
+    overflow-y: auto;
+  }
+  .transcript-line {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .transcript-line:last-child { border-bottom: none; }
+  .transcript-time { font-size: 10px; color: var(--muted); font-weight: 600; margin-right: 8px; font-variant-numeric: tabular-nums; }
+  .transcript-speaker { font-weight: 700; color: var(--gold); margin-right: 6px; }
+  .transcript-speaker.client { color: var(--purple-light); }
+  .highlight-change { background: rgba(212,168,83,0.08); border-left: 3px solid var(--gold); padding-left: 13px; }
+  .highlight-todo { background: rgba(124,58,237,0.06); border-left: 3px solid var(--purple); padding-left: 13px; }
+  .highlight-ai { background: rgba(34,197,94,0.06); border-left: 3px solid var(--green); padding-left: 13px; }
+
+  /* ─── EXTRACTED ITEMS ─── */
+  .extract-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .extract-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .extract-item:last-child { border-bottom: none; }
+  .extract-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0; margin-top: 2px;
+  }
+  .extract-icon.change { background: var(--gold-glow); border: 1px solid rgba(212,168,83,0.2); }
+  .extract-icon.todo { background: var(--purple-glow); border: 1px solid rgba(124,58,237,0.2); }
+  .extract-icon.email { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); }
+  .extract-icon.done { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); }
+  .extract-icon.ai { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); }
+  .extract-label { font-size: 12px; font-weight: 700; color: var(--white); }
+  .extract-detail { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+  .extract-meta { font-size: 10px; color: var(--muted); margin-top: 4px; opacity: 0.7; }
+
+  /* ─── AI INSIGHT BOX ─── */
+  .ai-insight {
+    background: linear-gradient(135deg, rgba(34,197,94,0.05), rgba(34,197,94,0.02));
+    border: 1px solid rgba(34,197,94,0.15);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 12px;
+    display: flex; align-items: flex-start; gap: 10px;
+    box-shadow: 0 0 30px rgba(34,197,94,0.04);
+  }
+  .ai-insight-icon { font-size: 16px; flex-shrink: 0; animation: breathe 3s ease-in-out infinite; }
+  .ai-insight-text { font-size: 11px; color: var(--green); line-height: 1.6; }
+  .ai-insight-text strong { color: #4ade80; }
+
+  /* ─── DOCUMENT TABLE ─── */
+  .doc-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .doc-table th {
+    text-align: left; padding: 10px 14px; font-size: 10px; font-weight: 800;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--border); background: var(--bg-light);
+  }
+  .doc-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
+  .doc-table tr { transition: background 0.15s; }
+  .doc-table tr:hover { background: var(--surface); }
+  .doc-name { font-weight: 600; color: var(--white); }
+  .doc-type-badge {
+    font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .doc-type-badge.tax { background: rgba(59,130,246,0.1); color: var(--blue); }
+  .doc-type-badge.legal { background: rgba(239,68,68,0.1); color: var(--red); }
+  .doc-type-badge.cert { background: rgba(34,197,94,0.1); color: var(--green); }
+  .doc-type-badge.contract { background: var(--gold-glow); color: var(--gold); }
+
+  /* ─── DM TRIAGE ─── */
+  .dm-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .dm-item:hover { background: var(--surface); }
+  .dm-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: white; flex-shrink: 0;
+  }
+  .dm-content { flex: 1; min-width: 0; }
+  .dm-name { font-size: 12px; font-weight: 700; color: var(--white); }
+  .dm-preview { font-size: 11px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dm-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .dm-time { font-size: 10px; color: var(--muted); opacity: 0.6; }
+  .dm-category {
+    font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .dm-category.hot { background: rgba(239,68,68,0.15); color: var(--red); }
+  .dm-category.student { background: rgba(124,58,237,0.15); color: var(--purple-light); }
+  .dm-category.collab { background: rgba(212,168,83,0.12); color: var(--gold); }
+  .dm-category.spam { background: rgba(255,255,255,0.05); color: var(--muted); }
+  .dm-action {
+    font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 6px;
+    border: none; cursor: pointer; transition: all 0.15s;
+  }
+  .dm-action.reply { background: var(--purple); color: white; }
+  .dm-action.auto { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+
+  /* ─── INBOX ─── */
+  .inbox-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 768px) { .inbox-summary { grid-template-columns: repeat(2, 1fr); } }
+  .inbox-stat {
+    text-align: center; padding: 16px;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+  }
+  .inbox-stat-num { font-size: 28px; font-weight: 900; }
+  .inbox-stat-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+
+  /* ─── ONBOARDING FLOW ─── */
+  .flow-steps { display: flex; align-items: center; gap: 0; overflow-x: auto; padding: 10px 0; }
+  .flow-step { display: flex; flex-direction: column; align-items: center; min-width: 100px; text-align: center; }
+  .flow-step-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-bottom: 8px;
+    border: 2px solid var(--border); background: var(--bg-card);
+  }
+  .flow-step-icon.complete { border-color: var(--green); background: rgba(34,197,94,0.1); }
+  .flow-step-icon.active { border-color: var(--gold); background: var(--gold-glow); animation: goldPulse 2s ease-in-out infinite; }
+  .flow-step-label { font-size: 10px; font-weight: 600; color: var(--muted); }
+  .flow-step-label.complete { color: var(--green); }
+  .flow-step-label.active { color: var(--gold); }
+  .flow-arrow { font-size: 14px; color: var(--muted); margin: 0 2px; opacity: 0.4; padding-bottom: 20px; }
+
+  /* ─── SEARCH BAR ─── */
+  .search-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    background: var(--bg-light); border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 16px;
+  }
+  .search-bar input {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--white); font-size: 13px; font-family: inherit;
+  }
+  .search-bar input::placeholder { color: var(--muted); }
+
+  /* ─── BRIEF ─── */
+  .brief-container { background: var(--bg-light); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .brief-section { margin-bottom: 14px; }
+  .brief-section:last-child { margin-bottom: 0; }
+  .brief-section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); margin-bottom: 6px; }
+  .brief-list { list-style: none; padding: 0; }
+  .brief-list li { padding: 4px 0; font-size: 12px; color: var(--text); line-height: 1.5; display: flex; align-items: flex-start; gap: 6px; }
+  .brief-list li::before { content: '→'; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+
+  /* ─── PIPELINE CARD ─── */
+  .pipeline-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px; gap: 2px; }
+  .pipeline-seg { height: 100%; border-radius: 2px; }
+
+  /* ─── ORG CHART ─── */
+  .org-chart { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .org-leader {
+    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(212,168,83,0.06));
+    border: 1px solid rgba(212,168,83,0.25);
+    border-radius: 14px; padding: 24px 32px;
+    text-align: center; position: relative; max-width: 360px; width: 100%;
+    box-shadow: 0 4px 40px rgba(124,58,237,0.1), 0 0 60px rgba(212,168,83,0.05);
+  }
+  .org-leader::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--purple), var(--gold));
+    border-radius: 14px 14px 0 0;
+  }
+  .org-avatar {
+    width: 56px; height: 56px; border-radius: 14px; margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  .org-leader .org-avatar { background: linear-gradient(135deg, var(--purple), var(--gold)); }
+  .org-name { font-size: 18px; font-weight: 800; color: var(--white); }
+  .org-title { font-size: 11px; color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .org-desc { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  .org-line-down {
+    width: 2px; height: 24px;
+    background: linear-gradient(180deg, var(--gold), rgba(212,168,83,0.2));
+  }
+  .org-line-h {
+    height: 2px; background: rgba(212,168,83,0.15);
+    align-self: stretch; margin: 0 60px;
+    position: relative;
+  }
+  .org-line-h::before, .org-line-h::after {
+    content: ''; position: absolute; top: 0;
+    width: 2px; height: 24px; background: rgba(212,168,83,0.15);
+  }
+  .org-line-h::before { left: 0; }
+  .org-line-h::after { right: 0; }
+  .org-team { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; margin-top: 24px; }
+  @media (max-width: 900px) { .org-team { grid-template-columns: repeat(2, 1fr); } }
+  .org-member {
+    background: linear-gradient(135deg, var(--bg-card), rgba(26,21,40,0.9));
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 16px; text-align: center; position: relative;
+    transition: all 0.25s;
+  }
+  .org-member:hover {
+    border-color: rgba(212,168,83,0.15);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+  }
+  .org-member .org-avatar {
+    width: 44px; height: 44px; font-size: 20px; border-radius: 10px;
+  }
+  .org-member .org-name { font-size: 14px; font-weight: 700; }
+  .org-member .org-title { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: none; letter-spacing: 0; }
+  .org-member .org-desc { font-size: 10px; }
+  .org-status {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    margin-top: 8px;
+  }
+  .org-status-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .org-status-dot.active { background: var(--green); animation: pulse 2s ease-in-out infinite; }
+  .org-status-dot.idle { background: var(--purple); opacity: 0.6; }
+  .org-tags { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+  .org-tag {
+    font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 3px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+  }
+
+  /* ─── BENTO ADD-ONS ─── */
+  .bento-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+  @media (max-width: 900px) { .bento-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .bento-grid { grid-template-columns: 1fr; } }
+  .bento-card {
+    background: linear-gradient(135deg, var(--bg-card), rgba(26,21,40,0.9));
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 22px; position: relative; overflow: hidden;
+    transition: all 0.25s;
+  }
+  .bento-card:hover {
+    border-color: rgba(255,255,255,0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 40px rgba(124,58,237,0.04);
+  }
+  .bento-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .bento-card.gold::before { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+  .bento-card.purple::before { background: linear-gradient(90deg, var(--purple), var(--purple-light)); }
+  .bento-card.green::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+  .bento-card.blue::before { background: linear-gradient(90deg, var(--blue), #60a5fa); }
+  .bento-card.red::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+  .bento-card.cyan::before { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+  .bento-icon { font-size: 28px; margin-bottom: 12px; }
+  .bento-title { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+  .bento-desc { font-size: 11px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+  .bento-example {
+    font-size: 10px; color: var(--text); line-height: 1.5;
+    padding: 10px 12px; background: rgba(0,0,0,0.25); border-radius: 6px;
+    border-left: 2px solid var(--border);
+  }
+  .bento-example strong { color: var(--gold); }
+  .bento-impact {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 3px 8px; border-radius: 4px; margin-top: 10px;
+  }
+  .bento-impact.high { background: rgba(34,197,94,0.1); color: var(--green); }
+  .bento-impact.medium { background: var(--gold-glow); color: var(--gold); }
+
+  /* ─── CTA BAR ─── */
+  .cta-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    padding: 12px 28px;
+    background: linear-gradient(180deg, rgba(12,10,20,0.92), rgba(12,10,20,0.98));
+    border-top: 1px solid rgba(212,168,83,0.06);
+    backdrop-filter: blur(20px);
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 150;
+  }
+  .cta-text { font-size: 12px; color: var(--muted); }
+  .cta-text strong { color: var(--white); }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 72px; right: 24px;
+    background: var(--bg-card);
+    border: 1px solid rgba(34,197,94,0.3);
+    border-radius: 10px;
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    z-index: 200;
+    max-width: 360px;
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.3s ease;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast-icon { font-size: 18px; }
+  .toast-text { font-size: 12px; color: var(--text); line-height: 1.4; }
+  .toast-title { font-weight: 700; color: var(--white); }
+</style>
+</head>
+<body>
+
+<!-- ═══════ HEADER ═══════ -->
+<div class="header">
+  <div class="logo-area">
+    <div class="logo-icon">△</div>
+    <div class="logo-text-group">
+      <div class="logo-title">Wilde OS</div>
+      <div class="logo-sub">AI Command Center — Eli Wilde</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-pill"><div class="live-dot"></div> SYSTEM ACTIVE</div>
+    <div class="date-label" id="dateLabel"></div>
+  </div>
+</div>
+
+<!-- ═══════ NAV ═══════ -->
+<div class="nav-bar">
+  <div class="nav-tab active" data-tab="brief">
+    <span class="tab-icon">☀️</span> Morning Brief
+  </div>
+  <div class="nav-tab" data-tab="warroom">
+    <span class="tab-icon">🎯</span> Event War Room
+    <span class="tab-badge">3</span>
+  </div>
+  <div class="nav-tab" data-tab="docs">
+    <span class="tab-icon">📄</span> Document Hub
+  </div>
+  <div class="nav-tab" data-tab="growth">
+    <span class="tab-icon">📈</span> Growth OS
+    <span class="tab-badge">59</span>
+  </div>
+  <div class="nav-tab" data-tab="agents">
+    <span class="tab-icon">🤖</span> Agents
+  </div>
+  <div class="nav-tab" data-tab="addons">
+    <span class="tab-icon">✨</span> Add-Ons
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ═══════ TAB 0: MORNING BRIEF ═══════ -->
+<div class="page active" id="brief">
+
+  <div class="morning-brief">
+    <div class="mb-header">
+      <div class="mb-icon">☀️</div>
+      <div>
+        <div class="mb-title">Good morning, Eli.</div>
+        <div class="mb-time">Thursday, March 6 · 8:00 AM EST · Here's your day at a glance.</div>
+      </div>
+    </div>
+
+    <div class="mb-grid">
+      <div class="mb-item">
+        <div class="mb-item-label gold">📬 Inbox — 3 need you</div>
+        <div class="mb-item-content">
+          <div class="mb-bullet">Fontainebleau — AV contract amendment needs signature by Friday</div>
+          <div class="mb-bullet">CPA — Q4 estimated tax payment $42,300 due March 15</div>
+          <div class="mb-bullet">Client slide deck feedback — 2 minor updates requested</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px;">44 other emails handled · 12 spam blocked · Zero inbox ✓</div>
+        </div>
+      </div>
+
+      <div class="mb-item">
+        <div class="mb-item-label purple">🎤 Today's Events</div>
+        <div class="mb-item-content">
+          <div class="mb-bullet"><strong>10am</strong> — Client script review with Marcus (Speak-Sell-Scale prep). Review <strong>Section 3 identity shift flow</strong> before call — 2 open items from last session.</div>
+          <div class="mb-bullet"><strong>2pm</strong> — Webinar dry run. Slide deck updated overnight. 3 new testimonial slides added.</div>
+          <div class="mb-bullet"><strong>4pm</strong> — Team sync (15 min)</div>
+        </div>
+      </div>
+
+      <div class="mb-item">
+        <div class="mb-item-label green">💰 Overnight Activity</div>
+        <div class="mb-item-content">
+          <div class="mb-bullet"><strong>3 new enrollments</strong> — Signature Talk That Sells ($21K revenue overnight)</div>
+          <div class="mb-bullet"><strong>12 hot DMs</strong> — 4 auto-booked discovery calls, 8 need your personal reply</div>
+          <div class="mb-bullet"><strong>Pipeline value:</strong> $127K in active conversations</div>
+        </div>
+      </div>
+
+      <div class="mb-item">
+        <div class="mb-item-label blue">⚠️ Deadlines & Alerts</div>
+        <div class="mb-item-content">
+          <div class="mb-bullet"><strong style="color:var(--yellow)">LLC renewal in 13 days</strong> — $138.75 filing fee · sunbiz.org</div>
+          <div class="mb-bullet">Speaker insurance renewal — Jul 1 (no action needed yet)</div>
+          <div class="mb-bullet">Fontainebleau Miami event — 37 days out. 312/400 seats sold.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Pipeline -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Revenue Pipeline — Last 30 Days</div>
+        <div class="card-subtitle">Auto-tracked from enrollments, events, and DM conversions</div>
+      </div>
+      <span class="badge badge-green">↑ 34% vs prior month</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:12px;">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Closed Revenue</div>
+        <div style="font-size:24px;font-weight:800;color:var(--green);">$184K</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Active Pipeline</div>
+        <div style="font-size:24px;font-weight:800;color:var(--gold);">$127K</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">New Enrollments</div>
+        <div style="font-size:24px;font-weight:800;color:var(--white);">28</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">DM → Call Rate</div>
+        <div style="font-size:24px;font-weight:800;color:var(--purple-light);">23%</div>
+      </div>
+    </div>
+    <div class="pipeline-bar">
+      <div class="pipeline-seg" style="width:58%;background:var(--green);"></div>
+      <div class="pipeline-seg" style="width:28%;background:var(--gold);"></div>
+      <div class="pipeline-seg" style="width:14%;background:var(--purple);"></div>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:6px;font-size:10px;color:var(--muted);">
+      <span><span style="color:var(--green)">●</span> Closed</span>
+      <span><span style="color:var(--gold)">●</span> Pipeline</span>
+      <span><span style="color:var(--purple-light)">●</span> Nurturing</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TAB 1: EVENT WAR ROOM ═══════ -->
+<div class="page" id="warroom">
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-label">Active Events</div>
+      <div class="stat-value">4</div>
+      <div class="stat-change up">Next: Miami Live — Apr 12</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Script Changes Today</div>
+      <div class="stat-value">12</div>
+      <div class="stat-change up">All documented + versioned</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">To-Dos Extracted</div>
+      <div class="stat-value">7</div>
+      <div class="stat-change up">5 auto-executed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Emails Auto-Sent</div>
+      <div class="stat-value">3</div>
+      <div class="stat-change up">0 pending approval</div>
+    </div>
+  </div>
+
+  <div class="section-hd">
+    <div>
+      <div class="section-title">Live Call — Marcus Chen · Speak-Sell-Scale Prep</div>
+      <div class="section-sub">Call started 47 min ago · Script v3.2 · 12 changes captured</div>
+    </div>
+    <span class="badge badge-green">● RECORDING</span>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="transcript-container">
+        <div class="transcript-line">
+          <span class="transcript-time">00:32:14</span>
+          <span class="transcript-speaker">Eli:</span>
+          Alright so the opening — I think we ditch the "What if I told you" thing. It's played out. What about something like "Every room I walk into, I already know who's buying." Way more visceral, puts them in your frame immediately.
+        </div>
+        <div class="transcript-line highlight-change">
+          <span class="transcript-time">00:32:38</span>
+          <span class="transcript-speaker client">Marcus:</span>
+          Oh I love that. It's confident without being arrogant. Can we tie it into the poker thing? Like, reading the room is like counting cards — except you're doing it with body language and tonality.
+        </div>
+        <div class="transcript-line">
+          <span class="transcript-time">00:33:02</span>
+          <span class="transcript-speaker">Eli:</span>
+          That's fire. So the flow is: hook — "I already know who's buying" — then the poker analogy — then the "but here's what nobody teaches you" bridge. Lock that in.
+        </div>
+        <div class="transcript-line highlight-ai">
+          <span class="transcript-time">00:33:15</span>
+          <span style="font-size:10px;font-weight:800;color:var(--green);background:rgba(34,197,94,0.15);padding:2px 8px;border-radius:4px;margin-right:6px;">🤖 TRINITY</span>
+          <span style="color:var(--green);font-size:12px;">Heads up — the poker/counting cards analogy was used in the Dan Fleishman event (Feb 14). Consider a fresh metaphor for Marcus to keep it unique to his audience. Suggestion: "It's like being a chess player in a room full of checkers players — same board, different game entirely."</span>
+        </div>
+        <div class="transcript-line">
+          <span class="transcript-time">00:33:48</span>
+          <span class="transcript-speaker">Eli:</span>
+          Actually yeah, good catch. Marcus, let's use the chess one instead. Fits your brand better anyway — you're all about strategic thinking.
+        </div>
+        <div class="transcript-line highlight-todo">
+          <span class="transcript-time">00:34:22</span>
+          <span class="transcript-speaker">Eli:</span>
+          Oh hey — can you shoot Sarah the updated deck? She needs the new slide count for AV by end of day. We added like five new slides this week.
+        </div>
+        <div class="transcript-line highlight-change">
+          <span class="transcript-time">00:35:10</span>
+          <span class="transcript-speaker client">Marcus:</span>
+          For the pricing section — I don't want to just drop the number cold. Can we do the investment stack thing? Show the value pile first, let it build, THEN reveal the price. Makes it feel like a no-brainer.
+        </div>
+        <div class="transcript-line">
+          <span class="transcript-time">00:35:38</span>
+          <span class="transcript-speaker">Eli:</span>
+          Yep, classic Smooth Offer Structure. Value stack, social proof, anchor high, reveal, guarantee. We'll restructure Section 4 to that flow. Also — let's move the identity shift earlier. Right after the chess analogy. Hit 'em with "Trust Themselves" before doubt has a chance to creep in.
+        </div>
+        <div class="transcript-line highlight-todo">
+          <span class="transcript-time">00:36:15</span>
+          <span class="transcript-speaker client">Marcus:</span>
+          Makes sense. Oh, and I need that testimonial clip from the Nashville event — the one where the guy closed 40% of the room on his first try. Can your team grab that from the Google Drive?
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="extract-panel">
+        <div style="font-size:12px;font-weight:800;color:var(--gold);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.08em;">
+          🤖 Trinity — Live Extraction
+        </div>
+
+        <div class="extract-item">
+          <div class="extract-icon change">✏️</div>
+          <div>
+            <div class="extract-label">Opening Hook — Rewritten</div>
+            <div class="extract-detail"><s style="color:var(--red);opacity:0.5">"What if I told you..."</s> → <span style="color:var(--gold)">"Every room I walk into, I already know who's buying."</span></div>
+            <div class="extract-meta">Section 1 · Applied to Script v3.3</div>
+          </div>
+        </div>
+
+        <div class="extract-item">
+          <div class="extract-icon ai">🧠</div>
+          <div>
+            <div class="extract-label" style="color:var(--green);">Cross-Event Memory — Duplicate Caught</div>
+            <div class="extract-detail">Poker analogy flagged as reused. Swapped for chess metaphor. <strong style="color:var(--white);">This keeps Marcus's event unique.</strong></div>
+            <div class="extract-meta">AI insight · Pattern matched across 3 prior events</div>
+          </div>
+        </div>
+
+        <div class="extract-item">
+          <div class="extract-icon change">✏️</div>
+          <div>
+            <div class="extract-label">Pricing Section — Restructured</div>
+            <div class="extract-detail">Section 4 reordered: value stack → social proof → anchor → reveal → guarantee</div>
+            <div class="extract-meta">Section 4 · Smooth Offer Structure applied</div>
+          </div>
+        </div>
+
+        <div class="extract-item">
+          <div class="extract-icon change">✏️</div>
+          <div>
+            <div class="extract-label">Identity Shift — Moved Earlier</div>
+            <div class="extract-detail">"Trust Themselves" section relocated after chess analogy, before doubt window</div>
+            <div class="extract-meta">Section 2 · Queued for approval</div>
+          </div>
+        </div>
+
+        <div class="extract-item">
+          <div class="extract-icon email">📧</div>
+          <div>
+            <div class="extract-label">Email Sent → Sarah (Venue AV)</div>
+            <div class="extract-detail">"Hi Sarah — updated deck is 47 slides now (was 42). Attached the latest version. Let me know if AV needs any changes for the extra transitions."</div>
+            <div class="extract-meta">✅ Sent automatically · 00:34:29</div>
+          </div>
+        </div>
+
+        <div class="extract-item">
+          <div class="extract-icon todo">📋</div>
+          <div>
+            <div class="extract-label">To-Do — Nashville Testimonial Clip</div>
+            <div class="extract-detail">Pull video from Google Drive → clip the 40% close-rate testimonial → embed in social proof section</div>
+            <div class="extract-meta">⏳ Assigned to team · Due tomorrow</div>
+          </div>
+        </div>
+
+        <div class="extract-item">
+          <div class="extract-icon done">✅</div>
+          <div>
+            <div class="extract-label">Script v3.3 Auto-Saved</div>
+            <div class="extract-detail">3 changes applied, 1 pending approval. Synced to Google Docs.</div>
+            <div class="extract-meta">Updated 8 seconds ago</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-insight">
+        <div class="ai-insight-icon">🧠</div>
+        <div class="ai-insight-text">
+          <strong>Pattern detected:</strong> Marcus's audience skews corporate (65% C-suite). Across your last 4 corporate events, the "identity shift before proof" sequence converted 12% higher than "proof before identity shift." Current script aligns with the higher-converting order. ✓
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post-Call Brief -->
+  <div class="card" style="margin-top:8px;">
+    <div class="card-header">
+      <div>
+        <div class="card-title">📝 Post-Call Brief — Auto-Generated</div>
+        <div class="card-subtitle">Preview · Finalizes when call ends</div>
+      </div>
+      <span class="badge badge-gold">LIVE UPDATING</span>
+    </div>
+    <div class="brief-container">
+      <div class="brief-section">
+        <div class="brief-section-title">Decisions Made</div>
+        <ul class="brief-list">
+          <li>New opening hook locked: "Every room I walk into, I already know who's buying."</li>
+          <li>Chess metaphor replaces poker analogy (unique to Marcus's event)</li>
+          <li>Pricing restructured to Smooth Offer Structure format</li>
+          <li>"Trust Themselves" moved earlier — before doubt window</li>
+        </ul>
+      </div>
+      <div class="brief-section">
+        <div class="brief-section-title">Auto-Executed</div>
+        <ul class="brief-list">
+          <li>Email sent to Sarah (venue AV) — updated slide count</li>
+          <li>Script v3.2 → v3.3 — 3 changes applied, synced to Google Docs</li>
+          <li>Poker analogy flagged as reused — chess alternative suggested and accepted</li>
+        </ul>
+      </div>
+      <div class="brief-section">
+        <div class="brief-section-title">Open Items</div>
+        <ul class="brief-list">
+          <li>Nashville testimonial clip needed (assigned to team, due tomorrow)</li>
+          <li>1 script change pending approval</li>
+          <li>Rehearsal run-through not yet scheduled</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TAB 2: DOCUMENT HUB ═══════ -->
+<div class="page" id="docs">
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-label">Documents Processed</div>
+      <div class="stat-value">142</div>
+      <div class="stat-change up">+8 this week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Auto-Categorized</div>
+      <div class="stat-value">100%</div>
+      <div class="stat-change up">Zero manual filing</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Upcoming Deadlines</div>
+      <div class="stat-value">3</div>
+      <div class="stat-change" style="color:var(--yellow)">LLC renewal in 13 days</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Notion Synced</div>
+      <div class="stat-value">✓</div>
+      <div class="stat-change up">Last sync 2 min ago</div>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <span>🔍</span>
+    <input type="text" placeholder="Ask anything... 'When does my LLC filing expire?'" value="When does my LLC filing expire?" readonly>
+  </div>
+
+  <div class="card" style="border-color:rgba(212,168,83,0.2);margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <div style="width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,var(--purple),var(--gold));display:flex;align-items:center;justify-content:center;font-size:12px;">△</div>
+      <span style="font-size:12px;font-weight:700;color:var(--gold);">Trinity</span>
+    </div>
+    <div style="font-size:13px;line-height:1.6;">
+      Your <strong style="color:var(--white)">Florida LLC (Wilde Influence LLC)</strong> renewal is due <strong style="color:var(--gold)">March 19, 2026</strong> — <strong style="color:var(--yellow)">13 days from now</strong>. Filing fee: $138.75. I've set a reminder for March 14 (5 days before). File at <span style="color:var(--purple-light)">sunbiz.org</span>. Want me to draft a to-do or send you the direct link?
+    </div>
+  </div>
+
+  <div class="section-hd">
+    <div>
+      <div class="section-title">Document Intelligence</div>
+      <div class="section-sub">Drop any file — Trinity extracts, categorizes, and organizes automatically</div>
+    </div>
+  </div>
+
+  <div class="card" style="overflow:hidden;padding:0;">
+    <div style="overflow-x:auto;">
+      <table class="doc-table">
+        <thead>
+          <tr>
+            <th>Document</th>
+            <th>Type</th>
+            <th>Key Fields Extracted</th>
+            <th>Deadline</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="doc-name">📄 2025_Federal_Tax_Return.pdf</span></td>
+            <td><span class="doc-type-badge tax">Tax</span></td>
+            <td style="font-size:11px;">AGI: $847,293 · Filed: Jan 15 · Refund: $12,440</td>
+            <td style="font-size:11px;color:var(--green);">Filed ✓</td>
+            <td><span class="badge badge-green">Complete</span></td>
+          </tr>
+          <tr>
+            <td><span class="doc-name">📄 FL_LLC_Renewal_Notice.pdf</span></td>
+            <td><span class="doc-type-badge cert">Cert</span></td>
+            <td style="font-size:11px;">Entity: Wilde Influence LLC · Fee: $138.75</td>
+            <td style="font-size:11px;color:var(--yellow);">Mar 19 ⚠️</td>
+            <td><span class="badge badge-gold">Due Soon</span></td>
+          </tr>
+          <tr>
+            <td><span class="doc-name">📄 NDA_Client_7thLevel.pdf</span></td>
+            <td><span class="doc-type-badge legal">Legal</span></td>
+            <td style="font-size:11px;">Parties: Wilde Influence ↔ 7th Level HQ · Exp: Dec 2026</td>
+            <td style="font-size:11px;">Dec 31, 2026</td>
+            <td><span class="badge badge-green">Active</span></td>
+          </tr>
+          <tr>
+            <td><span class="doc-name">📄 Speaker_Insurance_Cert.pdf</span></td>
+            <td><span class="doc-type-badge cert">Cert</span></td>
+            <td style="font-size:11px;">Policy #GL-8847291 · Coverage: $2M · Hiscox</td>
+            <td style="font-size:11px;">Jul 1, 2026</td>
+            <td><span class="badge badge-green">Active</span></td>
+          </tr>
+          <tr>
+            <td><span class="doc-name">📄 Venue_Contract_MiamiLive.pdf</span></td>
+            <td><span class="doc-type-badge contract">Contract</span></td>
+            <td style="font-size:11px;">Fontainebleau · Apr 12 · Deposit: $18,500 paid</td>
+            <td style="font-size:11px;">Apr 12, 2026</td>
+            <td><span class="badge badge-purple">Upcoming</span></td>
+          </tr>
+          <tr>
+            <td><span class="doc-name">📄 Consulting_Agreement_GymLaunch.pdf</span></td>
+            <td><span class="doc-type-badge contract">Contract</span></td>
+            <td style="font-size:11px;">Client: Gym Launch · Rate: $50K/event · 3 events</td>
+            <td style="font-size:11px;">Jun 30, 2026</td>
+            <td><span class="badge badge-green">Active</span></td>
+          </tr>
+          <tr>
+            <td><span class="doc-name">📄 IRS_1099_Compilation_2025.pdf</span></td>
+            <td><span class="doc-type-badge tax">Tax</span></td>
+            <td style="font-size:11px;">14 contractors · Total: $312,800 · All 1099s filed</td>
+            <td style="font-size:11px;color:var(--green);">Filed ✓</td>
+            <td><span class="badge badge-green">Complete</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TAB 3: GROWTH OS ═══════ -->
+<div class="page" id="growth">
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-label">DMs Today</div>
+      <div class="stat-value">59</div>
+      <div class="stat-change up">12 hot leads identified</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Auto-Replied</div>
+      <div class="stat-value">41</div>
+      <div class="stat-change up">69% handled without you</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pipeline from DMs</div>
+      <div class="stat-value" style="color:var(--gold);">$86K</div>
+      <div class="stat-change up">4 discovery calls auto-booked</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Email Inbox</div>
+      <div class="stat-value" style="color:var(--green);">0</div>
+      <div class="stat-change up">Zero inbox at 8:47am</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="section-hd">
+        <div>
+          <div class="section-title">Instagram DM Triage</div>
+          <div class="section-sub">AI categorized · Draft replies ready · Revenue tracked</div>
+        </div>
+        <span class="badge badge-purple">59 processed</span>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="dm-item">
+          <div class="dm-avatar" style="background:linear-gradient(135deg,#ef4444,#f97316);">JR</div>
+          <div class="dm-content">
+            <div class="dm-name">@jason_realtor_miami <span style="font-size:9px;color:var(--gold);margin-left:4px;">est. value: $7K</span></div>
+            <div class="dm-preview">Hey Eli, loved the masterclass. I run a team of 12 agents and we need to nail our pitch events. What's the best way to work with you?</div>
+            <div class="dm-meta">
+              <span class="dm-category hot">🔥 HOT LEAD</span>
+              <span class="dm-time">2h ago</span>
+            </div>
+          </div>
+          <button class="dm-action reply">View Draft</button>
+        </div>
+
+        <div class="dm-item">
+          <div class="dm-avatar" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);">ML</div>
+          <div class="dm-content">
+            <div class="dm-name">@maria_lifecoach</div>
+            <div class="dm-preview">Just enrolled in Signature Talk! Where do I access the Skool community?</div>
+            <div class="dm-meta">
+              <span class="dm-category student">STUDENT</span>
+              <span class="dm-time">3h ago</span>
+            </div>
+          </div>
+          <button class="dm-action auto">✓ Auto-Replied</button>
+        </div>
+
+        <div class="dm-item">
+          <div class="dm-avatar" style="background:linear-gradient(135deg,#d4a853,#e8c97a);">KP</div>
+          <div class="dm-content">
+            <div class="dm-name">@kevin_podcast_host</div>
+            <div class="dm-preview">Would love to have you on — 50K downloads per episode. Topic: selling without being salesy. Down?</div>
+            <div class="dm-meta">
+              <span class="dm-category collab">COLLAB</span>
+              <span class="dm-time">5h ago</span>
+            </div>
+          </div>
+          <button class="dm-action reply">View Draft</button>
+        </div>
+
+        <div class="dm-item">
+          <div class="dm-avatar" style="background:linear-gradient(135deg,#ef4444,#f97316);">TD</div>
+          <div class="dm-content">
+            <div class="dm-name">@tony_medspa_owner <span style="font-size:9px;color:var(--gold);margin-left:4px;">est. value: $12K</span></div>
+            <div class="dm-preview">Eli we met at GC's event. I've got a medspa chain doing $4M and I need help doing live selling events for my audience. Let's talk.</div>
+            <div class="dm-meta">
+              <span class="dm-category hot">🔥 HOT LEAD</span>
+              <span class="dm-time">6h ago</span>
+            </div>
+          </div>
+          <button class="dm-action reply">View Draft</button>
+        </div>
+
+        <div class="dm-item" style="opacity:0.5;">
+          <div class="dm-avatar" style="background:#333;">🚫</div>
+          <div class="dm-content">
+            <div class="dm-name">@crypto_gains_daily</div>
+            <div class="dm-preview">🚀 Make $10K/day with our secret system! DM for free...</div>
+            <div class="dm-meta">
+              <span class="dm-category spam">SPAM</span>
+              <span class="dm-time">8h ago</span>
+            </div>
+          </div>
+          <button class="dm-action auto" style="opacity:0.5;">Archived</button>
+        </div>
+
+        <div class="dm-item">
+          <div class="dm-avatar" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);">AS</div>
+          <div class="dm-content">
+            <div class="dm-name">@amanda_speaker</div>
+            <div class="dm-preview">Week 3 in the program and I just booked my first $10K speaking gig!! Trust Trinity is INSANE 🙏</div>
+            <div class="dm-meta">
+              <span class="dm-category student">STUDENT</span>
+              <span class="dm-time">9h ago</span>
+            </div>
+          </div>
+          <button class="dm-action auto">✓ Auto-Replied</button>
+        </div>
+
+        <div style="padding:12px 16px;text-align:center;font-size:11px;color:var(--muted);">
+          + 53 more processed · <span style="color:var(--green)">41 auto-handled</span> · <span style="color:var(--gold)">$86K pipeline identified</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-hd">
+        <div>
+          <div class="section-title">Email Zero Inbox</div>
+          <div class="section-sub">47 emails processed this morning</div>
+        </div>
+        <span class="badge badge-green">✓ ZERO INBOX</span>
+      </div>
+
+      <div class="inbox-summary">
+        <div class="inbox-stat">
+          <div class="inbox-stat-num" style="color:var(--green);">3</div>
+          <div class="inbox-stat-label">Need You</div>
+        </div>
+        <div class="inbox-stat">
+          <div class="inbox-stat-num" style="color:var(--blue);">8</div>
+          <div class="inbox-stat-label">FYI Only</div>
+        </div>
+        <div class="inbox-stat">
+          <div class="inbox-stat-num" style="color:var(--muted);">24</div>
+          <div class="inbox-stat-label">Auto-Filed</div>
+        </div>
+        <div class="inbox-stat">
+          <div class="inbox-stat-num" style="color:var(--red);">12</div>
+          <div class="inbox-stat-label">Blocked</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:14px;">
+        <div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:10px;">📬 3 EMAILS THAT NEED YOU</div>
+        <div class="extract-item">
+          <div class="extract-icon" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);">🔴</div>
+          <div>
+            <div class="extract-label">Fontainebleau — AV Contract Amendment</div>
+            <div class="extract-detail">Updated AV requirements need your signature. Deadline: Friday.</div>
+            <div class="extract-meta">Draft reply ready · 1 attachment</div>
+          </div>
+        </div>
+        <div class="extract-item">
+          <div class="extract-icon" style="background:rgba(212,168,83,0.1);border:1px solid rgba(212,168,83,0.2);">🟡</div>
+          <div>
+            <div class="extract-label">Client Feedback — Slide Deck Updates</div>
+            <div class="extract-detail">"Slide 14 needs the updated headshot. Can we also add the Nashville testimonial?"</div>
+            <div class="extract-meta">Draft reply ready</div>
+          </div>
+        </div>
+        <div class="extract-item">
+          <div class="extract-icon" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);">🔵</div>
+          <div>
+            <div class="extract-label">CPA — Q4 Estimated Tax Payment</div>
+            <div class="extract-detail">$42,300 due by March 15 to avoid penalty.</div>
+            <div class="extract-meta">Draft reply ready · Deadline added to calendar</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skool Onboarding -->
+      <div class="section-hd" style="margin-top:20px;">
+        <div>
+          <div class="section-title">Skool Auto-Onboarding</div>
+          <div class="section-sub">Latest enrollment · Fully automated</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div class="dm-avatar" style="background:linear-gradient(135deg,var(--purple),var(--gold));width:40px;height:40px;font-size:16px;">ML</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--white);">Maria Lopez</div>
+            <div style="font-size:11px;color:var(--muted);">Enrolled: Signature Talk That Sells · 3 hours ago</div>
+          </div>
+        </div>
+
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-step-icon complete">💳</div>
+            <div class="flow-step-label complete">Payment</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-step-icon complete">📧</div>
+            <div class="flow-step-label complete">Welcome</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-step-icon complete">🎓</div>
+            <div class="flow-step-label complete">Skool</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-step-icon complete">📚</div>
+            <div class="flow-step-label complete">Module 1</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-step-icon active">🔔</div>
+            <div class="flow-step-label active">Team Alert</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;padding:10px 14px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:8px;font-size:11px;color:var(--green);line-height:1.5;">
+          ✅ <strong>Fully automated in 47 seconds.</strong> Payment → welcome email → Skool access → Module 1 unlocked → team notified. No manual steps.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TAB 4: AGENTS ═══════ -->
+<div class="page" id="agents">
+
+  <div class="section-hd">
+    <div>
+      <div class="section-title">Your AI Team</div>
+      <div class="section-sub">5 agents working 24/7 — each specialized, all connected through shared memory</div>
+    </div>
+    <span class="badge badge-green">ALL SYSTEMS ACTIVE</span>
+  </div>
+
+  <div class="org-chart">
+    <!-- Trinity — Leader -->
+    <div class="org-leader">
+      <div class="org-avatar">△</div>
+      <div class="org-name">Trinity</div>
+      <div class="org-title">Chief of Staff · Orchestrator</div>
+      <div class="org-desc">Your main point of contact. Runs morning briefs, delegates tasks, manages priorities, and keeps cross-agent memory. Knows your business, clients, and preferences. Gets smarter every day.</div>
+      <div class="org-status" style="justify-content:center;margin-top:10px;">
+        <div class="org-status-dot active"></div>
+        <span style="color:var(--green);">Active — processing morning brief</span>
+      </div>
+    </div>
+
+    <div class="org-line-down"></div>
+
+    <!-- Team Row -->
+    <div class="org-team">
+      <div class="org-member">
+        <div class="org-avatar" style="background:var(--gold-glow);border:1px solid rgba(212,168,83,0.2);">🎯</div>
+        <div class="org-name">Director</div>
+        <div class="org-title">Event War Room</div>
+        <div class="org-desc">Lives in your event prep calls. Script versioning, to-do extraction, auto-emails, post-call briefs, cross-event memory.</div>
+        <div class="org-tags">
+          <span class="org-tag">Transcripts</span>
+          <span class="org-tag">Scripts</span>
+          <span class="org-tag">To-Dos</span>
+        </div>
+        <div class="org-status">
+          <div class="org-status-dot active"></div>
+          <span style="color:var(--green);">Recording</span>
+        </div>
+      </div>
+
+      <div class="org-member">
+        <div class="org-avatar" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);">📄</div>
+        <div class="org-name">Vault</div>
+        <div class="org-title">Document Intelligence</div>
+        <div class="org-desc">Parses any document — tax, legal, contracts. Extracts key fields, syncs to Notion, tracks deadlines, answers questions.</div>
+        <div class="org-tags">
+          <span class="org-tag">OCR</span>
+          <span class="org-tag">Notion</span>
+          <span class="org-tag">Deadlines</span>
+        </div>
+        <div class="org-status">
+          <div class="org-status-dot idle"></div>
+          <span style="color:var(--muted);">Standby</span>
+        </div>
+      </div>
+
+      <div class="org-member">
+        <div class="org-avatar" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);">📈</div>
+        <div class="org-name">Scout</div>
+        <div class="org-title">Growth & DM Engine</div>
+        <div class="org-desc">Monitors IG DMs 24/7. Categorizes, scores leads, drafts replies, tracks pipeline value, auto-books discovery calls.</div>
+        <div class="org-tags">
+          <span class="org-tag">DM Triage</span>
+          <span class="org-tag">Leads</span>
+          <span class="org-tag">Pipeline</span>
+        </div>
+        <div class="org-status">
+          <div class="org-status-dot active"></div>
+          <span style="color:var(--green);">Monitoring</span>
+        </div>
+      </div>
+
+      <div class="org-member">
+        <div class="org-avatar" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);">📬</div>
+        <div class="org-name">Gatekeeper</div>
+        <div class="org-title">Email & Onboarding</div>
+        <div class="org-desc">Zero inbox every morning. Categorizes, drafts replies, blocks spam. Handles Skool onboarding end-to-end in 47 seconds.</div>
+        <div class="org-tags">
+          <span class="org-tag">Inbox</span>
+          <span class="org-tag">Skool</span>
+          <span class="org-tag">Spam</span>
+        </div>
+        <div class="org-status">
+          <div class="org-status-dot active"></div>
+          <span style="color:var(--green);">Zero Inbox ✓</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Stats -->
+  <div class="card" style="margin-top:28px;">
+    <div class="card-header">
+      <div>
+        <div class="card-title">System Performance — Projected First 30 Days</div>
+        <div class="card-subtitle">All agents combined</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Tasks Handled</div>
+        <div style="font-size:22px;font-weight:800;color:var(--white);">1,200+</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Emails Processed</div>
+        <div style="font-size:22px;font-weight:800;color:var(--white);">1,400+</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">DMs Triaged</div>
+        <div style="font-size:22px;font-weight:800;color:var(--white);">1,700+</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Hours Saved</div>
+        <div style="font-size:22px;font-weight:800;color:var(--green);">~90h</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Monthly AI Cost</div>
+        <div style="font-size:22px;font-weight:800;color:var(--gold);">~$90</div>
+        <div style="font-size:10px;color:var(--muted);">in tokens</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How Agents Learn -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--gold));display:flex;align-items:center;justify-content:center;font-size:18px;">🧠</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--white);">Shared Memory — Agents Get Smarter Together</div>
+        <div style="font-size:12px;color:var(--text);margin-top:4px;line-height:1.6;">
+          Every agent shares a memory layer. When Director learns that Marcus prefers the chess metaphor, Trinity remembers it for future events. When Scout identifies a hot lead, Gatekeeper knows to prioritize their emails. The system compounds — month 1 is good, month 3 is like having a team that's worked with you for years.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TAB 5: ADD-ONS ═══════ -->
+<div class="page" id="addons">
+
+  <div class="section-hd">
+    <div>
+      <div class="section-title">Growth Add-Ons</div>
+      <div class="section-sub">Once the core system is running, these modules plug in to expand what your agents can do</div>
+    </div>
+  </div>
+
+  <div class="bento-grid">
+    <!-- Webinar Analytics -->
+    <div class="bento-card gold">
+      <div class="bento-icon">📊</div>
+      <div class="bento-title">Webinar Performance Analytics</div>
+      <div class="bento-desc">After every webinar or live event, Trinity auto-generates a performance breakdown — show rate, drop-off points, close rate by offer tier, and comparison to your last 5 events.</div>
+      <div class="bento-example">
+        <strong>Example:</strong> "Miami Masterclass: 312 registered → 247 attended (79% show rate) → 146 stayed to offer (59% retention) → 86 enrolled (59% close rate). That's up 4% from your Nashville event. Drop-off spiked at minute 38 — consider shortening the credibility section."
+      </div>
+      <div class="bento-impact high">★ HIGH IMPACT — Data-driven script optimization</div>
+    </div>
+
+    <!-- Client ROI Tracker -->
+    <div class="bento-card purple">
+      <div class="bento-icon">💰</div>
+      <div class="bento-title">Client Event ROI Tracker</div>
+      <div class="bento-desc">Every client event you prep gets auto-tracked: room size, close rate, revenue generated, and your consulting ROI multiplier. Turns every event into a documented case study.</div>
+      <div class="bento-example">
+        <strong>Example:</strong> "2026 Client Events: 8 events prepped → $14.2M total client revenue generated → Your fee: $400K → ROI for clients: 35x. Top performer: Gym Launch ($6M from 2 events)."
+      </div>
+      <div class="bento-impact high">★ HIGH IMPACT — Automated proof for marketing</div>
+    </div>
+
+    <!-- Testimonial Pipeline -->
+    <div class="bento-card green">
+      <div class="bento-icon">🎤</div>
+      <div class="bento-title">Testimonial Capture Pipeline</div>
+      <div class="bento-desc">Auto-requests feedback after every client event and student milestone. When they send a text or video testimonial, Trinity transcribes it, extracts the money quote, and formats it for web, Skool, and social.</div>
+      <div class="bento-example">
+        <strong>Example:</strong> Student DMs: "Just closed 45% of my room on a $25K offer!" → Auto-clipped, formatted, added to testimonial database. Trinity suggests using it for your next medspa industry prospect.
+      </div>
+      <div class="bento-impact high">★ HIGH IMPACT — Social proof on autopilot</div>
+    </div>
+
+    <!-- Script Intelligence -->
+    <div class="bento-card blue">
+      <div class="bento-icon">🧠</div>
+      <div class="bento-title">Script Intelligence Library</div>
+      <div class="bento-desc">Over time, Trinity builds a pattern library of what hooks, transitions, and close techniques perform best across all your events. Proprietary performance data nobody else has.</div>
+      <div class="bento-example">
+        <strong>Example:</strong> "The 'identity shift before proof' sequence converts 12% higher in corporate rooms vs 'proof before identity shift.' The chess metaphor outperforms sports analogies 2:1 with C-suite audiences."
+      </div>
+      <div class="bento-impact medium">◆ MEDIUM — Compounds over time</div>
+    </div>
+
+    <!-- Content Engine -->
+    <div class="bento-card red">
+      <div class="bento-icon">📱</div>
+      <div class="bento-title">Content Engine</div>
+      <div class="bento-desc">Auto-generates content ideas from your calls, events, and student wins. Drafts captions, suggests reel hooks, and schedules posts. Every client interaction becomes potential content — without you thinking about it.</div>
+      <div class="bento-example">
+        <strong>Example:</strong> From today's call with Marcus: "Reel idea — 'I told my client to ditch the poker analogy. Here's the metaphor that converted 12% higher.' Hook score: 8.4/10. Draft caption ready."
+      </div>
+      <div class="bento-impact medium">◆ MEDIUM — Feeds your 86K audience</div>
+    </div>
+
+    <!-- Competitor Intel -->
+    <div class="bento-card cyan">
+      <div class="bento-icon">🔍</div>
+      <div class="bento-title">Market & Competitor Pulse</div>
+      <div class="bento-desc">Weekly briefing on what other sales coaches and programs are doing — new course launches, pricing shifts, content trends, and audience sentiment. Stay ahead without scrolling.</div>
+      <div class="bento-example">
+        <strong>Example:</strong> "This week: 7th Level launched a new $7K virtual program (similar positioning to Speak-Sell-Scale). Grant Cardone posted 3x about AI sales coaching. Opportunity: position the human element of Trust Trinity vs AI-only approaches."
+      </div>
+      <div class="bento-impact medium">◆ MEDIUM — Strategic awareness</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px;border-color:rgba(212,168,83,0.15);">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--gold));display:flex;align-items:center;justify-content:center;font-size:18px;">💡</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--white);">How Add-Ons Work</div>
+        <div style="font-size:12px;color:var(--text);margin-top:4px;line-height:1.6;">
+          Every add-on plugs into your existing Wilde OS agents — no separate tools, no new logins. Trinity coordinates everything. Add-ons are activated after your core system is running and stable (usually 2-3 weeks in). Each one expands what your agents can do without adding complexity for you.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+<!-- ═══════ FOOTER BAR ═══════ -->
+<div class="cta-bar">
+  <div class="cta-text">
+    <strong>Wilde OS</strong> — Built by <span style="color:var(--gold)">Mau Studio</span> · AI agents running 24/7 so you don't have to
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="live-pill" style="font-size:10px;"><div class="live-dot"></div> 5 AGENTS ACTIVE</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast1">
+  <div class="toast-icon">📧</div>
+  <div class="toast-text">
+    <div class="toast-title">Email auto-sent to Sarah (Venue AV)</div>
+    Updated slide count delivered. No action needed.
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+
+const d = new Date();
+document.getElementById('dateLabel').textContent = d.toLocaleDateString('en-US', {
+  weekday:'short', month:'short', day:'numeric', year:'numeric'
+});
+
+setTimeout(() => {
+  const t = document.getElementById('toast1');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 5000);
+}, 3000);
+</script>
+
+</body>
+</html>
