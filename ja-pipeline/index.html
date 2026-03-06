@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JA — Permit Intelligence Pipeline</title>
+<style>
+  :root {
+    --bg: #070710;
+    --surface: #0e0e1a;
+    --card: #13131f;
+    --border: rgba(255,255,255,0.07);
+    --teal: #00d4ff;
+    --teal-dim: rgba(0,212,255,0.12);
+    --teal-glow: rgba(0,212,255,0.25);
+    --hot: #ff4d4d;
+    --hot-dim: rgba(255,77,77,0.12);
+    --warm: #ffb020;
+    --warm-dim: rgba(255,176,32,0.1);
+    --cold: #555570;
+    --cold-dim: rgba(85,85,112,0.12);
+    --excluded: rgba(255,255,255,0.08);
+    --text: #e8e8f0;
+    --text-dim: #8888aa;
+    --text-muted: #55556a;
+    --green: #22c55e;
+    --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(7,7,16,0.92);
+    backdrop-filter: blur(20px);
+  }
+  .logo { font-size: 13px; font-weight: 600; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; }
+  .logo span { color: var(--teal); }
+  .status-pill {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12px; color: var(--green); font-weight: 500;
+    background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);
+    padding: 5px 12px; border-radius: 20px;
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green);
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+  @keyframes pulse-green {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 80px 40px 60px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .hero-eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--teal);
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 700; line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 18px;
+  }
+  .hero h1 .dim { color: var(--text-dim); font-weight: 400; }
+  .hero-sub {
+    font-size: 17px; color: var(--text-dim);
+    max-width: 580px; line-height: 1.7;
+    margin-bottom: 48px;
+  }
+
+  .stats-bar {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .stat-cell {
+    background: var(--card);
+    padding: 22px 20px;
+    text-align: center;
+  }
+  .stat-val {
+    font-size: 26px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--teal);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .stat-val.hot { color: var(--hot); }
+  .stat-val.warm { color: var(--warm); }
+  .stat-val.green { color: var(--green); }
+  .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ── SECTION WRAPPER ── */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+  }
+  .section-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--text-muted);
+    margin-bottom: 32px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ── PIPELINE FLOW ── */
+  .pipeline-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .pipeline-step {
+    display: grid;
+    grid-template-columns: 56px 1px 1fr;
+    gap: 0 24px;
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .pipeline-step.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .step-num-col {
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .step-num {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+  }
+  .step-num.active {
+    background: var(--teal-dim);
+    border-color: var(--teal);
+    color: var(--teal);
+    box-shadow: 0 0 20px var(--teal-glow);
+  }
+  .step-line {
+    width: 1px;
+    background: var(--border);
+    flex: 1;
+    min-height: 24px;
+    margin: 4px 0;
+  }
+  .connector-col {
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .connector-line {
+    width: 1px; background: var(--border);
+    flex: 1; min-height: 20px;
+  }
+  .step-body {
+    padding: 0 0 36px 0;
+  }
+  .step-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 12px;
+    padding-top: 8px;
+  }
+  .step-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 4px;
+    background: var(--teal-dim); color: var(--teal);
+    border: 1px solid rgba(0,212,255,0.2);
+  }
+  .step-tag.trigger { background: rgba(168,85,247,0.1); color: #c084fc; border-color: rgba(168,85,247,0.2); }
+  .step-tag.report { background: rgba(34,197,94,0.1); color: var(--green); border-color: rgba(34,197,94,0.2); }
+  .step-tag.log { background: rgba(255,176,32,0.1); color: var(--warm); border-color: rgba(255,176,32,0.2); }
+  .step-name {
+    font-size: 16px; font-weight: 600; color: var(--text);
+  }
+  .step-desc {
+    font-size: 14px; color: var(--text-dim); line-height: 1.65;
+    margin-bottom: 14px;
+    max-width: 680px;
+  }
+  .io-row {
+    display: flex; gap: 12px; flex-wrap: wrap;
+  }
+  .io-pill {
+    font-size: 12px; font-family: var(--mono);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--text-dim);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .io-pill .io-label {
+    font-size: 9px; font-family: -apple-system, sans-serif;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+  .io-pill.out { border-color: rgba(0,212,255,0.2); color: var(--teal); }
+
+  /* ── PERMIT TABLE ── */
+  .table-wrap {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    background: var(--surface);
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  tbody tr.row-hot { background: var(--hot-dim); }
+  tbody tr.row-warm { background: var(--warm-dim); }
+  tbody tr.row-cold { background: var(--cold-dim); }
+  tbody tr.row-excluded { opacity: 0.4; }
+  tbody td {
+    padding: 11px 14px;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  tbody td.mono { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+  .priority-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 700; padding: 3px 9px;
+    border-radius: 4px; letter-spacing: 0.04em;
+  }
+  .badge-hot { background: var(--hot-dim); color: var(--hot); border: 1px solid rgba(255,77,77,0.25); }
+  .badge-warm { background: var(--warm-dim); color: var(--warm); border: 1px solid rgba(255,176,32,0.25); }
+  .badge-cold { background: var(--cold-dim); color: var(--cold); border: 1px solid rgba(85,85,112,0.3); }
+  .badge-excluded { background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid var(--border); }
+
+  .score-bar-wrap {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .score-bar {
+    width: 60px; height: 5px; border-radius: 3px;
+    background: rgba(255,255,255,0.06); overflow: hidden;
+  }
+  .score-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, #00b4d8, #00d4ff);
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .score-fill.hot { background: linear-gradient(90deg, #ff6b6b, #ff4d4d); }
+  .score-fill.warm { background: linear-gradient(90deg, #ffd166, #ffb020); }
+  .score-num { font-family: var(--mono); font-size: 12px; color: var(--text-dim); min-width: 24px; }
+
+  .dedupe-badge {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 3px; letter-spacing: 0.05em;
+  }
+  .dedupe-new { background: rgba(34,197,94,0.1); color: var(--green); }
+  .dedupe-dup { background: rgba(255,176,32,0.1); color: var(--warm); }
+
+  .table-legend {
+    display: flex; align-items: center; gap: 20px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--text-muted);
+    flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 7px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  /* ── EXECUTION LOG ── */
+  .exec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .exec-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+  }
+  .exec-card-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-muted);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .exec-card-title .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--teal);
+  }
+  .metric-list { display: flex; flex-direction: column; gap: 8px; }
+  .metric-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px;
+  }
+  .metric-key { color: var(--text-muted); }
+  .metric-val { font-family: var(--mono); font-size: 12px; color: var(--text); }
+  .metric-val.teal { color: var(--teal); }
+  .metric-val.green { color: var(--green); }
+  .metric-val.hot { color: var(--hot); }
+  .metric-val.warm { color: var(--warm); }
+
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+  .code-filename {
+    font-size: 12px; font-family: var(--mono); color: var(--text-muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .code-filename::before {
+    content: '{}'; color: var(--teal); font-weight: 700;
+    font-size: 11px;
+  }
+  .code-scroll {
+    max-height: 440px;
+    overflow-y: auto;
+    padding: 18px 20px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+  }
+  .code-scroll::-webkit-scrollbar { width: 6px; }
+  .code-scroll::-webkit-scrollbar-track { background: transparent; }
+  .code-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+  .j-key { color: #79b8ff; }
+  .j-str { color: #9ecbff; }
+  .j-num { color: #79c0ff; }
+  .j-bool { color: #f97583; }
+  .j-null { color: #f97583; }
+  .j-teal { color: var(--teal); }
+  .j-punc { color: var(--text-muted); }
+  .j-comment { color: #484f58; font-style: italic; }
+
+  /* ── COMMAND BLOCK ── */
+  .command-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+  .command-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--teal);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .command-text {
+    font-size: 15px; color: var(--text);
+    font-style: italic;
+    margin-bottom: 16px;
+    padding-left: 14px;
+    border-left: 2px solid var(--teal-glow);
+  }
+  .command-parsed {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .parsed-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px; font-family: var(--mono);
+  }
+  .parsed-chip .chip-k { color: var(--text-muted); }
+  .parsed-chip .chip-v { color: var(--teal); }
+
+  /* ── BATCH SUMMARY ── */
+  .summary-strip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .summary-left h3 {
+    font-size: 20px; font-weight: 700; margin-bottom: 6px;
+  }
+  .summary-left p {
+    font-size: 13px; color: var(--text-muted);
+  }
+  .summary-pills {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+  .s-pill {
+    padding: 8px 16px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 7px;
+    border: 1px solid transparent;
+  }
+  .s-pill.teal { background: var(--teal-dim); color: var(--teal); border-color: rgba(0,212,255,0.2); }
+  .s-pill.hot { background: var(--hot-dim); color: var(--hot); border-color: rgba(255,77,77,0.2); }
+  .s-pill.warm { background: var(--warm-dim); color: var(--warm); border-color: rgba(255,176,32,0.2); }
+  .s-pill.green { background: rgba(34,197,94,0.1); color: var(--green); border-color: rgba(34,197,94,0.2); }
+  .s-pill.muted { background: rgba(255,255,255,0.04); color: var(--text-muted); border-color: var(--border); }
+
+  /* ── FOOTER ── */
+  .page-footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    max-width: 1100px; margin: 0 auto;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .footer-logo { color: var(--teal); font-weight: 600; }
+
+  /* ── SCROLL ANIMATION ── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    .hero { padding: 50px 20px 40px; }
+    .section { padding: 0 20px 60px; }
+    .stats-bar { grid-template-columns: repeat(3, 1fr); }
+    .exec-grid { grid-template-columns: 1fr; }
+    .site-header { padding: 14px 20px; }
+    .summary-strip { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">Mau Studio <span>/</span> JA Pipeline</div>
+  <div class="status-pill"><div class="status-dot"></div> Pipeline Active</div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Lee County — February 2026 Batch</div>
+  <h1>Permit Intelligence<br><span class="dim">Automated. Scored. Live.</span></h1>
+  <p class="hero-sub">JA processes raw county permit PDFs into scored, deduplicated CRM leads — no manual sorting, no missed contractors, no duplicate contacts.</p>
+  <div class="stats-bar">
+    <div class="stat-cell">
+      <span class="stat-val" data-count="15">0</span>
+      <span class="stat-label">Permits Processed</span>
+    </div>
+    <div class="stat-cell">
+      <span class="stat-val hot" data-count="5">0</span>
+      <span class="stat-label">Hot Leads</span>
+    </div>
+    <div class="stat-cell">
+      <span class="stat-val warm" data-count="14">0</span>
+      <span class="stat-label">Deals Created</span>
+    </div>
+    <div class="stat-cell">
+      <span class="stat-val">$2.85M</span>
+      <span class="stat-label">Total Build Value</span>
+    </div>
+    <div class="stat-cell">
+      <span class="stat-val green">8.1s</span>
+      <span class="stat-label">Total Runtime</span>
+    </div>
+  </div>
+</section>
+
+<!-- PIPELINE FLOW -->
+<section class="section">
+  <div class="section-title">Automation Pipeline</div>
+
+  <div class="pipeline-grid" id="pipeline">
+
+    <div class="pipeline-step" data-step="0">
+      <div class="step-num-col">
+        <div class="step-num">01</div>
+        <div class="step-line"></div>
+      </div>
+      <div></div>
+      <div class="step-body">
+        <div class="step-header">
+          <span class="step-tag trigger">Trigger</span>
+          <span class="step-name">Source Detection</span>
+        </div>
+        <p class="step-desc">New permit PDF detected in watched folder, email attachment inbox, or county API scheduled poll. File queued with a unique batch ID — every run is traceable from first byte.</p>
+        <div class="io-row">
+          <div class="io-pill"><span class="io-label">in</span> lee_county_permits_feb_2026.pdf (93 pages)</div>
+          <div class="io-pill out"><span class="io-label">out</span> batch_id: LEE-2026-03-001</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline-step" data-step="1">
+      <div class="step-num-col">
+        <div class="step-num">02</div>
+        <div class="step-line"></div>
+      </div>
+      <div></div>
+      <div class="step-body">
+        <div class="step-header">
+          <span class="step-tag">Parse</span>
+          <span class="step-name">Structured Extraction</span>
+        </div>
+        <p class="step-desc">Layout-aware parser extracts all fields, normalizes addresses, detects data quality issues. Handles multi-column tabular layouts without OCR fragility. Each record flagged with quality annotations before scoring begins.</p>
+        <div class="io-row">
+          <div class="io-pill"><span class="io-label">in</span> Raw PDF / 93 pages</div>
+          <div class="io-pill out"><span class="io-label">out</span> 15 normalized records · 4 address fixes · 1 warning</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline-step" data-step="2">
+      <div class="step-num-col">
+        <div class="step-num">03</div>
+        <div class="step-line"></div>
+      </div>
+      <div></div>
+      <div class="step-body">
+        <div class="step-header">
+          <span class="step-tag">Score</span>
+          <span class="step-name">Lead Scoring Engine</span>
+        </div>
+        <p class="step-desc">Every permit scored 0–100 across four weighted factors. Building value (40%) + recency (30%) + contractor type (20%) + permit status (10%). Owner Builders and low-value permits excluded before they touch the CRM.</p>
+        <div class="io-row">
+          <div class="io-pill"><span class="io-label">in</span> 15 parsed records</div>
+          <div class="io-pill out"><span class="io-label">out</span> 5 Hot · 7 Warm · 1 Cold · 2 Excluded</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline-step" data-step="3">
+      <div class="step-num-col">
+        <div class="step-num">04</div>
+        <div class="step-line"></div>
+      </div>
+      <div></div>
+      <div class="step-body">
+        <div class="step-header">
+          <span class="step-tag">Dedupe</span>
+          <span class="step-name">Deduplication</span>
+        </div>
+        <p class="step-desc">Two-pass deduplication: first within the current batch, then against existing HubSpot contacts. Same contractor on 3 permits becomes 1 contact with 3 associated deals — not 3 duplicate records. Fuzzy match handles name formatting inconsistencies.</p>
+        <div class="io-row">
+          <div class="io-pill"><span class="io-label">in</span> 13 includable records</div>
+          <div class="io-pill out"><span class="io-label">out</span> 10 new contacts · 3 merged (D R Horton ×3, Southern Demo ×2)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline-step" data-step="4">
+      <div class="step-num-col">
+        <div class="step-num">05</div>
+        <div class="step-line"></div>
+      </div>
+      <div></div>
+      <div class="step-body">
+        <div class="step-header">
+          <span class="step-tag">Enrich</span>
+          <span class="step-name">Contact Enrichment</span>
+        </div>
+        <p class="step-desc">Phase 2 feature. Contacts flagged <code>contact_lookup_needed: Yes</code> are queued for enrichment from Google Business, Florida DBPR (license status), and Sunbiz. Phase 1 creates leads with permit data — ready to activate once enrichment is live.</p>
+        <div class="io-row">
+          <div class="io-pill"><span class="io-label">in</span> 10 new contacts (contact_lookup_needed: Yes)</div>
+          <div class="io-pill out"><span class="io-label">out</span> Queued for Phase 2 · phone, website, license number</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline-step" data-step="5">
+      <div class="step-num-col">
+        <div class="step-num">06</div>
+        <div class="step-line"></div>
+      </div>
+      <div></div>
+      <div class="step-body">
+        <div class="step-header">
+          <span class="step-tag">Create</span>
+          <span class="step-name">CRM Push</span>
+        </div>
+        <p class="step-desc">HubSpot contact + deal created per record via API. Custom permit properties attached: permit number, site address, build value, score, tier. Duplicates update existing contact and append a new deal — no overwriting.</p>
+        <div class="io-row">
+          <div class="io-pill"><span class="io-label">in</span> 10 new contacts · 3 updates</div>
+          <div class="io-pill out"><span class="io-label">out</span> 10 contacts created · 14 deals created · 43 API calls</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline-step" data-step="6">
+      <div class="step-num-col">
+        <div class="step-num">07</div>
+        <div class="step-line"></div>
+      </div>
+      <div></div>
+      <div class="step-body">
+        <div class="step-header">
+          <span class="step-tag trigger">Trigger</span>
+          <span class="step-name">Sequence Enrollment</span>
+        </div>
+        <p class="step-desc">Hot leads enrolled in immediate outreach sequences. Warm leads queued for 48-hour nurture. Existing contacts get re-engagement sequences, not first-touch. Cold leads logged — no sequence, no noise.</p>
+        <div class="io-row">
+          <div class="io-pill"><span class="io-label">in</span> 12 eligible contacts</div>
+          <div class="io-pill out"><span class="io-label">out</span> 3 immediate · 2 re-engagement · 7 nurture (48h)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline-step" data-step="7">
+      <div class="step-num-col">
+        <div class="step-num">08</div>
+        <div class="step-line"></div>
+      </div>
+      <div></div>
+      <div class="step-body">
+        <div class="step-header">
+          <span class="step-tag log">Log</span>
+          <span class="step-name">Audit Trail</span>
+        </div>
+        <p class="step-desc">Full execution log written: execution_id, records in/out, per-record decisions, HubSpot API call log, step timings, warnings. 90-day detailed retention. Mirrors to Google Sheets for client visibility.</p>
+        <div class="io-row">
+          <div class="io-pill"><span class="io-label">in</span> Full pipeline context</div>
+          <div class="io-pill out"><span class="io-label">out</span> exec_20260306_001 · 8,142ms · 0 errors · 1 warning</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline-step" data-step="8">
+      <div class="step-num-col">
+        <div class="step-num">09</div>
+      </div>
+      <div></div>
+      <div class="step-body">
+        <div class="step-header">
+          <span class="step-tag report">Report</span>
+          <span class="step-name">Daily Digest</span>
+        </div>
+        <p class="step-desc">7:00 AM EST digest pushed to Telegram and email. Immediate Telegram alert on any pipeline error. Weekly aggregate every Monday. No manual check-ins required.</p>
+        <div class="io-row">
+          <div class="io-pill"><span class="io-label">in</span> 24h log summary</div>
+          <div class="io-pill out"><span class="io-label">out</span> "15 permits processed. 5 hot leads. 3 merged. 2 excluded." → Telegram + email</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- LIVE PERMIT TABLE -->
+<section class="section fade-up">
+  <div class="section-title">Enriched Permit Output — LEE-2026-03-001</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Record</th>
+          <th>Contractor</th>
+          <th>Site Address</th>
+          <th>Value</th>
+          <th>Score</th>
+          <th>Priority</th>
+          <th>Contractor Type</th>
+          <th>Dedupe</th>
+          <th>Exclusion</th>
+        </tr>
+      </thead>
+      <tbody id="permit-table-body"></tbody>
+    </table>
+    <div class="table-legend">
+      <span>Legend:</span>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--hot-dim);border:1px solid rgba(255,77,77,0.3)"></div> Hot (score ≥ 70)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--warm-dim);border:1px solid rgba(255,176,32,0.3)"></div> Warm (40–69)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--cold-dim);border:1px solid rgba(85,85,112,0.3)"></div> Cold (&lt;40)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.04);border:1px solid var(--border)"></div> Excluded</div>
+    </div>
+  </div>
+</section>
+
+<!-- EXECUTION LOG -->
+<section class="section fade-up">
+  <div class="section-title">Tool Execution — Validation Gate 2</div>
+
+  <div class="command-card">
+    <div class="command-label">Voice Input → Normalized Command</div>
+    <p class="command-text">"Process this month's Lee County permits and create leads for all new contractors"</p>
+    <div class="command-parsed">
+      <div class="parsed-chip"><span class="chip-k">command: </span><span class="chip-v">"process_permit_batch"</span></div>
+      <div class="parsed-chip"><span class="chip-k">source: </span><span class="chip-v">"lee_county_feb_2026"</span></div>
+      <div class="parsed-chip"><span class="chip-k">min_value: </span><span class="chip-v">100000</span></div>
+      <div class="parsed-chip"><span class="chip-k">exclude_owner_builders: </span><span class="chip-v">true</span></div>
+      <div class="parsed-chip"><span class="chip-k">crm: </span><span class="chip-v">"hubspot"</span></div>
+      <div class="parsed-chip"><span class="chip-k">dedupe_window: </span><span class="chip-v">90 days</span></div>
+    </div>
+  </div>
+
+  <div class="exec-grid">
+    <div class="exec-card">
+      <div class="exec-card-title"><div class="dot"></div> Execution Metrics</div>
+      <div class="metric-list">
+        <div class="metric-row"><span class="metric-key">execution_id</span><span class="metric-val teal">exec_20260306_001</span></div>
+        <div class="metric-row"><span class="metric-key">batch_id</span><span class="metric-val teal">LEE-2026-03-001</span></div>
+        <div class="metric-row"><span class="metric-key">started_at</span><span class="metric-val">2026-03-06T06:30:00Z</span></div>
+        <div class="metric-row"><span class="metric-key">duration_ms</span><span class="metric-val green">8,142ms</span></div>
+        <div class="metric-row"><span class="metric-key">errors</span><span class="metric-val green">0</span></div>
+        <div class="metric-row"><span class="metric-key">warnings</span><span class="metric-val warm">1 (missing sq_ft)</span></div>
+        <div class="metric-row"><span class="metric-key">approved_by</span><span class="metric-val">auto (permit_ingestion_rule)</span></div>
+      </div>
+    </div>
+    <div class="exec-card">
+      <div class="exec-card-title"><div class="dot"></div> Record Accounting</div>
+      <div class="metric-list">
+        <div class="metric-row"><span class="metric-key">records_in</span><span class="metric-val">15</span></div>
+        <div class="metric-row"><span class="metric-key">records_parsed</span><span class="metric-val">15</span></div>
+        <div class="metric-row"><span class="metric-key">records_scored</span><span class="metric-val">15</span></div>
+        <div class="metric-row"><span class="metric-key">records_created</span><span class="metric-val green">10</span></div>
+        <div class="metric-row"><span class="metric-key">records_deduplicated</span><span class="metric-val warm">3</span></div>
+        <div class="metric-row"><span class="metric-key">records_excluded</span><span class="metric-val hot">2</span></div>
+        <div class="metric-row"><span class="metric-key">deals_created</span><span class="metric-val teal">14</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">tool-payload-v2.json</span>
+      <span style="font-size:11px;color:var(--text-muted)">Execution snapshot</span>
+    </div>
+    <div class="code-scroll" id="json-block"></div>
+  </div>
+</section>
+
+<!-- BATCH SUMMARY -->
+<section class="section fade-up">
+  <div class="section-title">Batch Summary</div>
+  <div class="summary-strip">
+    <div class="summary-left">
+      <h3>LEE-2026-03-001 Complete</h3>
+      <p>Next scheduled run: 2026-03-07 · 6:00 AM EST · 0 errors</p>
+    </div>
+    <div class="summary-pills">
+      <div class="s-pill teal">15 permits processed</div>
+      <div class="s-pill hot">5 hot leads</div>
+      <div class="s-pill warm">7 warm queued</div>
+      <div class="s-pill green">14 deals created</div>
+      <div class="s-pill green">12 sequences enrolled</div>
+      <div class="s-pill muted">2 excluded</div>
+    </div>
+  </div>
+</section>
+
+<div style="height:40px"></div>
+<div class="page-footer">
+  <span>Built by <span class="footer-logo">Mau Studio</span> — JA on OpenClaw Phase 1</span>
+  <span>Batch LEE-2026-03-001 · Processed 2026-03-06 06:30 UTC</span>
+</div>
+
+<script>
+// ── PERMIT DATA ──
+const permits = [
+  { record: 'RES2024-03127', contractor: 'ADAMS HOMES OF NW FL', address: '492 WILLOWBROOK DR, LEHIGH ACRES', value: '$358,950', score: 82, priority: 'Hot', type: 'Volume Builder', dedupe: 'New', exclude: '' },
+  { record: 'RES2024-07898', contractor: 'GAT CONSTRUCTION MGMT', address: '1008 BELL BLVD S, LEHIGH ACRES', value: '$312,000', score: 76, priority: 'Hot', type: 'Custom Builder', dedupe: 'New', exclude: '' },
+  { record: 'RES2024-02473', contractor: 'SOUTHERN DEMOLITION LLC', address: '433 EISENHOWER BLVD, LEHIGH ACRES', value: '$190,000', score: 74, priority: 'Hot', type: 'Custom Builder', dedupe: 'New', exclude: '' },
+  { record: 'RES2024-13021', contractor: 'PERSPECTIVE CONST LLC', address: '505 PROSPECT AVE, LEHIGH ACRES', value: '$230,000', score: 73, priority: 'Hot', type: 'Custom Builder', dedupe: 'New', exclude: '' },
+  { record: 'RES2024-10413', contractor: 'O AND J CONSTRUCTION FL', address: '2908 38TH ST SW, LEHIGH ACRES', value: '$255,000', score: 72, priority: 'Hot', type: 'Custom Builder', dedupe: 'New', exclude: '' },
+  { record: 'RES2024-02476', contractor: 'SOUTHERN DEMOLITION LLC', address: '2022 EDWARD AVE, ALVA', value: '$190,000', score: 71, priority: 'Hot', type: 'Custom Builder', dedupe: 'Duplicate', exclude: '' },
+  { record: 'RES2024-10647', contractor: 'FRATECH CORP', address: '336 PAISLEY AVE, LEHIGH ACRES', value: '$200,000', score: 64, priority: 'Warm', type: 'Custom Builder', dedupe: 'New', exclude: '' },
+  { record: 'RES2024-09242', contractor: 'TOP FURNITURE DESIGN', address: '3508 22ND ST SW, LEHIGH ACRES', value: '$178,000', score: 63, priority: 'Warm', type: 'Custom Builder', dedupe: 'New', exclude: '' },
+  { record: 'RES2024-03327', contractor: 'AJC BUILDERS INC', address: '912 MACY ST E, LEHIGH ACRES', value: '$120,000', score: 62, priority: 'Warm', type: 'Custom Builder', dedupe: 'New', exclude: '' },
+  { record: 'RES2025-00033', contractor: 'MP CONTRACTORS SERVICE', address: '3914 14TH ST SW, LEHIGH ACRES', value: '$150,000', score: 60, priority: 'Warm', type: 'Custom Builder', dedupe: 'New', exclude: '' },
+  { record: 'RES2024-14143', contractor: 'D R HORTON INC', address: '3566 CROSSWATER DR, N FORT MYERS', value: '$153,530', score: 58, priority: 'Warm', type: 'Volume Builder', dedupe: 'New', exclude: '' },
+  { record: 'RES2024-14150', contractor: 'D R HORTON INC', address: '3578 CROSSWATER DR, N FORT MYERS', value: '$153,530', score: 58, priority: 'Warm', type: 'Volume Builder', dedupe: 'Duplicate', exclude: '' },
+  { record: 'RES2024-14152', contractor: 'D R HORTON INC', address: '3582 CROSSWATER DR, N FORT MYERS', value: '$145,470', score: 57, priority: 'Warm', type: 'Volume Builder', dedupe: 'Duplicate', exclude: '' },
+  { record: 'RES2024-12328', contractor: 'Owner Builder', address: '5632 FOURTH AVE, FORT MYERS', value: '$150,000', score: 0, priority: 'Excluded', type: 'Owner Builder', dedupe: 'New', exclude: 'Owner Builder' },
+  { record: 'RES2023-15901', contractor: 'WILLIAMS JACKIE IND.', address: '4213 23RD ST SW, LEHIGH ACRES', value: '$15,000', score: 18, priority: 'Excluded', type: 'Specialty', dedupe: 'New', exclude: 'Low Value' },
+];
+
+function buildTable() {
+  const tbody = document.getElementById('permit-table-body');
+  permits.forEach((p, i) => {
+    const row = document.createElement('tr');
+    const isExcluded = p.priority === 'Excluded';
+    const pClass = isExcluded ? 'row-excluded' : `row-${p.priority.toLowerCase()}`;
+    row.className = pClass;
+
+    const badgeClass = isExcluded ? 'badge-excluded' : `badge-${p.priority.toLowerCase()}`;
+    const dot = p.priority === 'Hot' ? '🔴' : p.priority === 'Warm' ? '🟡' : p.priority === 'Excluded' ? '' : '⚪';
+    const scoreBarClass = p.priority === 'Hot' ? 'hot' : p.priority === 'Warm' ? 'warm' : '';
+    const scoreWidth = isExcluded ? 0 : p.score;
+    const dedupeClass = p.dedupe === 'Duplicate' ? 'dedupe-dup' : 'dedupe-new';
+
+    row.innerHTML = `
+      <td class="mono">${p.record}</td>
+      <td style="color:var(--text);font-weight:500">${p.contractor}</td>
+      <td style="color:var(--text-muted);font-size:12px;white-space:normal;min-width:180px">${p.address}</td>
+      <td style="font-weight:600;color:var(--text)">${p.value}</td>
+      <td>
+        <div class="score-bar-wrap">
+          <div class="score-bar"><div class="score-fill ${scoreBarClass}" style="width:0%" data-width="${scoreWidth}%"></div></div>
+          <span class="score-num">${isExcluded ? '—' : p.score}</span>
+        </div>
+      </td>
+      <td><span class="priority-badge ${badgeClass}">${dot} ${p.priority}</span></td>
+      <td style="color:var(--text-muted);font-size:12px">${p.type}</td>
+      <td><span class="dedupe-badge ${dedupeClass}">${p.dedupe}</span></td>
+      <td style="font-size:12px;color:var(--hot)">${p.exclude || ''}</td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  // Animate score bars after a short delay
+  setTimeout(() => {
+    document.querySelectorAll('.score-fill').forEach(el => {
+      el.style.width = el.dataset.width;
+    });
+  }, 600);
+}
+
+// ── JSON SYNTAX HIGHLIGHT ──
+function highlight(json) {
+  return json
+    .replace(/("execution_id"|"ingest_batch"|"batch_id"|"pipeline_version"|"trigger_source"|"command"|"intent"|"source"|"constraints"|"scoring_config"|"output_targets"|"parse_result"|"score_result"|"dedupe_result"|"crm_operations"|"event_log"|"batch_summary"|"contacts_created"|"deals_created"|"sequence_enrollments"|"exclusions"|"step_timings"|"top_leads"|"merged_groups"|"distribution"|"weights"|"priority_thresholds")(\s*:)/g, '<span class="j-teal">$1</span>$2')
+    .replace(/("(?:[^"\\]|\\.)*")(\s*:)/g, '<span class="j-key">$1</span>$2')
+    .replace(/:\s*("(?:[^"\\]|\\.)*")/g, (m, s) => m.replace(s, `<span class="j-str">${s}</span>`))
+    .replace(/:\s*(-?\d+\.?\d*)/g, (m, n) => m.replace(n, `<span class="j-num">${n}</span>`))
+    .replace(/:\s*(true|false)/g, (m, b) => m.replace(b, `<span class="j-bool">${b}</span>`))
+    .replace(/:\s*(null)/g, (m, n) => m.replace(n, `<span class="j-null">${n}</span>`))
+    .replace(/([{}\[\],])/g, '<span class="j-punc">$1</span>');
+}
+
+const samplePayload = {
+  "execution_id": "exec_20260306_001",
+  "ingest_batch": "LEE-2026-03-001",
+  "triggered_at": "2026-03-06T06:30:00Z",
+  "trigger_source": "scheduled_daily_pull",
+  "structured_command": {
+    "command": "process_permit_batch",
+    "intent": "ingest_new_permits",
+    "source": { "county": "Lee", "state": "FL", "period": "February 2026", "pages": 93 },
+    "constraints": { "min_building_value": 100000, "exclude_owner_builders": true, "dedupe_window_days": 90 },
+    "scoring_config": {
+      "weights": { "building_value": 0.40, "recency": 0.30, "contractor_type": 0.20, "permit_status": 0.10 },
+      "priority_thresholds": { "hot": 70, "warm": 40, "cold": 0 }
+    }
+  },
+  "score_result": { "hot": 5, "warm": 7, "cold": 1, "excluded": 2, "average_score": 62.4 },
+  "dedupe_result": {
+    "new_contacts": 10,
+    "duplicate_intra_batch": 3,
+    "merged_groups": [
+      { "primary": "SOUTHERN DEMOLITION LLC", "permits_merged": ["RES2024-02473","RES2024-02476"], "action": "create_contact_with_2_deals" },
+      { "primary": "D R HORTON INC", "permits_merged": ["RES2024-14143","RES2024-14150","RES2024-14152"], "action": "create_contact_with_3_deals" }
+    ]
+  },
+  "sample_crm_operation": {
+    "action": "create_contact",
+    "hubspot_contact_id": "hs_con_90271834",
+    "properties": { "company": "ADAMS HOMES OF NW FLORIDA INC", "lead_source": "Lee County Permits - Feb 2026", "hs_lead_status": "NEW" },
+    "custom_properties": { "lead_score_ja": 82, "lead_priority_ja": "Hot", "value_tier_ja": "$100K-$500K", "contractor_type_ja": "Volume Builder", "ingest_batch": "LEE-2026-03-001" },
+    "deal": { "dealname": "ADAMS HOMES - 492 WILLOWBROOK DR (RES2024-03127)", "dealstage": "permit_identified", "building_value": 358950 }
+  },
+  "event_log": {
+    "execution_id": "exec_20260306_001",
+    "started_at": "2026-03-06T06:30:00Z",
+    "completed_at": "2026-03-06T06:30:08Z",
+    "duration_ms": 8142,
+    "records_in": 15,
+    "records_created": 10,
+    "records_deduplicated": 3,
+    "records_excluded": 2,
+    "deals_created": 14,
+    "sequences_enrolled": 12,
+    "errors": 0,
+    "step_timings": { "parse_ms": 1243, "score_ms": 89, "dedupe_ms": 312, "crm_create_ms": 2847, "sequence_enroll_ms": 418, "log_write_ms": 34 },
+    "approved_by": "auto (rule: permit_ingestion_auto_approved)"
+  },
+  "batch_summary": {
+    "batch_id": "LEE-2026-03-001",
+    "total_permits": 15,
+    "total_building_value": 2851460,
+    "priority_breakdown": { "hot": 5, "warm": 7, "cold": 1, "excluded": 2 },
+    "crm_impact": { "new_contacts": 10, "new_deals": 14, "sequences_triggered": 12 },
+    "pipeline_health": "green",
+    "next_scheduled_run": "2026-03-07T11:30:00Z"
+  }
+};
+
+document.getElementById('json-block').innerHTML = highlight(JSON.stringify(samplePayload, null, 2));
+
+// ── COUNTER ANIMATION ──
+function animateCount(el, target) {
+  const duration = 1200;
+  const start = performance.now();
+  function update(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(eased * target);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+// ── INTERSECTION OBSERVER ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+// Pipeline steps
+document.querySelectorAll('.pipeline-step').forEach((step, i) => {
+  step.style.transitionDelay = `${i * 80}ms`;
+  observer.observe(step);
+});
+
+// Fade-up sections
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// Counters
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.querySelectorAll('[data-count]').forEach(el => {
+      animateCount(el, parseInt(el.dataset.count));
+    });
+  }, 300);
+});
+
+// Step number active state on scroll
+const stepEls = document.querySelectorAll('.pipeline-step');
+const stepNums = document.querySelectorAll('.step-num');
+const stepObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const idx = Array.from(stepEls).indexOf(entry.target);
+      stepNums[idx]?.classList.add('active');
+    }
+  });
+}, { threshold: 0.6 });
+stepEls.forEach(el => stepObserver.observe(el));
+
+// Build table
+buildTable();
+</script>
+</body>
+</html>
