@@ -55,7 +55,8 @@
   .portability{font-size:12px;color:var(--text-muted);font-family:var(--mono);margin-bottom:52px;display:flex;align-items:center;gap:8px}
   .portability::before{content:'//';color:var(--amber);opacity:0.5}
 
-  .stats-bar{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--border-hi);border-radius:14px;overflow:hidden;background:var(--border);gap:1px;box-shadow:0 0 80px rgba(232,160,48,0.07),0 1px 0 rgba(232,160,48,0.15)}
+  .stats-bar{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--border-hi);border-radius:14px;overflow:hidden;background:var(--border);gap:1px;box-shadow:0 0 80px rgba(232,160,48,0.07),0 1px 0 rgba(232,160,48,0.15);animation:stats-glow 4s ease-in-out infinite}
+  @keyframes stats-glow{0%,100%{box-shadow:0 0 80px rgba(232,160,48,0.07),0 1px 0 rgba(232,160,48,0.15)}50%{box-shadow:0 0 100px rgba(232,160,48,0.12),0 1px 0 rgba(232,160,48,0.25),0 0 40px rgba(232,160,48,0.06)}}
   .stat-cell{background:var(--card);padding:24px 16px;text-align:center;transition:background 0.2s}
   .stat-cell:hover{background:var(--card2)}
   .stat-val{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--amber);display:block;margin-bottom:5px;letter-spacing:-0.02em}
@@ -106,7 +107,13 @@
   .chat-status .dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pg 2s ease-in-out infinite}
   .chat-demo-badge{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:4px;background:rgba(255,84,64,0.08);color:var(--hot);border:1px solid rgba(255,84,64,0.15)}
   .chat-body{padding:20px 22px;min-height:280px;display:flex;flex-direction:column;gap:14px}
-  .chat-msg{max-width:82%;display:flex;flex-direction:column;gap:4px}
+  .chat-msg{max-width:82%;display:flex;flex-direction:column;gap:4px;opacity:0;transform:translateY(12px);animation:msg-in 0.4s ease forwards}
+  .chat-msg:nth-child(1){animation-delay:0.3s}
+  .chat-msg:nth-child(2){animation-delay:1.2s}
+  .chat-msg:nth-child(3){animation-delay:2.8s}
+  .chat-msg:nth-child(4){animation-delay:3.8s}
+  .typing{animation:msg-in 0.4s ease forwards;animation-delay:5s;opacity:0}
+  @keyframes msg-in{to{opacity:1;transform:translateY(0)}}
   .chat-msg.user{align-self:flex-end;align-items:flex-end}
   .chat-msg.ja{align-self:flex-start;align-items:flex-start}
   .msg-bubble{padding:10px 15px;border-radius:14px;font-size:14px;line-height:1.55}
@@ -338,7 +345,7 @@
         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15a.998.998 0 00-.98-.85c-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08a6.993 6.993 0 005.91-5.78c.1-.6-.39-1.14-1-1.14z"/></svg>
       </button>
     </div>
-    <div class="chat-note">Demonstrative interface only. In production, Ja uses a hyper-realistic voice model (ElevenLabs / Sesame AI) trained on her actual voice — indistinguishable from a real conversation.</div>
+    <div class="chat-note">Demonstrative interface only. In production, you'll be chatting directly with a cloned version of Ja, trained on her actual voice and personality. Every interaction, from daily reports to outbound calls, will sound and feel like her.</div>
   </div>
 </section>
 
@@ -350,7 +357,7 @@
       <div class="v-label">Daily Digest · March 6, 2026 · 7:00 AM</div>
       <div class="v-title">JA Pipeline Report</div>
       <p class="v-desc">The automated morning report Ja sends every day. Permits, leads, calls, meetings — all in one brief.</p>
-      <div class="v-note">// placeholder voice — production uses ElevenLabs or Sesame AI with Ja's custom voice model</div>
+      <div class="v-note">// placeholder voice — production uses Ja's cloned voice model, indistinguishable from the real thing</div>
     </div>
     <div class="v-controls">
       <div class="wave" id="wave"></div>
@@ -373,7 +380,7 @@
       <div class="leg"><div class="leg-d" style="background:rgba(249,115,22,0.3);border:1px solid rgba(249,115,22,0.4)"></div>Warm (40–69)</div>
       <div class="leg"><div class="leg-d" style="background:rgba(96,96,122,0.3);border:1px solid rgba(96,96,122,0.4)"></div>Cold (&lt;40)</div>
       <div class="leg"><div class="leg-d" style="background:rgba(255,255,255,0.05);border:1px solid var(--border)"></div>Excluded</div>
-      <span style="margin-left:10px">Months Active: licensed activity in Florida contractor system</span>
+      <span style="margin-left:10px">Months Active: consecutive months pulling permits (3+ = consistent builder)</span>
     </div>
   </div>
 </section>
@@ -450,24 +457,24 @@
 
 <script>
 const permits=[
-  {r:'CATHA-03127',c:'ADAMS HOMES OF NW FL',a:'492 WILLOWBROOK DR',v:'$358,950',s:82,p:'Hot',t:'Volume Builder',mo:160,d:'New',e:''},
-  {r:'CATHA-07898',c:'GAT CONSTRUCTION MGMT',a:'1008 BELL BLVD S',v:'$312,000',s:76,p:'Hot',t:'Custom Builder',mo:78,d:'New',e:''},
-  {r:'CATHA-02473',c:'SOUTHERN DEMOLITION LLC',a:'433 EISENHOWER BLVD',v:'$190,000',s:74,p:'Hot',t:'Custom Builder',mo:39,d:'New',e:''},
-  {r:'CATHA-13021',c:'PERSPECTIVE CONST LLC',a:'505 PROSPECT AVE',v:'$230,000',s:73,p:'Hot',t:'Custom Builder',mo:14,d:'New',e:''},
-  {r:'CATHA-10413',c:'O AND J CONSTRUCTION',a:'2908 38TH ST SW',v:'$255,000',s:72,p:'Hot',t:'Custom Builder',mo:62,d:'New',e:''},
-  {r:'CATHA-02476',c:'SOUTHERN DEMOLITION LLC',a:'2022 EDWARD AVE',v:'$190,000',s:71,p:'Hot',t:'Custom Builder',mo:39,d:'Duplicate',e:''},
-  {r:'CATHA-10647',c:'FRATECH CORP',a:'336 PAISLEY AVE',v:'$200,000',s:64,p:'Warm',t:'Custom Builder',mo:24,d:'New',e:''},
-  {r:'CATHA-09242',c:'TOP FURNITURE DESIGN',a:'3508 22ND ST SW',v:'$178,000',s:63,p:'Warm',t:'Custom Builder',mo:10,d:'New',e:''},
-  {r:'CATHA-03327',c:'AJC BUILDERS INC',a:'912 MACY ST E',v:'$120,000',s:62,p:'Warm',t:'Custom Builder',mo:17,d:'New',e:''},
-  {r:'CATHA-00033',c:'MP CONTRACTORS SERVICE',a:'3914 14TH ST SW',v:'$150,000',s:60,p:'Warm',t:'Custom Builder',mo:21,d:'New',e:''},
-  {r:'CATHA-14143',c:'D R HORTON INC',a:'3566 CROSSWATER DR',v:'$153,530',s:58,p:'Warm',t:'Volume Builder',mo:304,d:'New',e:''},
-  {r:'CATHA-14150',c:'D R HORTON INC',a:'3578 CROSSWATER DR',v:'$153,530',s:58,p:'Warm',t:'Volume Builder',mo:304,d:'Duplicate',e:''},
-  {r:'CATHA-14152',c:'D R HORTON INC',a:'3582 CROSSWATER DR',v:'$145,470',s:57,p:'Warm',t:'Volume Builder',mo:304,d:'Duplicate',e:''},
+  {r:'CATHA-03127',c:'ADAMS HOMES OF NW FL',a:'492 WILLOWBROOK DR',v:'$358,950',s:82,p:'Hot',t:'Volume Builder',mo:8,d:'New',e:''},
+  {r:'CATHA-07898',c:'GAT CONSTRUCTION MGMT',a:'1008 BELL BLVD S',v:'$312,000',s:76,p:'Hot',t:'Custom Builder',mo:6,d:'New',e:''},
+  {r:'CATHA-02473',c:'SOUTHERN DEMOLITION LLC',a:'433 EISENHOWER BLVD',v:'$190,000',s:74,p:'Hot',t:'Custom Builder',mo:4,d:'New',e:''},
+  {r:'CATHA-13021',c:'PERSPECTIVE CONST LLC',a:'505 PROSPECT AVE',v:'$230,000',s:73,p:'Hot',t:'Custom Builder',mo:2,d:'New',e:''},
+  {r:'CATHA-10413',c:'O AND J CONSTRUCTION',a:'2908 38TH ST SW',v:'$255,000',s:72,p:'Hot',t:'Custom Builder',mo:5,d:'New',e:''},
+  {r:'CATHA-02476',c:'SOUTHERN DEMOLITION LLC',a:'2022 EDWARD AVE',v:'$190,000',s:71,p:'Hot',t:'Custom Builder',mo:4,d:'Duplicate',e:''},
+  {r:'CATHA-10647',c:'FRATECH CORP',a:'336 PAISLEY AVE',v:'$200,000',s:64,p:'Warm',t:'Custom Builder',mo:3,d:'New',e:''},
+  {r:'CATHA-09242',c:'TOP FURNITURE DESIGN',a:'3508 22ND ST SW',v:'$178,000',s:63,p:'Warm',t:'Custom Builder',mo:1,d:'New',e:''},
+  {r:'CATHA-03327',c:'AJC BUILDERS INC',a:'912 MACY ST E',v:'$120,000',s:62,p:'Warm',t:'Custom Builder',mo:2,d:'New',e:''},
+  {r:'CATHA-00033',c:'MP CONTRACTORS SERVICE',a:'3914 14TH ST SW',v:'$150,000',s:60,p:'Warm',t:'Custom Builder',mo:3,d:'New',e:''},
+  {r:'CATHA-14143',c:'D R HORTON INC',a:'3566 CROSSWATER DR',v:'$153,530',s:58,p:'Warm',t:'Volume Builder',mo:9,d:'New',e:''},
+  {r:'CATHA-14150',c:'D R HORTON INC',a:'3578 CROSSWATER DR',v:'$153,530',s:58,p:'Warm',t:'Volume Builder',mo:9,d:'Duplicate',e:''},
+  {r:'CATHA-14152',c:'D R HORTON INC',a:'3582 CROSSWATER DR',v:'$145,470',s:57,p:'Warm',t:'Volume Builder',mo:9,d:'Duplicate',e:''},
   {r:'CATHA-12328',c:'Owner Builder',a:'5632 FOURTH AVE',v:'$150,000',s:0,p:'Excluded',t:'Owner Builder',mo:0,d:'New',e:'Owner Builder'},
-  {r:'CATHA-15901',c:'WILLIAMS JACKIE IND.',a:'4213 23RD ST SW',v:'$15,000',s:18,p:'Excluded',t:'Specialty',mo:3,d:'New',e:'Low Value'},
+  {r:'CATHA-15901',c:'WILLIAMS JACKIE IND.',a:'4213 23RD ST SW',v:'$15,000',s:18,p:'Excluded',t:'Specialty',mo:1,d:'New',e:'Low Value'},
 ];
 
-function moColor(mo){if(mo>=100)return'#34d399';if(mo>=36)return'#e8a030';if(mo>=12)return'#f97316';return'#ff5440'}
+function moColor(mo){if(mo>=6)return'#34d399';if(mo>=3)return'#e8a030';if(mo>=1)return'#f97316';return'#ff5440'}
 
 function buildTable(){
   const tbody=document.getElementById('tbl');
