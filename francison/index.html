@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Francison Consulting — Recruiting Automation Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --brown-primary: #8B5E3C;
+    --brown-light: #C4955A;
+    --brown-dark: #5C3D1E;
+    --brown-glow: rgba(139,94,60,0.15);
+    --bg: #080608;
+    --surface: rgba(18,14,10,0.85);
+    --border: rgba(139,94,60,0.2);
+  }
+
+  body {
+    background: var(--bg);
+    color: #e0d8d0;
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* GRID BACKGROUND */
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(139,94,60,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139,94,60,0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at 15% 10%, rgba(139,94,60,0.1) 0%, transparent 45%),
+      radial-gradient(ellipse at 85% 90%, rgba(92,61,30,0.08) 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 50%, rgba(196,149,90,0.04) 0%, transparent 60%);
+  }
+
+  .content { position: relative; z-index: 1; }
+
+  /* TOP BAR */
+  .top-bar {
+    background: linear-gradient(90deg, rgba(12,9,6,0.95) 0%, rgba(20,14,8,0.95) 50%, rgba(12,9,6,0.95) 100%);
+    border-bottom: 1px solid rgba(139,94,60,0.3);
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(20px);
+  }
+  .top-bar-left { display: flex; align-items: center; gap: 14px; }
+  .top-bar-logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--brown-dark), var(--brown-primary));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1rem; color: #f5e6d3;
+    border: 1px solid rgba(196,149,90,0.3);
+  }
+  .top-bar-name { font-size: 1.1rem; font-weight: 700; color: #f0e8e0; }
+  .top-bar-name span { color: var(--brown-light); }
+  .top-bar-center {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .top-bar-badge {
+    padding: 4px 12px;
+    background: rgba(139,94,60,0.15);
+    border: 1px solid rgba(139,94,60,0.3);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: var(--brown-light);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .top-bar-right { font-size: 0.7rem; color: #6b5a4a; text-align: right; line-height: 1.6; }
+  .top-bar-right strong { color: #8b7a6a; }
+
+  .main-content { padding: 60px 40px; }
+
+  /* HEADER */
+  .header { text-align: center; margin-bottom: 70px; }
+  .header h1 {
+    font-size: 2.4rem; font-weight: 800; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #f5e6d3, var(--brown-light), #f5e6d3);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .header p { color: #7a6a5a; font-size: 1rem; }
+  .header .tagline {
+    margin-top: 16px; display: inline-block;
+    padding: 6px 16px;
+    background: rgba(139,94,60,0.1);
+    border: 1px solid rgba(139,94,60,0.25);
+    border-radius: 20px;
+    font-size: 0.8rem; color: var(--brown-light); letter-spacing: 0.5px;
+  }
+
+  /* COMPARISON */
+  .comparison {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 40px; max-width: 1400px; margin: 0 auto 100px;
+  }
+  .lane {
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    border-radius: 16px; padding: 32px;
+    border: 1px solid var(--border);
+  }
+  .lane.old { border-color: rgba(239,68,68,0.2); background: linear-gradient(180deg, rgba(26,8,8,0.85) 0%, rgba(18,14,10,0.85) 100%); }
+  .lane.new { border-color: rgba(139,94,60,0.3); background: linear-gradient(180deg, rgba(20,12,6,0.85) 0%, rgba(18,14,10,0.85) 100%); }
+
+  .lane-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .lane.old .lane-title { color: #ef4444; }
+  .lane.new .lane-title { color: var(--brown-light); }
+  .lane-subtitle { color: #6b5a4a; font-size: 0.85rem; margin-bottom: 24px; font-style: italic; }
+
+  .step { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; position: relative; }
+  .step:not(:last-child)::after {
+    content: ''; position: absolute; left: 16px; top: 36px;
+    width: 2px; height: calc(100% - 8px);
+  }
+  .lane.old .step::after { background: rgba(127,29,29,0.4); }
+  .lane.new .step::after { background: rgba(139,94,60,0.3); }
+
+  .step-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; flex-shrink: 0; font-weight: 700;
+  }
+  .lane.old .step-icon { background: #7f1d1d; color: #fca5a5; }
+  .lane.new .step-icon { background: rgba(139,94,60,0.25); color: var(--brown-light); border: 1px solid rgba(139,94,60,0.4); }
+
+  .step-content h4 { font-size: 0.92rem; font-weight: 600; margin-bottom: 4px; }
+  .lane.old .step-content h4 { color: #fca5a5; }
+  .lane.new .step-content h4 { color: #e0c9b0; }
+  .step-content p { font-size: 0.8rem; color: #8a7a6a; line-height: 1.5; }
+
+  .time-tag {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 0.68rem; font-weight: 600; margin-top: 6px;
+  }
+  .lane.old .time-tag { background: rgba(127,29,29,0.5); color: #fca5a5; }
+  .lane.new .time-tag { background: rgba(139,94,60,0.2); color: var(--brown-light); }
+  .time-tag.active { background: rgba(34,197,94,0.15) !important; color: #4ade80 !important; border: 1px solid rgba(34,197,94,0.3); }
+  .time-tag.unlock { background: rgba(245,158,11,0.15) !important; color: #fbbf24 !important; border: 1px solid rgba(245,158,11,0.3); }
+
+  /* PHASES */
+  .phases-section { max-width: 1400px; margin: 0 auto 100px; }
+  .section-title { text-align: center; font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; color: #e0d0c0; }
+  .section-subtitle { text-align: center; color: #6b5a4a; margin-bottom: 40px; font-size: 0.9rem; }
+
+  .phases-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 18px; }
+
+  .phase-card {
+    background: var(--surface); backdrop-filter: blur(12px);
+    border-radius: 14px; padding: 22px;
+    border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .phase-card:hover { transform: translateY(-3px); }
+  .phase-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+
+  .phase-card.active::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+  .phase-card.active { border-color: rgba(34,197,94,0.25); }
+  .phase-card.next::before { background: linear-gradient(90deg, var(--brown-primary), var(--brown-light)); }
+  .phase-card.next { border-color: rgba(139,94,60,0.35); }
+  .phase-card.future::before { background: linear-gradient(90deg, #4b5563, #6b7280); }
+  .phase-card.future { border-color: rgba(75,85,99,0.3); }
+  .phase-card.unlock::before { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+  .phase-card.unlock { border-color: rgba(245,158,11,0.3); }
+
+  .phase-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 10px;
+  }
+  .phase-card.active .phase-badge { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+  .phase-card.next .phase-badge { background: rgba(139,94,60,0.2); color: var(--brown-light); border: 1px solid rgba(139,94,60,0.3); }
+  .phase-card.future .phase-badge { background: rgba(75,85,99,0.2); color: #9ca3af; border: 1px solid rgba(75,85,99,0.3); }
+  .phase-card.unlock .phase-badge { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+
+  .phase-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: #f0e8e0; }
+  .phase-card .phase-desc { font-size: 0.78rem; color: #8a7a6a; line-height: 1.5; margin-bottom: 12px; }
+  .phase-tools { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tool-tag {
+    padding: 2px 7px; border-radius: 5px; font-size: 0.62rem; font-weight: 600;
+    background: rgba(139,94,60,0.12); color: var(--brown-light);
+    border: 1px solid rgba(139,94,60,0.2);
+  }
+
+  /* ============================================
+     FLYWHEEL — SVG + JS POSITIONED
+     ============================================ */
+  .flywheel-section { max-width: 900px; margin: 0 auto 100px; text-align: center; }
+
+  .flywheel-title {
+    font-size: 2rem; font-weight: 800; margin-bottom: 8px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b, #f97316, #fbbf24);
+    background-size: 200% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: shine 3s linear infinite;
+  }
+  @keyframes shine { to { background-position: 200% center; } }
+
+  .flywheel-subtitle { color: #6b5a4a; margin-bottom: 48px; font-size: 0.9rem; }
+
+  .flywheel-wrapper {
+    position: relative; width: 700px; height: 700px;
+    margin: 0 auto 40px;
+  }
+
+  /* SVG sits behind everything */
+  .flywheel-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* Node cards positioned by JS */
+  .fw-node {
+    position: absolute;
+    width: 130px;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+  }
+  .fw-node-circle {
+    width: 56px; height: 56px; border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    position: relative;
+    border: 2px solid;
+    animation: nodeGlow 2.4s ease-in-out infinite;
+  }
+  @keyframes nodeGlow {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  .fw-node h5 { font-size: 0.78rem; font-weight: 700; color: #f0e8e0; margin-bottom: 4px; line-height: 1.3; }
+  .fw-node p { font-size: 0.68rem; color: #8a7a6a; line-height: 1.4; }
+
+  .fw-node:nth-child(1) .fw-node-circle { background: rgba(196,149,90,0.25); border-color: #c4955a; box-shadow: 0 0 12px rgba(196,149,90,0.3); animation-delay: 0s; }
+  .fw-node:nth-child(2) .fw-node-circle { background: rgba(167,139,250,0.25); border-color: #a78bfa; box-shadow: 0 0 12px rgba(167,139,250,0.3); animation-delay: 0.4s; }
+  .fw-node:nth-child(3) .fw-node-circle { background: rgba(239,68,68,0.25); border-color: #ef4444; box-shadow: 0 0 12px rgba(239,68,68,0.3); animation-delay: 0.8s; }
+  .fw-node:nth-child(4) .fw-node-circle { background: rgba(245,158,11,0.25); border-color: #f59e0b; box-shadow: 0 0 12px rgba(245,158,11,0.3); animation-delay: 1.2s; }
+  .fw-node:nth-child(5) .fw-node-circle { background: rgba(74,222,128,0.25); border-color: #4ade80; box-shadow: 0 0 12px rgba(74,222,128,0.3); animation-delay: 1.6s; }
+  .fw-node:nth-child(6) .fw-node-circle { background: rgba(251,191,36,0.25); border-color: #fbbf24; box-shadow: 0 0 12px rgba(251,191,36,0.3); animation-delay: 2.0s; }
+
+  /* Center hub */
+  .fw-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(30,18,8,0.95) 0%, rgba(12,8,4,0.95) 100%);
+    border: 2px solid rgba(196,149,90,0.4);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 5;
+    box-shadow: 0 0 40px rgba(139,94,60,0.2), inset 0 0 30px rgba(139,94,60,0.05);
+  }
+  .fw-center-icon { font-size: 2rem; margin-bottom: 4px; }
+  .fw-center h4 { font-size: 0.8rem; color: var(--brown-light); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+  .fw-center p { font-size: 0.62rem; color: #6b5a4a; margin-top: 2px; }
+
+  .flywheel-result {
+    background: linear-gradient(135deg, rgba(20,14,8,0.9), rgba(12,18,10,0.9));
+    border: 1px solid rgba(139,94,60,0.3);
+    border-radius: 14px; padding: 24px;
+    backdrop-filter: blur(12px);
+    text-align: left;
+  }
+  .flywheel-result h4 { color: var(--brown-light); font-size: 1rem; margin-bottom: 8px; }
+  .flywheel-result p { color: #8a7a6a; font-size: 0.85rem; line-height: 1.6; }
+
+  /* ARCH */
+  .arch-section { max-width: 1400px; margin: 0 auto 100px; }
+  .arch-layers { display: flex; flex-direction: column; gap: 20px; }
+  .arch-layer {
+    background: var(--surface); backdrop-filter: blur(12px);
+    border-radius: 14px; padding: 22px 28px;
+    border: 1px solid var(--border);
+    display: grid; grid-template-columns: 180px 1fr;
+    gap: 20px; align-items: center;
+    transition: border-color 0.2s;
+  }
+  .arch-layer:hover { border-color: rgba(139,94,60,0.35); }
+  .layer-label { text-align: right; }
+  .layer-label h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 3px; }
+  .layer-label p { font-size: 0.7rem; color: #6b5a4a; }
+  .layer-label.ingest h3 { color: var(--brown-light); }
+  .layer-label.intelligence h3 { color: #a78bfa; }
+  .layer-label.outreach h3 { color: #f59e0b; }
+  .layer-label.reporting h3 { color: #4ade80; }
+  .layer-items { display: flex; gap: 10px; flex-wrap: wrap; }
+  .layer-item {
+    background: rgba(20,14,8,0.6); border: 1px solid rgba(139,94,60,0.15);
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 0.78rem; color: #c0b0a0; line-height: 1.4;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .layer-item:hover { transform: translateY(-2px); border-color: rgba(139,94,60,0.3); }
+  .layer-item strong { display: block; margin-bottom: 2px; font-size: 0.72rem; }
+  .layer-item.ingest strong { color: var(--brown-light); }
+  .layer-item.intelligence strong { color: #a78bfa; }
+  .layer-item.outreach strong { color: #f59e0b; }
+  .layer-item.reporting strong { color: #4ade80; }
+  .arrow-down { text-align: center; font-size: 1.2rem; color: rgba(139,94,60,0.2); padding: 2px 0; }
+
+  /* IMPACT */
+  .impact-section { max-width: 900px; margin: 0 auto 60px; }
+  .impact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; text-align: center; }
+  .impact-card {
+    background: var(--surface); backdrop-filter: blur(12px);
+    border-radius: 14px; padding: 28px 16px;
+    border: 1px solid var(--border);
+    transition: transform 0.2s;
+  }
+  .impact-card:hover { transform: translateY(-3px); }
+  .impact-number { font-size: 2.8rem; font-weight: 800; margin-bottom: 6px; }
+  .impact-card:nth-child(1) .impact-number { color: #ef4444; }
+  .impact-card:nth-child(2) .impact-number { color: #4ade80; }
+  .impact-card:nth-child(3) .impact-number { color: var(--brown-light); }
+  .impact-label { font-size: 0.82rem; color: #8a7a6a; line-height: 1.4; }
+
+  /* FOOTER */
+  .footer-bar {
+    background: linear-gradient(90deg, rgba(12,9,6,0.95) 0%, rgba(20,14,8,0.95) 50%, rgba(12,9,6,0.95) 100%);
+    border-top: 1px solid rgba(139,94,60,0.25);
+    padding: 20px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    backdrop-filter: blur(20px);
+  }
+  .footer-left { font-size: 0.72rem; color: #4b3a2a; }
+  .footer-left strong { color: #6b5a4a; }
+  .footer-right { display: flex; align-items: center; gap: 8px; }
+  .footer-mau-logo {
+    width: 24px; height: 24px;
+    background: linear-gradient(135deg, #7c3aed, #60a5fa);
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.7rem; color: white;
+  }
+  .footer-mau-text { font-size: 0.72rem; color: #6b5a4a; }
+  .footer-mau-text strong { color: #a78bfa; }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<div class="content">
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <div class="top-bar-logo">FC</div>
+    <div class="top-bar-name"><span>Francison</span> Consulting</div>
+  </div>
+  <div class="top-bar-center">
+    <div class="top-bar-badge">Recruiting Automation Architecture</div>
+  </div>
+  <div class="top-bar-right">
+    <strong>Confidential</strong><br>March 2026
+  </div>
+</div>
+
+<div class="main-content">
+
+<!-- HEADER -->
+<div class="header">
+  <h1>From Manual to Autonomous Recruiting</h1>
+  <p>A complete automation architecture for your LinkedIn · Bullhorn · ZoomInfo stack</p>
+  <div class="tagline">n8n + Claude AI + Bullhorn REST API — No new software to buy</div>
+</div>
+
+<!-- BEFORE / AFTER -->
+<div class="comparison">
+  <div class="lane old">
+    <div class="lane-title">⛔ Current Workflow</div>
+    <div class="lane-subtitle">Manual, repetitive, recruiter-dependent</div>
+    <div class="step">
+      <div class="step-icon">1</div>
+      <div class="step-content">
+        <h4>Manual Sourcing</h4>
+        <p>Recruiter manually searches LinkedIn, ZoomInfo. Copy-pastes candidate info into Bullhorn one by one.</p>
+        <span class="time-tag">⏱ 10+ hrs/week</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon">2</div>
+      <div class="step-content">
+        <h4>Manual Data Entry</h4>
+        <p>Every application manually entered. Resumes opened and read by hand. Duplicates everywhere.</p>
+        <span class="time-tag">⏱ 8+ hrs/week</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon">3</div>
+      <div class="step-content">
+        <h4>Manual Resume Review</h4>
+        <p>No scoring, no ranking. Gut feel decides who gets a call. Strong candidates buried in the pile.</p>
+        <span class="time-tag">⏱ 5+ hrs/week</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon">4</div>
+      <div class="step-content">
+        <h4>Manual Outreach</h4>
+        <p>Individual emails typed per candidate. No sequences. Follow-ups forgotten. Candidates ghost for days.</p>
+        <span class="time-tag">⏱ 6+ hrs/week</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon">5</div>
+      <div class="step-content">
+        <h4>Calendar Back-and-Forth</h4>
+        <p>Endless emails to schedule interviews. No-shows with no reminder system. Hiring managers frustrated.</p>
+        <span class="time-tag">⏱ 4+ hrs/week</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon">6</div>
+      <div class="step-content">
+        <h4>Manual Reporting</h4>
+        <p>Scramble to build Excel reports, email clients. Hours on formatting instead of recruiting.</p>
+        <span class="time-tag">⏱ 3+ hrs/week</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon">⚠</div>
+      <div class="step-content">
+        <h4>Lost Candidates</h4>
+        <p>Candidates not placed today are forgotten. No nurture. Next role opens — start from zero.</p>
+        <span class="time-tag">💸 Revenue left on table</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="lane new">
+    <div class="lane-title">⚡ Automated Flow</div>
+    <div class="lane-subtitle">AI-powered, always-on, zero manual data entry</div>
+    <div class="step">
+      <div class="step-icon">1</div>
+      <div class="step-content">
+        <h4>AI-Powered Sourcing</h4>
+        <p>ZoomInfo + LinkedIn data scraped by job criteria. Candidates created in Bullhorn with enriched profiles automatically. Recruiter wakes up to a shortlist.</p>
+        <span class="time-tag">⚡ Automated</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon">2</div>
+      <div class="step-content">
+        <h4>Zero-Touch Data Entry</h4>
+        <p>Careers page → n8n → Bullhorn. Resume parsed, fields populated, duplicates caught. Slack alert fires instantly.</p>
+        <span class="time-tag active">🟢 Phase 1 — In Progress</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon">3</div>
+      <div class="step-content">
+        <h4>AI Resume Scoring & Matching</h4>
+        <p>Every candidate auto-scored against open jobs. Fit > 80% = instant shortlist + Slack ping. Ranked lists, not piles.</p>
+        <span class="time-tag active">🟢 Phase 2 — In Progress</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon">4</div>
+      <div class="step-content">
+        <h4>Automated Outreach Sequences</h4>
+        <p>Qualified candidate → AI-personalized email → Day 3 follow-up → Day 7 different angle. All logged to Bullhorn.</p>
+        <span class="time-tag">⚡ Phase 4</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon">5</div>
+      <div class="step-content">
+        <h4>Smart Scheduling + AI Calls</h4>
+        <p>One-click scheduling → calendar sync → SMS reminder. Optional AI voice pre-screen for initial qualification.</p>
+        <span class="time-tag">⚡ Phase 5</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon">6</div>
+      <div class="step-content">
+        <h4>Auto-Generated Client Reports</h4>
+        <p>Weekly PDF per client: placements, time-to-fill, pipeline health. Sent every Monday. Zero recruiter time.</p>
+        <span class="time-tag">⚡ Phase 6</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon">♻</div>
+      <div class="step-content">
+        <h4>Candidate Flywheel</h4>
+        <p>Every unplaced candidate enters automated nurture. AI-tailored emails at Day 3, 7, 14, monthly. Never start from zero again.</p>
+        <span class="time-tag unlock">🔥 The Big Unlock</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASES -->
+<div class="phases-section">
+  <div class="section-title">Implementation Phases</div>
+  <div class="section-subtitle">Modular build — each phase delivers standalone value from day one</div>
+  <div class="phases-grid">
+    <div class="phase-card active">
+      <span class="phase-badge">🟢 In Progress</span>
+      <h3>Phase 1</h3>
+      <div class="phase-desc">Live Job Feed & Application Pipeline. Jobs auto-sync, applications write back to Bullhorn, Slack alerts, JD standardization.</div>
+      <div class="phase-tools"><span class="tool-tag">Bullhorn API</span><span class="tool-tag">n8n</span><span class="tool-tag">Slack</span></div>
+    </div>
+    <div class="phase-card active">
+      <span class="phase-badge">🟢 In Progress</span>
+      <h3>Phase 2</h3>
+      <div class="phase-desc">AI Resume Matching. Candidates scored against open positions. Strong matches → Slack + email digest to talent team.</div>
+      <div class="phase-tools"><span class="tool-tag">Claude AI</span><span class="tool-tag">Bullhorn API</span><span class="tool-tag">n8n</span></div>
+    </div>
+    <div class="phase-card next">
+      <span class="phase-badge">Next Up</span>
+      <h3>Phase 3</h3>
+      <div class="phase-desc">Candidate Sourcing Agent. AI scrapes LinkedIn + ZoomInfo by job criteria. Auto-creates enriched Bullhorn profiles with fit scores.</div>
+      <div class="phase-tools"><span class="tool-tag">ZoomInfo</span><span class="tool-tag">LinkedIn</span><span class="tool-tag">n8n</span><span class="tool-tag">AI</span></div>
+    </div>
+    <div class="phase-card next">
+      <span class="phase-badge">Next Up</span>
+      <h3>Phase 4</h3>
+      <div class="phase-desc">Outreach Sequences. Automated AI-personalized emails Day 1, 3, 7. Activity logged to Bullhorn automatically.</div>
+      <div class="phase-tools"><span class="tool-tag">n8n</span><span class="tool-tag">Email</span><span class="tool-tag">Claude AI</span></div>
+    </div>
+  </div>
+  <div class="phases-grid">
+    <div class="phase-card future">
+      <span class="phase-badge">Future</span>
+      <h3>Phase 5</h3>
+      <div class="phase-desc">Interview Scheduling + AI Pre-Screen. Calendar sync, auto-reminders, no-show detection. Optional AI voice calls.</div>
+      <div class="phase-tools"><span class="tool-tag">Calendly</span><span class="tool-tag">SMS</span><span class="tool-tag">Voice AI</span></div>
+    </div>
+    <div class="phase-card future">
+      <span class="phase-badge">Future</span>
+      <h3>Phase 6</h3>
+      <div class="phase-desc">Client Pipeline Reports. Weekly auto-generated PDF per client. Emailed every Monday morning. Zero recruiter time.</div>
+      <div class="phase-tools"><span class="tool-tag">Bullhorn API</span><span class="tool-tag">n8n</span><span class="tool-tag">PDF</span></div>
+    </div>
+    <div class="phase-card future">
+      <span class="phase-badge">Future</span>
+      <h3>Phase 7</h3>
+      <div class="phase-desc">JD Generator. 3 bullet points → full job description → auto-posted to Bullhorn + careers page instantly.</div>
+      <div class="phase-tools"><span class="tool-tag">Claude AI</span><span class="tool-tag">Bullhorn API</span></div>
+    </div>
+    <div class="phase-card unlock">
+      <span class="phase-badge">🔥 Big Unlock</span>
+      <h3>Flywheel</h3>
+      <div class="phase-desc">Candidate Database Flywheel. Automated nurture at Day 3, 7, 14, monthly. Every candidate stays warm forever.</div>
+      <div class="phase-tools"><span class="tool-tag">n8n</span><span class="tool-tag">AI</span><span class="tool-tag">Email</span><span class="tool-tag">Bullhorn</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================
+     FLYWHEEL — CANVAS/SVG
+     ======================== -->
+<div class="flywheel-section">
+  <div class="flywheel-title">🔥 The Candidate Flywheel</div>
+  <div class="flywheel-subtitle">Most recruiting firms miss this — it's the compound interest of recruiting</div>
+
+  <div class="flywheel-wrapper" id="flywheelWrapper">
+    <!-- SVG for circles and arrows -->
+    <svg class="flywheel-svg" id="flywheelSvg" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Rotating gradient ring -->
+        <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#c4955a" stop-opacity="0.8"/>
+          <stop offset="25%" stop-color="#a78bfa" stop-opacity="0.6"/>
+          <stop offset="50%" stop-color="#ef4444" stop-opacity="0.6"/>
+          <stop offset="75%" stop-color="#f59e0b" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#c4955a" stop-opacity="0.8"/>
+        </linearGradient>
+        <!-- Glow filter -->
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="centerGlow">
+          <feGaussianBlur stdDeviation="12" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <!-- Arrow marker -->
+        <marker id="arrowBrown" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#c4955a" opacity="0.8"/>
+        </marker>
+        <marker id="arrowGlow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#f59e0b"/>
+        </marker>
+      </defs>
+
+      <!-- Outer glow ring (static) -->
+      <circle cx="350" cy="350" r="265" fill="none" stroke="rgba(139,94,60,0.08)" stroke-width="60"/>
+
+      <!-- Dashed orbit (rotates) -->
+      <circle cx="350" cy="350" r="235" fill="none"
+        stroke="rgba(139,94,60,0.15)" stroke-width="1.5"
+        stroke-dasharray="12 8"
+        style="transform-origin: 350px 350px; animation: orbitSpin 30s linear infinite;"/>
+
+      <!-- Main orbit ring -->
+      <circle cx="350" cy="350" r="235" fill="none"
+        stroke="url(#ringGrad)" stroke-width="2.5" opacity="0.7"
+        filter="url(#glow)"
+        style="transform-origin: 350px 350px; animation: orbitSpin 15s linear infinite;"/>
+
+      <!-- Inner track -->
+      <circle cx="350" cy="350" r="110" fill="none"
+        stroke="rgba(139,94,60,0.12)" stroke-width="1"/>
+
+      <!-- Hidden path for motion — full ring clockwise -->
+      <path id="orbitPath" d="M 350,115 A 235 235 0 1 1 349.99,115" fill="none" stroke="none"/>
+
+      <!-- Traveling glow dot -->
+      <circle r="7" fill="#f59e0b" filter="url(#glow)" opacity="0.95">
+        <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
+          <mpath href="#orbitPath"/>
+        </animateMotion>
+        <animate attributeName="r" values="6;9;6" dur="1s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.9;1;0.9" dur="1s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Second trailing dot (slightly behind, dimmer) -->
+      <circle r="4" fill="#c4955a" filter="url(#glow)" opacity="0.5">
+        <animateMotion dur="6s" begin="-0.4s" repeatCount="indefinite" rotate="auto">
+          <mpath href="#orbitPath"/>
+        </animateMotion>
+      </circle>
+
+      <!-- Third trailing dot (further behind, faintest) -->
+      <circle r="2.5" fill="#c4955a" opacity="0.3">
+        <animateMotion dur="6s" begin="-0.8s" repeatCount="indefinite" rotate="auto">
+          <mpath href="#orbitPath"/>
+        </animateMotion>
+      </circle>
+
+      <!-- Node connector dots on ring -->
+      <g filter="url(#glow)">
+        <circle cx="350" cy="115" r="5" fill="#c4955a" opacity="0.9"/>
+        <circle cx="554" cy="232" r="5" fill="#a78bfa" opacity="0.9"/>
+        <circle cx="554" cy="468" r="5" fill="#ef4444" opacity="0.9"/>
+        <circle cx="350" cy="585" r="5" fill="#f59e0b" opacity="0.9"/>
+        <circle cx="146" cy="468" r="5" fill="#4ade80" opacity="0.9"/>
+        <circle cx="146" cy="232" r="5" fill="#fbbf24" opacity="0.9"/>
+      </g>
+
+      <!-- Center glow pulse -->
+      <circle cx="350" cy="350" r="85" fill="rgba(139,94,60,0.05)"
+        style="animation: centerPulse 2.5s ease-in-out infinite;"/>
+    </svg>
+
+    <!-- Center hub (HTML over SVG) -->
+    <div class="fw-center">
+      <div class="fw-center-icon">🔄</div>
+      <h4>Bullhorn</h4>
+      <p>System of Record</p>
+    </div>
+
+    <!-- 6 nodes — positioned by JS -->
+    <div class="fw-node" id="fw0">
+      <div class="fw-node-circle">📥</div>
+      <h5>Candidate Applies</h5>
+      <p>Careers page, LinkedIn, referral</p>
+    </div>
+    <div class="fw-node" id="fw1">
+      <div class="fw-node-circle">🧠</div>
+      <h5>AI Scores & Matches</h5>
+      <p>Ranked against all open jobs instantly</p>
+    </div>
+    <div class="fw-node" id="fw2">
+      <div class="fw-node-circle">🚫</div>
+      <h5>Not Placed Today</h5>
+      <p>Auto-added to talent pool — never lost</p>
+    </div>
+    <div class="fw-node" id="fw3">
+      <div class="fw-node-circle">📧</div>
+      <h5>Auto-Nurture</h5>
+      <p>AI emails: Day 3, 7, 14, monthly alerts</p>
+    </div>
+    <div class="fw-node" id="fw4">
+      <div class="fw-node-circle">🔄</div>
+      <h5>New Job Opens</h5>
+      <p>AI re-matches entire talent pool to role</p>
+    </div>
+    <div class="fw-node" id="fw5">
+      <div class="fw-node-circle">🔥</div>
+      <h5>Warm Leads Ready</h5>
+      <p>Pre-engaged, pre-qualified — zero cold start</p>
+    </div>
+  </div>
+
+  <div class="flywheel-result">
+    <h4>Result: Compound Growth in Recruiting Capacity</h4>
+    <p>Every candidate who enters your system stays warm forever. Each new role pulls from a growing, pre-nurtured talent pool instead of starting from scratch. The longer this runs, the faster you fill roles and the less you spend on sourcing.</p>
+  </div>
+</div>
+
+<!-- FULL ARCHITECTURE -->
+<div class="arch-section">
+  <div class="section-title">Full System Architecture</div>
+  <div class="section-subtitle">Four layers — all connected by n8n + Bullhorn REST API</div>
+  <div class="arch-layers">
+    <div class="arch-layer">
+      <div class="layer-label ingest"><h3>Layer 1: Ingest</h3><p>Auto-feed Bullhorn</p></div>
+      <div class="layer-items">
+        <div class="layer-item ingest"><strong>Careers Page</strong>Application → n8n → Bullhorn Candidate</div>
+        <div class="layer-item ingest"><strong>Resume Email</strong>Inbox parse → n8n → Bullhorn profile</div>
+        <div class="layer-item ingest"><strong>ZoomInfo</strong>Enrichment → n8n → ClientContacts</div>
+        <div class="layer-item ingest"><strong>LinkedIn RSC</strong>Manual sync → Bullhorn (native)</div>
+        <div class="layer-item ingest"><strong>AI Sourcing Agent</strong>Auto-scrape → scored candidates</div>
+      </div>
+    </div>
+    <div class="arrow-down">↓</div>
+    <div class="arch-layer">
+      <div class="layer-label intelligence"><h3>Layer 2: Intelligence</h3><p>AI processing layer</p></div>
+      <div class="layer-items">
+        <div class="layer-item intelligence"><strong>Resume Scoring</strong>Candidate ↔ JobOrder fit analysis</div>
+        <div class="layer-item intelligence"><strong>Auto-Shortlist</strong>Score &gt; 80% → recruiter alert</div>
+        <div class="layer-item intelligence"><strong>Dedup Detection</strong>Name + email + phone fuzzy match</div>
+        <div class="layer-item intelligence"><strong>Talent Pool Sort</strong>Score &lt; 50% → nurture queue</div>
+      </div>
+    </div>
+    <div class="arrow-down">↓</div>
+    <div class="arch-layer">
+      <div class="layer-label outreach"><h3>Layer 3: Outreach</h3><p>Automated comms</p></div>
+      <div class="layer-items">
+        <div class="layer-item outreach"><strong>Email Sequences</strong>Day 1, 3, 7 — AI personalized</div>
+        <div class="layer-item outreach"><strong>SMS Reminders</strong>Interview confirmations</div>
+        <div class="layer-item outreach"><strong>Smart Scheduling</strong>Calendar sync + auto-book</div>
+        <div class="layer-item outreach"><strong>AI Voice Calls</strong>Pre-screen + voicemail drops</div>
+      </div>
+    </div>
+    <div class="arrow-down">↓</div>
+    <div class="arch-layer">
+      <div class="layer-label reporting"><h3>Layer 4: Reporting</h3><p>Autopilot insights</p></div>
+      <div class="layer-items">
+        <div class="layer-item reporting"><strong>Client Reports</strong>Weekly PDF per client — auto-sent</div>
+        <div class="layer-item reporting"><strong>Recruiter Dashboard</strong>Activity + pipeline metrics</div>
+        <div class="layer-item reporting"><strong>Time-to-Fill</strong>Per job, per recruiter tracking</div>
+        <div class="layer-item reporting"><strong>Flywheel Health</strong>Talent pool growth + engagement</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IMPACT -->
+<div class="impact-section">
+  <div class="impact-grid">
+    <div class="impact-card">
+      <div class="impact-number">32+</div>
+      <div class="impact-label">Hours/week of recruiter work automated</div>
+    </div>
+    <div class="impact-card">
+      <div class="impact-number">95%</div>
+      <div class="impact-label">Reduction in manual data entry</div>
+    </div>
+    <div class="impact-card">
+      <div class="impact-number">∞</div>
+      <div class="impact-label">Candidate relationships kept warm forever</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- main-content -->
+
+<!-- FOOTER -->
+<div class="footer-bar">
+  <div class="footer-left"><strong>Confidential</strong> — Prepared for Francison Consulting, March 2026</div>
+  <div class="footer-right">
+    <div class="footer-mau-logo">M</div>
+    <div class="footer-mau-text">Prepared by <strong>Mau Studio</strong></div>
+  </div>
+</div>
+
+</div><!-- content -->
+
+<style>
+  @keyframes orbitSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes centerPulse {
+    0%, 100% { r: 85; opacity: 0.05; }
+    50% { r: 100; opacity: 0.12; }
+  }
+</style>
+
+<script>
+  // Position 6 nodes perfectly around the circle using trigonometry
+  document.addEventListener('DOMContentLoaded', function() {
+    const wrapper = document.getElementById('flywheelWrapper');
+    const wrapperSize = 700;
+    const cx = wrapperSize / 2; // 350
+    const cy = wrapperSize / 2; // 350
+    const radius = 235; // Match SVG ring radius
+    const nodeCount = 6;
+
+    for (let i = 0; i < nodeCount; i++) {
+      const node = document.getElementById('fw' + i);
+      if (!node) continue;
+
+      // Start at top (-90°), distribute evenly
+      const angleDeg = (i * 360 / nodeCount) - 90;
+      const angleRad = angleDeg * Math.PI / 180;
+
+      const x = cx + radius * Math.cos(angleRad);
+      const y = cy + radius * Math.sin(angleRad);
+
+      node.style.left = x + 'px';
+      node.style.top = y + 'px';
+    }
+  });
+</script>
+
+</body>
+</html>
