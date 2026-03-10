@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mau Studio — Client Demos (Private)</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --card: #12121a;
+    --border: rgba(255,255,255,0.06);
+    --white: #f0eef5;
+    --muted: #6b6880;
+    --purple: #7c3aed;
+    --gold: #d4a853;
+    --blue: #3b82f6;
+    --aqua: #00b8d4;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg); color: var(--white);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 40px 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 99px; font-size: 10px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px;
+    background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2);
+  }
+  .logo { font-size: 12px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; text-align: center; color: var(--white); }
+  .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 40px; text-align: center; max-width: 420px; line-height: 1.6; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; max-width: 960px; width: 100%; }
+  .demo-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit; position: relative; overflow: hidden; }
+  .demo-card:hover { border-color: rgba(255,255,255,0.12); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .demo-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .demo-card.purple::before { background: linear-gradient(90deg, var(--purple), var(--gold)); }
+  .demo-card.blue::before { background: linear-gradient(90deg, var(--blue), #60a5fa); }
+  .demo-card.aqua::before { background: linear-gradient(90deg, var(--aqua), #0066cc); }
+  .card-icon { font-size: 28px; margin-bottom: 12px; }
+  .card-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .card-client { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .card-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .card-tags { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .tag { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); }
+  .pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 700; position: absolute; top: 14px; right: 14px; background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
+  .footer { margin-top: 48px; font-size: 11px; color: var(--muted); text-align: center; }
+  .footer a { color: var(--purple); text-decoration: none; }
+  .back { font-size: 12px; color: var(--muted); text-decoration: none; margin-bottom: 24px; }
+  .back:hover { color: var(--white); }
+</style>
+</head>
+<body>
+
+<a href="/" class="back">← Back to Public Demos</a>
+<div class="badge">🔒 Internal Only — Do Not Share</div>
+<div class="logo">Mau Studio</div>
+<h1>Client Demo Gallery</h1>
+<p class="subtitle">Real client demos with actual brand data. For internal use and direct client presentations only.</p>
+
+<div class="grid">
+  <a href="/wilde/" class="demo-card purple">
+    <span class="pill">CLIENT</span>
+    <div class="card-icon">🎤</div>
+    <div class="card-client">Sales & Events Coach</div>
+    <div class="card-title">Wilde OS — Trinity</div>
+    <div class="card-desc">Event scripting co-pilot, document intelligence hub, DM triage, email zero inbox, and Skool auto-onboarding.</div>
+    <div class="card-tags">
+      <span class="tag">Event Ops</span>
+      <span class="tag">Document AI</span>
+      <span class="tag">Social Triage</span>
+    </div>
+  </a>
+
+  <a href="/plaid/" class="demo-card blue">
+    <span class="pill">CLIENT</span>
+    <div class="card-icon">📊</div>
+    <div class="card-client">Marketing Analytics</div>
+    <div class="card-title">Plaid Testing Intelligence</div>
+    <div class="card-desc">Multi-channel marketing dashboard with Google, Pinterest, TikTok, and Shopify data. Predictive analytics and automated client reporting.</div>
+    <div class="card-tags">
+      <span class="tag">Dashboards</span>
+      <span class="tag">Multi-Channel</span>
+      <span class="tag">Predictive</span>
+    </div>
+  </a>
+
+  <a href="/aquala/" class="demo-card aqua">
+    <span class="pill">CLIENT</span>
+    <div class="card-icon">🌊</div>
+    <div class="card-client">Premium Water Filtration</div>
+    <div class="card-title">AQUALA Intelligence</div>
+    <div class="card-desc">AI marketing system with competitive tracking, campaign optimization, and automated content strategy.</div>
+    <div class="card-tags">
+      <span class="tag">Marketing AI</span>
+      <span class="tag">Competitor Intel</span>
+      <span class="tag">Content Strategy</span>
+    </div>
+  </a>
+
+  <a href="/ja-pipeline/" class="demo-card purple">
+    <span class="pill">CLIENT</span>
+    <div class="card-icon">🏗️</div>
+    <div class="card-client">Construction Services</div>
+    <div class="card-title">JA Permit Pipeline</div>
+    <div class="card-desc">Permit intelligence pipeline with automated lead scoring, outbound voice agent, and CRM enrichment for Florida contractors.</div>
+    <div class="card-tags">
+      <span class="tag">Lead Scoring</span>
+      <span class="tag">Voice Agent</span>
+      <span class="tag">Permit Intel</span>
+    </div>
+  </a>
+</div>
+
+<div class="footer">
+  Internal use only · <a href="https://maupan.com" target="_blank">Mau Studio</a>
+</div>
+
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mau Studio — Live Demo Gallery</title>
+<title>Mau Studio — AI Operating System Demos</title>
 <style>
   :root {
     --bg: #0a0a0f;
@@ -36,7 +36,7 @@
   }
   .subtitle {
     font-size: 14px; color: var(--muted); margin-bottom: 40px; text-align: center;
-    max-width: 420px; line-height: 1.6;
+    max-width: 480px; line-height: 1.6;
   }
   .grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -59,9 +59,10 @@
   .demo-card.purple::before { background: linear-gradient(90deg, var(--purple), var(--gold)); }
   .demo-card.blue::before { background: linear-gradient(90deg, var(--blue), #60a5fa); }
   .demo-card.aqua::before { background: linear-gradient(90deg, var(--aqua), #0066cc); }
+  .demo-card.green::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
   .card-icon { font-size: 28px; margin-bottom: 12px; }
   .card-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-  .card-client { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .card-industry { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
   .card-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
   .card-tags { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
   .tag {
@@ -79,116 +80,83 @@
     display: inline-flex; align-items: center; gap: 5px;
     padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 700;
     position: absolute; top: 14px; right: 14px;
+    background: rgba(124,58,237,0.1); color: #a78bfa; border: 1px solid rgba(124,58,237,0.2);
   }
-  .pill-live { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
-  .pill-demo { background: rgba(124,58,237,0.1); color: #a78bfa; border: 1px solid rgba(124,58,237,0.2); }
+  .cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 40px; padding: 12px 28px; border-radius: 8px;
+    background: var(--purple); color: white; text-decoration: none;
+    font-size: 14px; font-weight: 700; letter-spacing: 0.02em;
+    transition: all 0.2s;
+  }
+  .cta:hover { background: #6d28d9; transform: translateY(-1px); }
 </style>
 </head>
 <body>
 
 <div class="logo">Mau Studio</div>
-<h1>Live Demo Gallery</h1>
-<p class="subtitle">Custom AI command centers built for real businesses. Each system is tailored to the client's workflow, data, and goals.</p>
-
-<div class="grid">
-  <a href="/wilde/" class="demo-card purple">
-    <span class="pill pill-demo">DEMO</span>
-    <div class="card-icon">🎤</div>
-    <div class="card-client">Sales & Events Coach</div>
-    <div class="card-title">Wilde OS — Trinity</div>
-    <div class="card-desc">Event scripting co-pilot, document intelligence hub, DM triage, email zero inbox, and Skool auto-onboarding for a 9-figure sales coach.</div>
-    <div class="card-tags">
-      <span class="tag">Event Ops</span>
-      <span class="tag">Document AI</span>
-      <span class="tag">Social Triage</span>
-      <span class="tag">Email Automation</span>
-    </div>
-  </a>
-
-  <a href="/plaid/" class="demo-card blue">
-    <span class="pill pill-demo">DEMO</span>
-    <div class="card-icon">📊</div>
-    <div class="card-client">Marketing Analytics</div>
-    <div class="card-title">Plaid Testing Intelligence</div>
-    <div class="card-desc">Multi-channel marketing dashboard with Google, Pinterest, TikTok, and Shopify data. Predictive analytics and automated client reporting.</div>
-    <div class="card-tags">
-      <span class="tag">Dashboards</span>
-      <span class="tag">Multi-Channel</span>
-      <span class="tag">Predictive</span>
-      <span class="tag">Client Reports</span>
-    </div>
-  </a>
-
-  <a href="/aquala/" class="demo-card aqua">
-    <span class="pill pill-demo">DEMO</span>
-    <div class="card-icon">🌊</div>
-    <div class="card-client">Wellness Brand</div>
-    <div class="card-title">AQUALA Intelligence</div>
-    <div class="card-desc">AI marketing system with competitive tracking, campaign optimization, and automated content strategy for a premium wellness brand.</div>
-    <div class="card-tags">
-      <span class="tag">Marketing AI</span>
-      <span class="tag">Competitor Intel</span>
-      <span class="tag">Content Strategy</span>
-    </div>
-  </a>
-</div>
-
-<h2 style="font-size:22px;font-weight:700;margin-top:56px;margin-bottom:6px;text-align:center;color:var(--white)">Generic OS Templates</h2>
-<p class="subtitle" style="margin-bottom:24px">Industry-specific AI operating systems — anonymized showcases of what we build.</p>
+<h1>AI Operating System Demos</h1>
+<p class="subtitle">Interactive demos of custom AI systems we build for businesses. Each one automates a different workflow — from lead gen to recruiting to e-commerce ops.</p>
 
 <div class="grid">
   <a href="/lead-gen-os/" class="demo-card purple">
-    <span class="pill pill-demo">TEMPLATE</span>
+    <span class="pill">INTERACTIVE</span>
     <div class="card-icon">🏗️</div>
-    <div class="card-client">Construction / Services</div>
+    <div class="card-industry">Construction / Services</div>
     <div class="card-title">Lead Gen OS</div>
     <div class="card-desc">Permit intelligence pipeline with automated lead scoring, outbound voice agent, and CRM enrichment. Built for contractor-heavy industries.</div>
     <div class="card-tags">
       <span class="tag">Lead Scoring</span>
       <span class="tag">Voice Agent</span>
       <span class="tag">Permit Intel</span>
+      <span class="tag">CRM</span>
     </div>
   </a>
 
   <a href="/agency-os/" class="demo-card blue">
-    <span class="pill pill-demo">TEMPLATE</span>
+    <span class="pill">INTERACTIVE</span>
     <div class="card-icon">📊</div>
-    <div class="card-client">Marketing Agency</div>
+    <div class="card-industry">Marketing Agency</div>
     <div class="card-title">Agency OS</div>
     <div class="card-desc">Multi-channel analytics dashboard with automated client reporting, predictive insights, and campaign health scoring.</div>
     <div class="card-tags">
       <span class="tag">Dashboards</span>
       <span class="tag">Client Reports</span>
       <span class="tag">Multi-Channel</span>
+      <span class="tag">Predictive</span>
     </div>
   </a>
 
   <a href="/ecommerce-os/" class="demo-card aqua">
-    <span class="pill pill-demo">TEMPLATE</span>
+    <span class="pill">INTERACTIVE</span>
     <div class="card-icon">🛒</div>
-    <div class="card-client">E-Commerce Brand</div>
+    <div class="card-industry">E-Commerce Brand</div>
     <div class="card-title">E-Commerce OS</div>
     <div class="card-desc">AI marketing system with competitive tracking, campaign optimization, inventory intelligence, and automated content strategy.</div>
     <div class="card-tags">
       <span class="tag">Marketing AI</span>
       <span class="tag">Competitor Intel</span>
       <span class="tag">Inventory</span>
+      <span class="tag">Content</span>
     </div>
   </a>
 
-  <a href="/recruiting-os/" class="demo-card purple">
-    <span class="pill pill-demo">TEMPLATE</span>
+  <a href="/recruiting-os/" class="demo-card green">
+    <span class="pill">INTERACTIVE</span>
     <div class="card-icon">🎯</div>
-    <div class="card-client">Staffing & Recruiting</div>
+    <div class="card-industry">Staffing & Recruiting</div>
     <div class="card-title">Recruiting OS</div>
-    <div class="card-desc">Automated talent pipeline with job board integration, resume parsing, candidate scoring, and recruiter workflow automation.</div>
+    <div class="card-desc">Automated talent pipeline with ATS integration, resume parsing, candidate scoring, and recruiter workflow automation.</div>
     <div class="card-tags">
       <span class="tag">ATS Integration</span>
       <span class="tag">Resume AI</span>
       <span class="tag">Pipeline</span>
+      <span class="tag">Outreach</span>
     </div>
   </a>
 </div>
+
+<a href="https://maupan.com/blueprint" class="cta">Get Your AI Blueprint →</a>
 
 <div class="footer">
   Built by <a href="https://maupan.com" target="_blank">Mau Studio</a> · AI systems that run while you sleep
