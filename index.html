@@ -39,7 +39,7 @@
     max-width: 480px; line-height: 1.6;
   }
   .grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    display: grid; grid-template-columns: repeat(2, 1fr);
     gap: 16px; max-width: 960px; width: 100%;
   }
   .demo-card {
@@ -90,6 +90,14 @@
     transition: all 0.2s;
   }
   .cta:hover { background: #6d28d9; transform: translateY(-1px); }
+  @media (max-width: 480px) {
+    .grid { gap: 10px; }
+    .demo-card { padding: 16px 14px; }
+    .card-icon { font-size: 22px; margin-bottom: 8px; }
+    .card-title { font-size: 13px; }
+    .card-desc { display: none; }
+    .pill { font-size: 8px; padding: 2px 7px; top: 10px; right: 10px; }
+  }
 </style>
 </head>
 <body>
@@ -101,10 +109,10 @@
 <div class="grid">
   <a href="/lead-gen-os/" class="demo-card purple">
     <span class="pill">INTERACTIVE</span>
-    <div class="card-icon">🏗️</div>
-    <div class="card-industry">Construction / Services</div>
+    <div class="card-icon">📡</div>
+    <div class="card-industry">Lead Generation</div>
     <div class="card-title">Lead Gen OS</div>
-    <div class="card-desc">Permit intelligence pipeline with automated lead scoring, outbound voice agent, and CRM enrichment. Built for contractor-heavy industries.</div>
+    <div class="card-desc">Automated lead intelligence pipeline with scoring, outbound voice agent, and CRM enrichment. Turns raw signals into booked calls.</div>
     <div class="card-tags">
       <span class="tag">Lead Scoring</span>
       <span class="tag">Voice Agent</span>
